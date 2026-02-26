@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.threektechone.resorthub.enums.BookingStatus;
 
 import jakarta.persistence.Column;
@@ -46,7 +48,8 @@ public class Booking {
 
     @Column(name="status", nullable = false, length = 20)
     private BookingStatus status = BookingStatus.PENDING;
-
+    
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

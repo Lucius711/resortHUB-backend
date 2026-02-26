@@ -1,6 +1,8 @@
 package com.threektechone.resorthub.models;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,7 +32,8 @@ public class RefreshToken {
 
     @Column(name = "is_revoked", nullable = true)
     private boolean isRevoked = false;
-
+    
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

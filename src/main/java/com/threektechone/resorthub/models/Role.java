@@ -32,9 +32,8 @@ public class Role {
     public Role() {
     }
 
-    public Role(RoleName roleName, List<User> users) {
+    public Role(RoleName roleName) {
         this.roleName = roleName;
-        this.users = users;
     }
 
     public int getRoleId() {

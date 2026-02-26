@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.threektechone.resorthub.enums.ResortStatus;
 
 import jakarta.persistence.Column;
@@ -42,7 +44,8 @@ public class Resort {
 
     @Column(name = "status", nullable = false, length = 20)
     private ResortStatus status = ResortStatus.PENDING;
-
+    
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

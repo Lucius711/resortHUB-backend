@@ -3,6 +3,8 @@ package com.threektechone.resorthub.models;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.threektechone.resorthub.enums.PaymentStatus;
 
 import jakarta.persistence.Column;
@@ -38,7 +40,8 @@ public class Payment {
 
     @Column(name = "transaction_code", nullable = true, length = 100, unique = true)
     private String transactionCode;
-
+    
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

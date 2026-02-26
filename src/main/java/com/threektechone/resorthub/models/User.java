@@ -1,7 +1,10 @@
 package com.threektechone.resorthub.models;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import com.threektechone.resorthub.enums.UserStatus;
 
@@ -30,11 +33,20 @@ public class User {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(name = "gender", nullable = false)
+    private boolean gender;
+
+    @Column(name ="dob", nullable = false)
+    private LocalDate dob;
+
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 
     @Column(name = "phone", nullable = false, length = 20,unique = true)
     private String phone;
+
+    @Column(name="city", length = 50,nullable = false)
+    private String city;
 
     @Column(name="status", nullable = false, length = 20)
     private UserStatus status = UserStatus.ACTIVE;
@@ -42,7 +54,8 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
-
+    
+    @CreationTimestamp
     @Column(name = "created_at",nullable = false)
     private LocalDateTime createdAt;
 
@@ -68,19 +81,21 @@ public class User {
     private List<ChatMessage> receivedMessages;
 
     @OneToMany(mappedBy = "user")
-    private List<OTP> otps;
-
-    @OneToMany(mappedBy = "user")
     private List<RefreshToken> refreshTokens;
+
+    
 
     public User() {
     }
 
-    public User(String fullName, String email, String password, String phone, UserStatus status, Role role, LocalDateTime createdAt, List<Resort> resorts, List<Booking> bookings, List<LostFoundItem> lostFoundItems, List<Contract> ASideContracts, List<Contract> BSideContracts, List<ChatMessage> sentMessages, List<ChatMessage> receivedMessages, List<OTP> otps, List<RefreshToken> refreshTokens) {
+    public User(String fullName, String email, String password, String phone, boolean gender, LocalDate dob, String city, UserStatus status, Role role, LocalDateTime createdAt, List<Resort> resorts, List<Booking> bookings, List<LostFoundItem> lostFoundItems, List<Contract> ASideContracts, List<Contract> BSideContracts, List<ChatMessage> sentMessages, List<ChatMessage> receivedMessages, List<RefreshToken> refreshTokens) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.phone = phone;
+        this.gender = gender;
+        this.city = city;
+        this.dob = dob;
         this.status = status;
         this.role = role;
         this.createdAt = LocalDateTime.now();
@@ -91,7 +106,6 @@ public class User {
         this.BSideContracts = BSideContracts;
         this.sentMessages = sentMessages;
         this.receivedMessages = receivedMessages;
-        this.otps = otps;
         this.refreshTokens = refreshTokens;
     }
 
@@ -135,6 +149,30 @@ public class User {
         this.phone = phone;
     }
     
+    public boolean isGender() {
+        return gender;
+    }
+
+    public void setGender(boolean gender) {
+        this.gender = gender;
+    }
+
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    public void setDob(LocalDate dob) {
+        this.dob = dob;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     public UserStatus getStatus() {
         return status;
     }
@@ -214,13 +252,6 @@ public class User {
         this.receivedMessages = receivedMessages;
     }
 
-    public List<OTP> getOtps() {
-        return otps;
-    }
-
-    public void setOtps(List<OTP> otps) {
-        this.otps = otps;
-    }
     public List<RefreshToken> getRefreshTokens() {
         return refreshTokens;
     }
@@ -232,23 +263,26 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "user_id=" + user_id +
+                "user_id=" + user_id +'\'' +
                 ", fullName='" + fullName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", phone='" + phone + '\'' +
+                ", gender=" + gender + '\'' +
+                ", dob=" + dob + '\'' +
+                ", city='" + city + '\'' +
                 ", status='" + status + '\'' +
-                ", role=" + role +
-                ", createdAt=" + createdAt +
-                ", resorts=" + resorts +
-                ", bookings=" + bookings +
-                ", lostFoundItems=" + lostFoundItems +
-                ", ASideContracts=" + ASideContracts +
-                ", BSideContracts=" + BSideContracts +
-                ", sentMessages=" + sentMessages +
-                ", receivedMessages=" + receivedMessages +
-                ", otps=" + otps +
+                ", role=" + role + '\''+
+                ", createdAt=" + createdAt +'\''+
+                ", resorts=" + resorts +'\''+
+                ", bookings=" + bookings +'\''+
+                ", lostFoundItems=" + lostFoundItems +'\''+
+                ", ASideContracts=" + ASideContracts +'\''+
+                ", BSideContracts=" + BSideContracts +'\''+
+                ", sentMessages=" + sentMessages +'\''+
+                ", receivedMessages=" + receivedMessages +'\''+
                 ", refreshTokens=" + refreshTokens +
                 '}';
     }
+
 }

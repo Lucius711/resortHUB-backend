@@ -2,6 +2,8 @@ package com.threektechone.resorthub.models;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.threektechone.resorthub.enums.LostFoundItemStatus;
 
 import jakarta.persistence.Column;
@@ -34,7 +36,8 @@ public class LostFoundItem {
 
     @Column(name = "status", nullable = true, length = 20)
     private LostFoundItemStatus status;
-
+    
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

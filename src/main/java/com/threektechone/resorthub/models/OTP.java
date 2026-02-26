@@ -1,13 +1,14 @@
 package com.threektechone.resorthub.models;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -18,13 +19,31 @@ public class OTP {
     @Column(name = "otp_id")
     private int otpId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String password;
+    
+    @Column(nullable = false)
+    private String phone;
+
+    @Column(nullable = false)
+    private Boolean gender;
+
+    @Column(nullable = false)
+    private LocalDate dob;
+
+    @Column(nullable = false)
+    private String city;
     
     @Column(name = "otp_code", nullable = false, length = 10)
     private String otpCode;
-
+    
+    @CreationTimestamp
     @Column(name = "expired_at", nullable = false)
     private LocalDateTime expiredAt;
 
@@ -34,8 +53,14 @@ public class OTP {
     public OTP() {
     }
 
-    public OTP(User user, String otpCode, LocalDateTime expiredAt, boolean verified) {
-        this.user = user;
+    public OTP(String email, String name, String password, String phone, Boolean gender, LocalDate dob, String city, String otpCode, LocalDateTime expiredAt, boolean verified) {
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.phone = phone;
+        this.gender = gender;
+        this.dob = dob;
+        this.city = city;
         this.otpCode = otpCode;
         this.expiredAt = LocalDateTime.now().plusMinutes(5); // Set default expiry to 5 minutes from now
         this.verified = verified;
@@ -49,13 +74,60 @@ public class OTP {
         this.otpId = otpId;
     }
 
-    public User getUser() {
-        return user;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setEmail(String email) {
+        this.email = email;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Boolean isGender() {
+        return gender;
+    }
+
+    public void setGender(Boolean gender) {
+        this.gender = gender;
+    }   
+
+    public LocalDate getDob() {
+        return dob;
+    }   
+    public void setDob(LocalDate dob) {
+        this.dob = dob;
+    }
+    
+    public String getCity() {
+        return city;
+    }
+    public void setCity(String city) {
+        this.city = city;
+    }
+
 
     public String getOtpCode() {
         return otpCode;
@@ -85,7 +157,12 @@ public class OTP {
     public String toString() {
         return "OTP{" +
                 "otpId=" + otpId +
-                ", user=" + user +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                ", gender=" + gender +
+                ", dob=" + dob +
+                ", city='" + city + '\'' +
                 ", otpCode='" + otpCode + '\'' +
                 ", expiredAt=" + expiredAt +
                 ", verified=" + verified +
