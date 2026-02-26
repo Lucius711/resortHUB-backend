@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.threektechone.resorthub.dto.AuthModuleDTO.AuthRequestDTO;
 import com.threektechone.resorthub.dto.AuthModuleDTO.AuthResponseDTO;
 import com.threektechone.resorthub.enums.RoleName;
+import com.threektechone.resorthub.mapper.UserMapper;
 import com.threektechone.resorthub.models.Role;
 import com.threektechone.resorthub.models.User;
 import com.threektechone.resorthub.repositories.RoleRepository;
@@ -30,19 +31,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private UserMapper userMapper;
     
 
     //Register new user
     @Override
     public void register(AuthRequestDTO authRequestDTO) {
-       User user = new User();
-       user.setFullName(authRequestDTO.getName());
-       user.setEmail(authRequestDTO.getEmail());
-       user.setPhone(authRequestDTO.getPhone());
-       user.setGender(authRequestDTO.isGender());
-       user.setDob(authRequestDTO.getDob());
-       user.setCity(authRequestDTO.getCity());
-       user.setPassword(passwordEncoder.encode(authRequestDTO.getPassword()));
+       User user = userMapper.toUser(authRequestDTO);
        Role role = roleRepository.findByRoleName(RoleName.CUSTOMER)
        .orElseThrow(() -> new RuntimeException("Role not found: " + RoleName.CUSTOMER));
        
