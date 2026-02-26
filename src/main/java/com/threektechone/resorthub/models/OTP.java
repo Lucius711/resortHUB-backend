@@ -2,8 +2,6 @@ package com.threektechone.resorthub.models;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.CreationTimestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,31 +17,30 @@ public class OTP {
     @Column(name = "otp_id")
     private int otpId;
 
-    @Column(nullable = false)
+    @Column(name="email",nullable = false,length=100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "full_name", nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
     
-    @Column(nullable = false)
+    @Column(name = "phone", nullable = false, length = 20)
     private String phone;
 
-    @Column(nullable = false)
+    @Column(name = "gender", nullable = false)
     private Boolean gender;
 
-    @Column(nullable = false)
+    @Column(name ="dob", nullable = false)
     private LocalDate dob;
 
-    @Column(nullable = false)
+    @Column(name="city", length = 50,nullable = false)
     private String city;
     
     @Column(name = "otp_code", nullable = false, length = 10)
     private String otpCode;
     
-    @CreationTimestamp
     @Column(name = "expired_at", nullable = false)
     private LocalDateTime expiredAt;
 
