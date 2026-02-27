@@ -50,7 +50,7 @@ public class OTP {
     public OTP() {
     }
 
-    public OTP(String email, String name, String password, String phone, Boolean gender, LocalDate dob, String city, String otpCode, LocalDateTime expiredAt, boolean verified) {
+    public OTP(String email, String name, String password, String phone, Boolean gender, LocalDate dob, String city, String otpCode) {
         this.email = email;
         this.name = name;
         this.password = password;
@@ -60,7 +60,7 @@ public class OTP {
         this.city = city;
         this.otpCode = otpCode;
         this.expiredAt = LocalDateTime.now().plusMinutes(5); // Set default expiry to 5 minutes from now
-        this.verified = verified;
+        this.verified = false;
     }
 
     public int getOtpId() {

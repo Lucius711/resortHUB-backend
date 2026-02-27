@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.threektechone.resorthub.enums.UserStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -80,7 +81,7 @@ public class User {
     @OneToMany(mappedBy = "receiver")
     private List<ChatMessage> receivedMessages;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
 
     

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.threektechone.resorthub.dto.AuthModuleDTO.AuthRequestDTO;
 import com.threektechone.resorthub.dto.AuthModuleDTO.AuthResponseDTO;
+import com.threektechone.resorthub.dto.AuthModuleDTO.RefreshTokenRequestDTO;
+import com.threektechone.resorthub.dto.AuthModuleDTO.VerifyOTPRequestDTO;
 import com.threektechone.resorthub.service.AuthModule.AuthService;
 
 @RestController
@@ -28,5 +30,24 @@ public class AuthController {
         AuthResponseDTO authResponseDTO = authService.login(authRequestDTO);
         return ResponseEntity.ok(authResponseDTO);
     }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<String> verifyOtp(@RequestBody VerifyOTPRequestDTO request) {
+        authService.verifyOTP(request);
+        return ResponseEntity.ok("Verify OTP successful. Account created!");
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponseDTO> refreshToken(@RequestBody RefreshTokenRequestDTO request) {
+        return ResponseEntity.ok(authService.refreshToken(request));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody RefreshTokenRequestDTO request) {
+        authService.logout(request);
+        return ResponseEntity.ok("Logout successfully");
+    }
+    
+    
 
 }
