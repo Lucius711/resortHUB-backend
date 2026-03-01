@@ -17,6 +17,8 @@ public class MailServiceImpl implements MailService {
         this.mailSender = mailSender;
     }
     
+
+    //send otp to email
     @Override
     public void sendOtpEmail(String toEmail, String otpCode) {
         try {

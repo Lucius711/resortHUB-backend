@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.threektechone.resorthub.config.properties.JwtProperties;
+import com.threektechone.resorthub.config.security.UserDetails.UserDetailsServiceImpl;
 import com.threektechone.resorthub.dto.AuthModuleDTO.AuthRequestDTO;
 import com.threektechone.resorthub.dto.AuthModuleDTO.AuthResponseDTO;
 import com.threektechone.resorthub.dto.AuthModuleDTO.RefreshTokenRequestDTO;
@@ -56,6 +57,11 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
+    @Autowired
+    private UserDetailsServiceImpl userDetailService;
+    
+
+    //generate OTP 
     private String generateOtp() {
         return String.valueOf((int)(Math.random() * 900000) + 100000);
     }
@@ -142,12 +148,7 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid password");
         }
 
-        UserDetails userDetails = org.springframework.security.core.userdetails.User
-                .builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .roles(user.getRole().getRoleName().name())
-                .build();
+        UserDetails userDetails = userDetailService.loadUserByUsername(user.getEmail());
         
         String accesstoken = jwtService.generateAccessToken(userDetails);
         String refreshtokenStr = jwtService.generateRefreshToken(userDetails);
@@ -186,12 +187,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new RuntimeException("User not found"));
 
-        UserDetails userDetails = org.springframework.security.core.userdetails.User
-            .builder()
-            .username(user.getEmail())
-            .password(user.getPassword())
-            .roles(user.getRole().getRoleName().name())
-            .build();
+        UserDetails userDetails = userDetailService.loadUserByUsername(user.getEmail());
 
         if (!jwtService.isTokenValid(token, userDetails)) {
             throw new RuntimeException("Refresh token expired");

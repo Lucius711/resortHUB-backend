@@ -35,7 +35,7 @@ public class User {
     private String email;
 
     @Column(name = "gender", nullable = false)
-    private boolean gender;
+    private Boolean gender;
 
     @Column(name ="dob", nullable = false)
     private LocalDate dob;
@@ -89,7 +89,7 @@ public class User {
     public User() {
     }
 
-    public User(String fullName, String email, String password, String phone, boolean gender, LocalDate dob, String city, UserStatus status, Role role, LocalDateTime createdAt, List<Resort> resorts, List<Booking> bookings, List<LostFoundItem> lostFoundItems, List<Contract> ASideContracts, List<Contract> BSideContracts, List<ChatMessage> sentMessages, List<ChatMessage> receivedMessages, List<RefreshToken> refreshTokens) {
+    public User(String fullName, String email, String password, String phone, Boolean gender, LocalDate dob, String city, UserStatus status, Role role, LocalDateTime createdAt, List<Resort> resorts, List<Booking> bookings, List<LostFoundItem> lostFoundItems, List<Contract> ASideContracts, List<Contract> BSideContracts, List<ChatMessage> sentMessages, List<ChatMessage> receivedMessages, List<RefreshToken> refreshTokens) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
@@ -150,11 +150,11 @@ public class User {
         this.phone = phone;
     }
     
-    public boolean isGender() {
+    public Boolean isGender() {
         return gender;
     }
 
-    public void setGender(boolean gender) {
+    public void setGender(Boolean gender) {
         this.gender = gender;
     }
 
