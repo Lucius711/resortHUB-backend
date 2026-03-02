@@ -35,6 +35,7 @@ By integrating booking management, payment processing, contract handling, and co
 3. Run application
 
 ## Project Structure
+---
 RESORTHUB-backend/
 │
 ├── src/
@@ -62,7 +63,7 @@ RESORTHUB-backend/
 ├── docs/                        # API & system documentation
 ├── pom.xml                      # Maven configuration
 └── README.md
-
+---
 ## API Overview
 ---
 
