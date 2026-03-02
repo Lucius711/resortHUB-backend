@@ -35,7 +35,7 @@ By integrating booking management, payment processing, contract handling, and co
 3. Run application
 
 ## Project Structure
----
+---text
 RESORTHUB-backend/
 │
 ├── src/
