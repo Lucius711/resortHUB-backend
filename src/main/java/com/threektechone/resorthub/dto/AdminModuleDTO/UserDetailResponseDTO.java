@@ -1,51 +1,44 @@
 package com.threektechone.resorthub.dto.AdminModuleDTO;
+
 import java.time.LocalDate;
 
 import com.threektechone.resorthub.enums.RoleName;
 import com.threektechone.resorthub.enums.UserStatus;
 
-public class UserListResponseDTO {
-    
-    private int userId;
+public class UserDetailResponseDTO {
+    private int userid;
     private String fullName;
     private String email;
     private Boolean gender;
     private LocalDate dob;
     private String phone;
     private String city;
-    private RoleName roleName;
     private UserStatus status;
-
-    public UserListResponseDTO(){}
-
-    /**
-     * Parameterized constructor for creating a UserListResponseDTO with user details.
-     * 
-     * @param fullName the full name of the user
-     * @param email the email address of the user
-     * @param gender the gender of the user
-     * @param dob the date of birth of the user
-     * @param phone the phone number of the user
-     * @param city the city of the user
-     * @param roleName the role name assigned to the user
-     */
-    public UserListResponseDTO(String fullName, String email, Boolean gender, LocalDate dob, String phone, String city, RoleName roleName,UserStatus status) {
-       this.fullName = fullName;
-       this.email = email;
-       this.gender = gender;
-       this.dob = dob;
-       this.phone = phone;
-       this.city = city;
-       this.roleName= roleName;
-       this.status= status;
-    }
+    private RoleName roleName;
     
-    public int getUserId() {
-        return userId;
+    public UserDetailResponseDTO(){}
+
+
+    public UserDetailResponseDTO(int userid, String fullName, String email, Boolean gender,
+                                LocalDate dob, String phone, String city,
+                                UserStatus status, RoleName roleName) {
+        this.userid = userid;
+        this.fullName = fullName;
+        this.email = email;
+        this.gender = gender;
+        this.dob = dob;
+        this.phone = phone;
+        this.city = city;
+        this.status = status;
+        this.roleName = roleName;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public int getUserid() {
+        return userid;
+    }
+
+    public void setUserid(int userid) {
+        this.userid = userid;
     }
 
     public String getFullName() {
@@ -64,7 +57,7 @@ public class UserListResponseDTO {
         this.email = email;
     }
 
-    public Boolean isGender() {
+    public Boolean getGender() {
         return gender;
     }
 
@@ -96,14 +89,6 @@ public class UserListResponseDTO {
         this.city = city;
     }
 
-    public RoleName getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(RoleName roleName) {
-        this.roleName = roleName;
-    }
-
     public UserStatus getStatus() {
         return status;
     }
@@ -111,6 +96,13 @@ public class UserListResponseDTO {
     public void setStatus(UserStatus status) {
         this.status = status;
     }
-    
+
+    public RoleName getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(RoleName roleName) {
+        this.roleName = roleName;
+    }
     
 }

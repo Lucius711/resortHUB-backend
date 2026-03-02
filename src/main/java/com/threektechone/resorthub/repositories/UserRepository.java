@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.threektechone.resorthub.enums.RoleName;
+import com.threektechone.resorthub.enums.UserStatus;
 import com.threektechone.resorthub.models.User;
 
 @Repository
@@ -25,11 +26,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
          OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')))
     AND (:gender IS NULL OR u.gender = :gender)
     AND (:roleName IS NULL OR r.roleName = :roleName)
+    AND (:status IS NULL OR u.status = :status)
     """)
     Page<User> getUserListWithSearchAndFilterAndPagination(
         @Param("search") String search,
         @Param("gender") Boolean gender,
         @Param("roleName") RoleName roleName,
+        @Param("status") UserStatus status,
         Pageable pageable
     );
 }

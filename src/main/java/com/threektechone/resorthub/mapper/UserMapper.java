@@ -1,6 +1,7 @@
 package com.threektechone.resorthub.mapper;
 import org.springframework.stereotype.Component;
 
+import com.threektechone.resorthub.dto.AdminModuleDTO.UserDetailResponseDTO;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UserListResponseDTO;
 import com.threektechone.resorthub.dto.AuthModuleDTO.AuthRequestDTO;
 import com.threektechone.resorthub.models.User;
@@ -20,6 +21,20 @@ public class UserMapper {
         return user;
     }
 
+    public UserDetailResponseDTO toUserDetailResponseDTO(User user) {
+        UserDetailResponseDTO dto = new UserDetailResponseDTO();
+        dto.setUserid(user.getUserId());
+        dto.setFullName(user.getFullName());
+        dto.setPhone(user.getPhone());
+        dto.setGender(user.isGender());
+        dto.setDob(user.getDob());
+        dto.setCity(user.getCity());
+        dto.setEmail(user.getEmail());
+        dto.setRoleName(user.getRole().getRoleName());
+        dto.setStatus(user.getStatus());
+        return dto;
+    }
+
     public UserListResponseDTO toUserListDTO(User user) {
         UserListResponseDTO dto = new UserListResponseDTO();
         dto.setUserId(user.getUserId());
@@ -30,6 +45,7 @@ public class UserMapper {
         dto.setDob(user.getDob());
         dto.setCity(user.getCity());
         dto.setRoleName(user.getRole().getRoleName());
+        dto.setStatus(user.getStatus());
         return dto;
     }
     

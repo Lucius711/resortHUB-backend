@@ -1,11 +1,13 @@
 package com.threektechone.resorthub.service.impl.MailImpl;
 
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.threektechone.resorthub.service.mail.MailService;
 
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 @Service
@@ -40,7 +42,7 @@ public class MailServiceImpl implements MailService {
 
 
         }
-        catch(Exception e) {
+        catch(MessagingException | MailException e) {
             throw new RuntimeException("Failed to send email");
         }
     }
