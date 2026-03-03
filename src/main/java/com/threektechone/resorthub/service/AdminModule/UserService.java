@@ -23,4 +23,6 @@ public interface UserService {
 
      UserDetailResponseDTO updateStatus(int id,UpdateStatusRequestDTO dto);
 
+     void deleteUser(int id);
+
 }

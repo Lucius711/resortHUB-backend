@@ -1,10 +1,15 @@
 package com.threektechone.resorthub.service.impl.AdminModuleImpl;
 
+import java.time.LocalDate;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UpdateRoleRequestDTO;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UpdateStatusRequestDTO;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UserDetailRequestDTO;
@@ -30,6 +35,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
 
     //getAllusers with search,gender,roleName and page
@@ -45,7 +53,7 @@ public class UserServiceImpl implements UserService {
     //Update information about user
     @Override
     public UserDetailResponseDTO updateUser(int id,UserDetailRequestDTO dto) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found!"));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         
 
         user.setFullName(dto.getFullName());
@@ -63,10 +71,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetailResponseDTO updateRole(int id, UpdateRoleRequestDTO dto) {
         User user = userRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("User not found!"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Role role = roleRepository.findByRoleName(dto.getRoleName())
-        .orElseThrow(() -> new RuntimeException("Role not foung!"));
+        .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
         user.setRole(role);
 
@@ -74,11 +82,12 @@ public class UserServiceImpl implements UserService {
         
         return userMapper.toUserDetailResponseDTO(user);
     }
-
+    
+    //Update status of user
     @Override
     public UserDetailResponseDTO updateStatus(int id, UpdateStatusRequestDTO dto) {
         User user = userRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("User not found!"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setStatus(dto.getStatus());
 
@@ -86,5 +95,22 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.toUserDetailResponseDTO(user);
     }
-    
+
+    //Delete User with anonymize user details
+    @Override
+    public void deleteUser(int id) {
+        User user = userRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.setFullName("Deleted User");
+        user.setEmail("deleted_" + user.getUserId() + "@system.local");
+        user.setDob(LocalDate.of(1900,1,1));
+        user.setPhone("0000000000");
+        user.setCity("N/A");
+        user.setStatus(UserStatus.INACTIVE);
+        user.setIsDeleted(true);
+        user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+
+        userRepository.save(user);
+    }
 }

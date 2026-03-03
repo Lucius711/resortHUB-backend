@@ -52,6 +52,9 @@ public class User {
     @Column(name="status", nullable = false, length = 20)
     private UserStatus status = UserStatus.ACTIVE;
 
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
+
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
@@ -89,7 +92,7 @@ public class User {
     public User() {
     }
 
-    public User(String fullName, String email, String password, String phone, Boolean gender, LocalDate dob, String city, UserStatus status, Role role, LocalDateTime createdAt, List<Resort> resorts, List<Booking> bookings, List<LostFoundItem> lostFoundItems, List<Contract> ASideContracts, List<Contract> BSideContracts, List<ChatMessage> sentMessages, List<ChatMessage> receivedMessages, List<RefreshToken> refreshTokens) {
+    public User(String fullName, String email, String password, String phone, Boolean gender, LocalDate dob, String city, UserStatus status,Boolean isDeleted, Role role, LocalDateTime createdAt, List<Resort> resorts, List<Booking> bookings, List<LostFoundItem> lostFoundItems, List<Contract> ASideContracts, List<Contract> BSideContracts, List<ChatMessage> sentMessages, List<ChatMessage> receivedMessages, List<RefreshToken> refreshTokens) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
@@ -98,6 +101,7 @@ public class User {
         this.city = city;
         this.dob = dob;
         this.status = status;
+        this.isDeleted = isDeleted;
         this.role = role;
         this.createdAt = LocalDateTime.now();
         this.resorts = resorts;
@@ -180,6 +184,14 @@ public class User {
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     public Role getRole() {
@@ -273,6 +285,7 @@ public class User {
                 ", dob=" + dob + '\'' +
                 ", city='" + city + '\'' +
                 ", status='" + status + '\'' +
+                ", isDeleted='" + isDeleted + '\'' +
                 ", role=" + role + '\''+
                 ", createdAt=" + createdAt +'\''+
                 ", resorts=" + resorts +'\''+

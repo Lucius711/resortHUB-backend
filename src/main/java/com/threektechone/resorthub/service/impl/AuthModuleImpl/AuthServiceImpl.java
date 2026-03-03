@@ -3,10 +3,16 @@ package com.threektechone.resorthub.service.impl.AuthModuleImpl;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.threektechone.resorthub.ExceptionHandler.CustomException.DuplicateResourceException;
+import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidOtpException;
+import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidRefreshTokenException;
+import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
 import com.threektechone.resorthub.config.properties.JwtProperties;
 import com.threektechone.resorthub.config.security.UserDetails.UserDetailsServiceImpl;
 import com.threektechone.resorthub.dto.AuthModuleDTO.AuthRequestDTO;
@@ -77,16 +83,16 @@ public class AuthServiceImpl implements AuthService {
 
          OTP otp = otpRepository
                 .findByEmailAndOtpCode(request.getEmail(),request.getOtpCode())
-                .orElseThrow(() -> new RuntimeException("OTP invalid"));
+                .orElseThrow(() -> new InvalidOtpException("Invalid OTP"));
         
         //Check otp code is expired
         if (otp.getExpiredAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("OTP expired");
+            throw new InvalidOtpException("OTP expired");
         }
         
         //Check email is existed
         if (userRepository.findByEmail(otp.getEmail()).isPresent()) {
-            throw new RuntimeException("User is existed!");
+            throw new DuplicateResourceException("User is existed!");
         }
 
         User user = otpMapper.toUser(otp);
@@ -95,7 +101,7 @@ public class AuthServiceImpl implements AuthService {
 
         Role role = roleRepository.findByRoleName(RoleName.CUSTOMER)
         .orElseThrow(() -> 
-            new RuntimeException("Role not found: " + RoleName.CUSTOMER)
+            new ResourceNotFoundException("Role not found!")
         );
 
         user.setRole(role);
@@ -115,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
 
         //Check email is existed
         if (userRepository.findByEmail(authRequestDTO.getEmail()).isPresent()) {
-        throw new RuntimeException("Email is existed!");
+        throw new DuplicateResourceException("Email is existed!");
         }
 
         //Generate OTP Code
@@ -141,11 +147,15 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponseDTO login(AuthRequestDTO authRequestDTO) {
         // TODO Auto-generated method stub
         User user = userRepository.findByEmail(authRequestDTO.getEmail())
-        .orElseThrow(() -> new RuntimeException("User not found with email: " + authRequestDTO.getEmail()));
+        .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
             
 
         if (!passwordEncoder.matches(authRequestDTO.getPassword(), user.getPassword())) { 
-            throw new RuntimeException("Invalid password");
+            throw new BadCredentialsException("Invalid username or password");
+        }
+
+        if (user.getIsDeleted()) {
+            throw new DisabledException("Account deleted");
         }
 
         UserDetails userDetails = userDetailService.loadUserByUsername(user.getEmail());
@@ -172,25 +182,25 @@ public class AuthServiceImpl implements AuthService {
         String token = request.getRefreshToken();
 
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-        .orElseThrow(() -> new RuntimeException("Token not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
 
         if (refreshToken.isRevoked()) {
-            throw new RuntimeException("Token revoked");
+            throw new InvalidRefreshTokenException("Token revoked");
         }
 
         if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token expired");
+            throw new InvalidRefreshTokenException("Token expired");
         }
 
         String email = jwtService.extractEmail(token);
 
         User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new RuntimeException("User not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         UserDetails userDetails = userDetailService.loadUserByUsername(user.getEmail());
 
         if (!jwtService.isTokenValid(token, userDetails)) {
-            throw new RuntimeException("Refresh token expired");
+            throw new InvalidRefreshTokenException("Refresh token expired");
         }
 
         String newAccessToken = jwtService.generateAccessToken(userDetails);
@@ -206,10 +216,10 @@ public class AuthServiceImpl implements AuthService {
 
     RefreshToken refreshToken = refreshTokenRepository
             .findByToken(token)
-            .orElseThrow(() -> new RuntimeException("Token not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
 
     if (refreshToken.isRevoked()) {
-        throw new RuntimeException("Token already revoked");
+        throw new InvalidRefreshTokenException("Token already revoked");
     }
 
     refreshToken.setRevoked(true);
