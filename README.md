@@ -41,12 +41,14 @@ RESORTHUB-backend/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/threektechone/resorthub/
-│   │   │   ├── config/          # Security, JWT, WebSocket configuration
+│   │   │   ├── config/          # Security, JWT,Data and WebSocket configuration
 │   │   │   ├── controller/      # REST Controllers
 │   │   │   ├── service/         # Business logic
 │   │   │   │   └── impl/
 │   │   │   ├── repositories/      # JPA Repositories
 │   │   │   ├── models/          # JPA Entities
+│   │   │   ├── ExceptionHandler/          # HandleExceptionHandler
+│   │   │   │   └── CustomException/
 │   │   │   ├── dto/             # Request & Response DTOs
 │   │   │   ├── mapper/          # MapStruct / manual mappers
 │   │   │   ├── websocket/       # WebSocket handlers
