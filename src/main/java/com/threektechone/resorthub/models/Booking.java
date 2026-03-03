@@ -1,7 +1,6 @@
 package com.threektechone.resorthub.models;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,10 +37,10 @@ public class Booking {
     private Resort resort;
 
     @Column(name = "check_in_date", nullable = false)
-    private LocalDate checkInDate;
+    private LocalDateTime checkInDate;
 
     @Column(name = "check_out_date", nullable = false)
-    private LocalDate checkOutDate;
+    private LocalDateTime checkOutDate;
 
     @Column(name = "total_price", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalPrice;
@@ -62,7 +61,7 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(User customer, Resort resort, LocalDate checkInDate, LocalDate checkOutDate, BigDecimal totalPrice, BookingStatus status, LocalDateTime createdAt, List<LostFoundItem> lostFoundItems, List<Contract> contracts) {
+    public Booking(User customer, Resort resort, LocalDateTime checkInDate, LocalDateTime checkOutDate, BigDecimal totalPrice, BookingStatus status, LocalDateTime createdAt, List<LostFoundItem> lostFoundItems, List<Contract> contracts) {
         this.customer = customer;
         this.resort = resort;
         this.checkInDate = checkInDate;
@@ -98,20 +97,20 @@ public class Booking {
         this.resort = resort;
     }
 
-    public LocalDate getCheckInDate() {
+    public LocalDateTime getCheckInDate() {
         return checkInDate;
     }
 
-    public void setCheckInDate(LocalDate checkInDate) {
+    public void setCheckInDate(LocalDateTime checkInDate) {
         this.checkInDate = checkInDate;
     }
 
 
-    public LocalDate getCheckOutDate() {
+    public LocalDateTime getCheckOutDate() {
         return checkOutDate;
     }
 
-    public void setCheckOutDate(LocalDate checkOutDate) {
+    public void setCheckOutDate(LocalDateTime checkOutDate) {
         this.checkOutDate = checkOutDate;
     }
 

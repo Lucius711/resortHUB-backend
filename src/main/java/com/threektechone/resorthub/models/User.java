@@ -40,6 +40,9 @@ public class User {
     @Column(name ="dob", nullable = false)
     private LocalDate dob;
 
+    @Column(name="image",nullable=true)
+    private String image;
+
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 
@@ -87,12 +90,16 @@ public class User {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
 
+    @OneToMany(mappedBy = "user")
+    private List<ResortReview> reviews;
+
+
     
 
     public User() {
     }
 
-    public User(String fullName, String email, String password, String phone, Boolean gender, LocalDate dob, String city, UserStatus status,Boolean isDeleted, Role role, LocalDateTime createdAt, List<Resort> resorts, List<Booking> bookings, List<LostFoundItem> lostFoundItems, List<Contract> ASideContracts, List<Contract> BSideContracts, List<ChatMessage> sentMessages, List<ChatMessage> receivedMessages, List<RefreshToken> refreshTokens) {
+    public User(String fullName, String email, String password, String phone, Boolean gender, LocalDate dob,String image, String city, UserStatus status,Boolean isDeleted, Role role, LocalDateTime createdAt, List<Resort> resorts, List<Booking> bookings, List<LostFoundItem> lostFoundItems, List<Contract> ASideContracts, List<Contract> BSideContracts, List<ChatMessage> sentMessages, List<ChatMessage> receivedMessages, List<RefreshToken> refreshTokens) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
@@ -100,6 +107,7 @@ public class User {
         this.gender = gender;
         this.city = city;
         this.dob = dob;
+        this.image = image;
         this.status = status;
         this.isDeleted = isDeleted;
         this.role = role;
@@ -170,6 +178,15 @@ public class User {
         this.dob = dob;
     }
 
+    public String getImage() {
+        return image;
+    }
+    
+     public void setImage(String image) {
+        this.image = image;
+    }
+
+
     public String getCity() {
         return city;
     }
@@ -224,6 +241,15 @@ public class User {
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
     }
+
+    public List<ResortReview> getReviews() {
+        return reviews;
+    }
+
+     public void setReviews(List<ResortReview> reviews) {
+        this.reviews = reviews;
+    }
+
 
     public List<LostFoundItem> getLostFoundItems() {
         return lostFoundItems;
