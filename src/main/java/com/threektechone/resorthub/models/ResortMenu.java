@@ -14,9 +14,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name="resort_menu")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class ResortMenu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,57 +44,5 @@ public class ResortMenu {
     
     @Enumerated(EnumType.STRING)
     @Column(length = 50)
-    private MenuCategory category;
-
-    public ResortMenu() {};
-
-    public ResortMenu(String name,BigDecimal price,MenuCategory category) {
-        this.name = name;
-        this.price= price;
-        this.category = category;
-    }
-
-    public int getMenuId() {
-        return menuId;
-    }
-
-    public void setMenuId(int menuId) {
-        this.menuId = menuId;
-    }
-
-    public Resort getResort() {
-        return resort;
-    }
-
-    public void setResort(Resort resort) {
-        this.resort = resort;
-    }
-
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public MenuCategory getMenuCategory() {
-        return category;
-    }
-
-    public void setMenuCategory(MenuCategory category) {
-        this.category = category;
-    }
-
-
-
-    
+    private MenuCategory category;   
 }

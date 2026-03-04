@@ -9,16 +9,13 @@ import com.threektechone.resorthub.service.mail.MailService;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
 
-    private final JavaMailSender mailSender;
-    
-    public MailServiceImpl(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
-    
+    private final JavaMailSender mailSender;   
 
     //send otp to email
     @Override

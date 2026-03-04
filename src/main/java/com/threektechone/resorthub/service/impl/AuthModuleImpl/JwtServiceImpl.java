@@ -14,16 +14,13 @@ import com.threektechone.resorthub.service.AuthModule.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
     private final JwtProperties jwtProperties;
-
-    public JwtServiceImpl(JwtProperties jwtProperties) {
-        this.jwtProperties = jwtProperties;
-    }
-
 
     private SecretKey  getSigningKey() {
         byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);

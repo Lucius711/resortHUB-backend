@@ -14,7 +14,7 @@ public class OTPMapper {
         user.setEmail(otp.getEmail());
         user.setFullName(otp.getName());
         user.setPhone(otp.getPhone());
-        user.setGender(otp.isGender());
+        user.setGender(otp.getGender());
         user.setDob(otp.getDob());
         user.setCity(otp.getCity());
         return user;
@@ -25,7 +25,7 @@ public class OTPMapper {
         otp.setName(dto.getName());
         otp.setEmail(dto.getEmail());
         otp.setPhone(dto.getPhone());
-        otp.setGender(dto.isGender());
+        otp.setGender(dto.getGender());
         otp.setDob(dto.getDob());
         otp.setCity(dto.getCity());
         otp.setVerified(false);

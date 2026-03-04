@@ -15,7 +15,7 @@ public class UserMapper {
         user.setFullName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
-        user.setGender(dto.isGender());
+        user.setGender(dto.getGender());
         user.setDob(dto.getDob());
         user.setCity(dto.getCity());
         return user;
@@ -23,10 +23,10 @@ public class UserMapper {
 
     public UserDetailResponseDTO toUserDetailResponseDTO(User user) {
         UserDetailResponseDTO dto = new UserDetailResponseDTO();
-        dto.setUserid(user.getUserId());
+        dto.setUserId(user.getUserId());
         dto.setFullName(user.getFullName());
         dto.setPhone(user.getPhone());
-        dto.setGender(user.isGender());
+        dto.setGender(user.getGender());
         dto.setDob(user.getDob());
         dto.setCity(user.getCity());
         dto.setEmail(user.getEmail());
@@ -40,7 +40,7 @@ public class UserMapper {
         dto.setUserId(user.getUserId());
         dto.setFullName(user.getFullName());
         dto.setEmail(user.getEmail());
-        dto.setGender(user.isGender());
+        dto.setGender(user.getGender());
         dto.setPhone(user.getPhone());
         dto.setDob(user.getDob());
         dto.setCity(user.getCity());

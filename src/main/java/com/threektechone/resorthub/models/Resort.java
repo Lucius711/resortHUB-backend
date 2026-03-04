@@ -2,7 +2,6 @@ package com.threektechone.resorthub.models;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,14 +21,24 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "Resorts")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class Resort {
     @Id
     @Column(name = "resort_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int resort_id;
+    private int resortId;
 
     @Column(name = "resort_code", unique = true, nullable = false)
     private String resortCode;
@@ -67,13 +76,14 @@ public class Resort {
     private BigDecimal price;
 
     @OneToMany(mappedBy = "resort",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ResortImage> images = new ArrayList<>();
+    private List<ResortImage> images;
 
     @Column(name = "status", nullable = false, length = 20)
+    @Builder.Default
     private ResortStatus status = ResortStatus.PENDING;
     
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false,updatable=false)
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "resort")
@@ -81,177 +91,5 @@ public class Resort {
 
     @OneToMany(mappedBy = "resort")
     private List<Contract> contracts;
-
-
-    public Resort() {
-    }
-
-    public Resort(String resortCode,User owner, String name, String description,int maxGuest,BigDecimal averageRating, String location, BigDecimal price,List<ResortReview> reviews,Set<ResortAmenity> amenities,List<ResortMenu> menuItems,List<ResortImage> images, ResortStatus status, LocalDateTime createdAt, List<Booking> bookings, List<Contract> contracts) {
-        this.resortCode = resortCode;
-        this.owner = owner;
-        this.name = name;
-        this.description = description;
-        this.location = location;
-        this.maxGuest = maxGuest;
-        this.price = price;
-        this.amenities = amenities;
-        this.averageRating = averageRating;
-        this.menuItems = menuItems;
-        this.reviews = reviews;
-        this.images = images;
-        this.status = status;
-        this.createdAt = LocalDateTime.now();
-        this.bookings = bookings;
-        this.contracts = contracts;
-    }
-
-    public int getResortId() {
-        return resort_id;
-    }
-
-    public void setResortId(int resort_id) {
-        this.resort_id = resort_id;
-    }
-
-    public String getResortCode() {
-        return resortCode;
-    }
-
-    public void setResortCode(String resortCode) {
-        this.resortCode = resortCode;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    public String getDescription() {
-        return description;
-    }
-
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-    public int getMaxGuest() {
-        return maxGuest;
-    }
-    public void setMaxGuest(int maxGuest) {
-        this.maxGuest = maxGuest;
-    }
-
-    public BigDecimal getAverageRating() {
-        return averageRating;
-    }
-
-    public void setAverageRating(BigDecimal averageRating) {
-        this.averageRating = averageRating;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public List<ResortImage> getImages() {
-        return images;
-    }
-
-    public void setImages(List<ResortImage> images) {
-        this.images = images;
-    } 
-
-    public ResortStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ResortStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-    public List<ResortReview> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(List<ResortReview> reviews) {
-        this.reviews = reviews;
-    }
-
-    public Set<ResortAmenity> getAmenities() {
-        return amenities;
-    }
-
-    public void setAmenities(Set<ResortAmenity> amenities) {
-        this.amenities = amenities;
-    }
-
-    public List<ResortMenu> getMenuItems() {
-        return menuItems;
-    }
-
-     public void setMenuItems(List<ResortMenu> menuItems) {
-        this.menuItems = menuItems;
-    }
-
-    public void setBookings(List<Booking> bookings) {
-        this.bookings = bookings;
-    }
-
-    public List<Contract> getContracts() {
-        return contracts;
-    }
-
-    public void setContracts(List<Contract> contracts) {
-        this.contracts = contracts;
-    }
-
-    @Override
-    public String toString() {
-        return "Resort{" +
-                "resort_id=" + resort_id +
-                "resort_code=" + resortCode +
-                ", owner=" + owner +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", location='" + location + '\'' +
-                ", price=" + price +
-                ", status='" + status + '\'' +
-                ", createdAt=" + createdAt +
-                ", bookings=" + bookings +
-                ", contracts=" + contracts +
-                '}';
-    }
-
     
 }

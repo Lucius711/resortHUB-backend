@@ -17,37 +17,33 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({BadCredentialsException.class,InvalidRefreshTokenException.class})
     public ResponseEntity<ExceptionResponse> handleUnauthorized(Exception ex) {
-    return ResponseEntity
-            .status(HttpStatus.UNAUTHORIZED)
-            .body(new ExceptionResponse(401, ex.getMessage()));
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ExceptionResponse> handleForbidden(DisabledException ex) {
-    return ResponseEntity
-            .status(HttpStatus.FORBIDDEN)
-            .body(new ExceptionResponse(403, ex.getMessage()));
+        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
     
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleNotFound(ResourceNotFoundException ex) {
-    return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(new ExceptionResponse(404, ex.getMessage()));
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidOtpException.class)
     public ResponseEntity<ExceptionResponse> handleBadRequest(InvalidOtpException ex) {
-    return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(new ExceptionResponse(400, ex.getMessage()));
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ExceptionResponse> handleConflict(DuplicateResourceException ex) {
-    return ResponseEntity
-            .status(HttpStatus.CONFLICT)
-            .body(new ExceptionResponse(409, ex.getMessage()));
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    private ResponseEntity<ExceptionResponse> buildResponse(HttpStatus status, String message) {
+        return ResponseEntity
+                .status(status)
+                .body(new ExceptionResponse(status.value(), message));
     }
     
 }

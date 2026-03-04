@@ -12,15 +12,25 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @Table(name = "Roles")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class Role {
     @Id
     @Column(name = "role_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int role_id;
+    private int roleId;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "role_name", nullable = false, unique = true, length = 20)
@@ -28,44 +38,4 @@ public class Role {
 
     @OneToMany(mappedBy = "role")
     private List<User> users;
-
-    public Role() {
-    }
-
-    public Role(RoleName roleName) {
-        this.roleName = roleName;
-    }
-
-    public int getRoleId() {
-        return role_id;
-    }
-
-    public void setRoleId(int role_id) {
-        this.role_id = role_id;
-    }
-
-    public RoleName getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(RoleName roleName) {
-        this.roleName = roleName;
-    }
-    
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    @Override
-    public String toString() {
-        return "Role{" +
-                "role_id=" + role_id +
-                ", roleName='" + roleName + '\'' +
-                ", users=" + users +
-                '}';
-    }
 }

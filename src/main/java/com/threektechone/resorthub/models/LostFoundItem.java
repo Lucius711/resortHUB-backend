@@ -14,9 +14,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "LostFoundItems")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class LostFoundItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,78 +48,7 @@ public class LostFoundItem {
     private LostFoundItemStatus status;
     
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false,updatable=false)
     private LocalDateTime createdAt;
 
-    public LostFoundItem() {
-    }
-
-    public LostFoundItem(Booking booking, User reporter, String description, LostFoundItemStatus status, LocalDateTime createdAt) {
-        this.booking = booking;
-        this.reporter = reporter;
-        this.description = description;
-        this.status = status;
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public int getReportId() {
-        return reportId;
-    }
-
-    public void setReportId(int reportId) {
-        this.reportId = reportId;
-    }
-
-    public Booking getBooking() {
-        return booking;
-    }
-
-    public void setBooking(Booking booking) {
-        this.booking = booking;
-    }
-
-    public User getReporter() {
-        return reporter;
-    }
-
-    public void setReporter(User reporter) {
-        this.reporter = reporter;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public LostFoundItemStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(LostFoundItemStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public String toString() {
-        return "LostFoundItem{" +
-                "reportId=" + reportId +
-                ", booking=" + booking +
-                ", reporter=" + reporter +
-                ", description='" + description + '\'' +
-                ", status='" + status + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
-    }
 }

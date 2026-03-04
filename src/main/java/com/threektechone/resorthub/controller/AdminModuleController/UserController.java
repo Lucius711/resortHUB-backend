@@ -1,6 +1,5 @@
 package com.threektechone.resorthub.controller.AdminModuleController;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -24,20 +23,28 @@ import com.threektechone.resorthub.enums.RoleName;
 import com.threektechone.resorthub.enums.UserStatus;
 import com.threektechone.resorthub.service.AdminModule.UserService;
 
+import lombok.RequiredArgsConstructor;
+
 
 
 @RestController
 @RequestMapping("/api/admin")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
      
     @GetMapping("/users")
-    public Page<UserListResponseDTO> getUserList(@RequestParam(required=false) String search,@RequestParam(required=false) Boolean gender, @RequestParam(required=false) RoleName roleName,@RequestParam(required=false) UserStatus status,@PageableDefault(size=5) Pageable pageable) {
+    public ResponseEntity<Page<UserListResponseDTO>> getUserList(
+        @RequestParam(required=false) String search,
+        @RequestParam(required=false) Boolean gender, 
+        @RequestParam(required=false) RoleName roleName,
+        @RequestParam(required=false) UserStatus status,
+        @PageableDefault(size=5) Pageable pageable) {
+
         Page<UserListResponseDTO> userList = userService.getAllUsers(search,gender,roleName,status,pageable);
 
-        return userList;
+        return ResponseEntity.ok(userList);
     }
 
     @PutMapping("/users/{id}")
@@ -49,7 +56,7 @@ public class UserController {
     @DeleteMapping("/users/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok("Deleted successfully");
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/users/{id}/role")

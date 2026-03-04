@@ -14,10 +14,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @Table(name = "Contracts")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class Contract {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,98 +58,5 @@ public class Contract {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private ContractStatus status;
-
-    public Contract() {
-    }
-    public Contract(User owner, User staff, Resort resort, ContractType contractType, LocalDate startDate, LocalDate endDate,ContractStatus status) {
-        this.owner = owner;
-        this.staff = staff;
-        this.resort = resort;
-        this.contractType = contractType;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.status = status;
-    }
-
-    public int getContractId() {
-        return contractId;
-    }
-
-    public void setContractId(int contractId) {
-        this.contractId = contractId;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public User getStaff() {
-        return staff;
-    }
-
-
-    public void setStaff(User staff) {
-        this.staff = staff;
-    }
-
-    public Resort getResort() {
-        return resort;
-    }
-
-    public void setResort(Resort resort) {
-        this.resort = resort;
-    }
-
-    public ContractType getContractType() {
-        return contractType;
-    }
-
-    public void setContractType(ContractType contractType) {
-        this.contractType = contractType;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public ContractStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ContractStatus status) {
-        this.status = status;
-    }
-    
-    @Override
-    public String toString() {
-        return "Contract{" +
-                "contractId=" + contractId +
-                ", owner=" + owner +
-                ", staff=" + staff +
-                ", resort=" + resort +
-                ", contractType=" + contractType +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", status=" + status +
-                '}';
-    }
-
-
     
 }

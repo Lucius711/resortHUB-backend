@@ -8,9 +8,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name= "resort_image")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class ResortImage {
 
     @Id
@@ -24,36 +34,4 @@ public class ResortImage {
     @ManyToOne
     @JoinColumn(name = "resort_id", nullable = false)
     private Resort resort;
-
-    public ResortImage() {}
-
-    public ResortImage(String imageUrl, Resort resort) {
-        this.imageUrl = imageUrl;
-        this.resort = resort;
-    }
-
-    public int getImageId() {
-        return imageId;
-    }
-
-    public void setImageId(int imageId) {
-        this.imageId = imageId;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public Resort getResort() {
-        return resort;
-    }
-
-    public void setResort(Resort resort) {
-        this.resort = resort;
-    }
-    
 }

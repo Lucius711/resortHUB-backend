@@ -1,6 +1,5 @@
 package com.threektechone.resorthub.config.security.UserDetails;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,11 +8,12 @@ import org.springframework.stereotype.Service;
 import com.threektechone.resorthub.models.User;
 import com.threektechone.resorthub.repositories.UserRepository;
 
-@Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+import lombok.RequiredArgsConstructor;
 
-    @Autowired
-    private UserRepository userRepository;
+@Service
+@RequiredArgsConstructor
+public class UserDetailsServiceImpl implements UserDetailsService {
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) {

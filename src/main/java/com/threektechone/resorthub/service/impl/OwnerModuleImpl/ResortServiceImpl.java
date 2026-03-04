@@ -1,6 +1,5 @@
 package com.threektechone.resorthub.service.impl.OwnerModuleImpl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,14 +11,15 @@ import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.service.OwnerModule.ResortService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class ResortServiceImpl implements ResortService {
 
-    @Autowired
-    private ResortRepository resortRepository;
+    private final ResortRepository resortRepository;
 
-    @Autowired
-    private ResortMapper resortMapper;
+    private final ResortMapper resortMapper;
 
     @Override
     public Page<OwnerResortsResponseDTO> getAllOwnerResorts(String email,String searchkey, ResortStatus status, Pageable pageable) {

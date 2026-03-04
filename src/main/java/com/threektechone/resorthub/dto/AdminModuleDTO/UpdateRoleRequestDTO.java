@@ -2,20 +2,15 @@ package com.threektechone.resorthub.dto.AdminModuleDTO;
 
 import com.threektechone.resorthub.enums.RoleName;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class UpdateRoleRequestDTO {
     private RoleName roleName;
-
-    public UpdateRoleRequestDTO() {};
-
-    public UpdateRoleRequestDTO(RoleName roleName) {
-        this.roleName = roleName;
-    }
-
-    public RoleName getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(RoleName roleName) {
-        this.roleName = roleName;
-    }
 }

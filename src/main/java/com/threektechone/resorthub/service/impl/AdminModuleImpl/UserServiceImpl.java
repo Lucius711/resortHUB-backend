@@ -2,8 +2,6 @@ package com.threektechone.resorthub.service.impl.AdminModuleImpl;
 
 import java.time.LocalDate;
 import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,20 +22,19 @@ import com.threektechone.resorthub.repositories.RoleRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
 import com.threektechone.resorthub.service.AdminModule.UserService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     
 
     //getAllusers with search,gender,roleName and page

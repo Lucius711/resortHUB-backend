@@ -1,5 +1,4 @@
 package com.threektechone.resorthub.controller.AuthModuleController;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,17 +11,19 @@ import com.threektechone.resorthub.dto.AuthModuleDTO.RefreshTokenRequestDTO;
 import com.threektechone.resorthub.dto.AuthModuleDTO.VerifyOTPRequestDTO;
 import com.threektechone.resorthub.service.AuthModule.AuthService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
     
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody AuthRequestDTO authRequestDTO) {
         authService.register(authRequestDTO);
-        return ResponseEntity.ok("User registered successfully");
+        return ResponseEntity.status(201).body("User registered successfully");
     }
 
     @PostMapping("/login")

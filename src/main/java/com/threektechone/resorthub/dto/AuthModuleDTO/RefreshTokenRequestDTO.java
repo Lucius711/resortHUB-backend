@@ -1,21 +1,17 @@
 package com.threektechone.resorthub.dto.AuthModuleDTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class RefreshTokenRequestDTO {
 
     private String refreshToken;
 
-    public RefreshTokenRequestDTO() {};
-
-    public RefreshTokenRequestDTO(String refreshToken) {
-        this.refreshToken=refreshToken; 
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken=refreshToken;
-    }
     
 }

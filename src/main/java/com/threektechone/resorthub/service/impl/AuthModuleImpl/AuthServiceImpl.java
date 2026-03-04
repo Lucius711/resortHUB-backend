@@ -2,7 +2,6 @@ package com.threektechone.resorthub.service.impl.AuthModuleImpl;
 
 import java.time.LocalDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,49 +33,39 @@ import com.threektechone.resorthub.service.AuthModule.AuthService;
 import com.threektechone.resorthub.service.AuthModule.JwtService;
 import com.threektechone.resorthub.service.mail.MailService;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
+    private final OTPRepository otpRepository;
 
-    @Autowired
-    private OTPRepository otpRepository;
+    private final OTPMapper otpMapper;
 
-    @Autowired
-    private OTPMapper otpMapper;
+    private final MailService mailService;
 
-    @Autowired
-    private MailService mailService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    private final UserDetailsServiceImpl userDetailService;
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailService;
+    private final JwtProperties jwtProperties;
     
 
     //generate OTP 
     private String generateOtp() {
         return String.valueOf((int)(Math.random() * 900000) + 100000);
     }
-    private final JwtProperties jwtProperties;
-
-    public AuthServiceImpl(JwtProperties jwtProperties) {
-        this.jwtProperties = jwtProperties;
-    }
-
+    
     //Verify OTP
     @Override
     public void verifyOTP(VerifyOTPRequestDTO request) {
@@ -145,7 +134,6 @@ public class AuthServiceImpl implements AuthService {
     //Login user and generate JWT token
     @Override
     public AuthResponseDTO login(AuthRequestDTO authRequestDTO) {
-        // TODO Auto-generated method stub
         User user = userRepository.findByEmail(authRequestDTO.getEmail())
         .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
             

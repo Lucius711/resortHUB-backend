@@ -3,7 +3,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,32 +21,37 @@ import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.repositories.RoleRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class DataInit implements CommandLineRunner {
 
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ResortRepository resortRepository;
-
-    @Autowired
-    private ContractRepository contractRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final ResortRepository resortRepository;
+    private final ContractRepository contractRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
         // Initialize roles
         if (roleRepository.count() == 0) {
-            roleRepository.save(new Role(RoleName.ADMIN));
-            roleRepository.save(new Role(RoleName.CUSTOMER));
-            roleRepository.save(new Role(RoleName.OWNER));
-            roleRepository.save(new Role(RoleName.STAFF));
+            Role role1 = new Role();
+            role1.setRoleName(RoleName.ADMIN);
+            roleRepository.save(role1);
+
+            Role role2 = new Role();
+            role2.setRoleName(RoleName.CUSTOMER);
+            roleRepository.save(role2);
+
+            Role role3 = new Role();
+            role3.setRoleName(RoleName.OWNER);
+            roleRepository.save(role3);
+
+            Role role4 = new Role();
+            role4.setRoleName(RoleName.STAFF);
+            roleRepository.save(role4);
         }
          String pass = passwordEncoder.encode("123456");
 

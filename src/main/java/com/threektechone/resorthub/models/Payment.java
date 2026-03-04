@@ -15,10 +15,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @Table(name = "Payments")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,95 +46,13 @@ public class Payment {
     private String paymentMethod;
 
     @Column(name = "payment_status", nullable = false, length = 20)
+    @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
     @Column(name = "transaction_code", nullable = true, length = 100, unique = true)
     private String transactionCode;
     
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false,updatable=false)
     private LocalDateTime createdAt;
-
-    public Payment() {
-    }
-
-    public Payment(Booking booking, BigDecimal amount, String paymentMethod, PaymentStatus paymentStatus, String transactionCode, LocalDateTime createdAt) {
-        this.booking = booking;
-        this.amount = amount;
-        this.paymentMethod = paymentMethod;
-        this.paymentStatus = paymentStatus;
-        this.transactionCode = transactionCode;
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public int getPaymentId() {
-        return paymentId;
-    }
-
-    public void setPaymentId(int paymentId) {
-        this.paymentId = paymentId;
-    }
-
-    public Booking getBooking() {
-        return booking;
-    }
-
-    public void setBooking(Booking booking) {
-        this.booking = booking;
-    }
-
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public PaymentStatus getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public void setPaymentStatus(PaymentStatus paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
-
-    public String getTransactionCode() {
-        return transactionCode;
-    }
-
-    public void setTransactionCode(String transactionCode) {
-        this.transactionCode = transactionCode;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public String toString() {
-        return "Payment{" +
-                "paymentId=" + paymentId +
-                ", booking=" + booking +
-                ", amount=" + amount +
-                ", paymentMethod='" + paymentMethod + '\'' +
-                ", paymentStatus='" + paymentStatus + '\'' +
-                ", transactionCode='" + transactionCode + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
-    }
-    
 }

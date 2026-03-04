@@ -14,9 +14,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "resort_review")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class ResortReview {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,61 +52,5 @@ public class ResortReview {
     @CreationTimestamp
     @Column(name="createdAt",nullable=false)
     private LocalDateTime createdAt;
-
-    public ResortReview() {}
-
-    public ResortReview(int rating,String comment,LocalDateTime createdAt) {
-        this.rating = rating;
-        this.comment = comment;
-        this.createdAt = createdAt;
-    }
-
-    public int getReviewId() {
-        return reviewId;
-    }
-
-    public void setReviewId(int reviewId) {
-        this.reviewId = reviewId;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Resort getResort() {
-        return resort;
-    }
-
-    public void setResort(Resort resort) {
-        this.resort = resort;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
  
 }
