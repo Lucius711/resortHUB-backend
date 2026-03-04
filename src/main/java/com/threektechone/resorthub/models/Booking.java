@@ -54,14 +54,18 @@ public class Booking {
 
     @OneToMany(mappedBy = "booking")
     private List<LostFoundItem> lostFoundItems;
+    
+    @Column(name = "accepted_terms", nullable = false)
+    private Boolean acceptedTerms;
 
-    @OneToMany(mappedBy = "booking")
-    private List<Contract> contracts;
+    @CreationTimestamp
+    @Column(name = "accepted_at",nullable=false)
+    private LocalDateTime acceptedAt;
 
     public Booking() {
     }
 
-    public Booking(User customer, Resort resort, LocalDateTime checkInDate, LocalDateTime checkOutDate, BigDecimal totalPrice, BookingStatus status, LocalDateTime createdAt, List<LostFoundItem> lostFoundItems, List<Contract> contracts) {
+    public Booking(User customer, Resort resort, LocalDateTime checkInDate, LocalDateTime checkOutDate, BigDecimal totalPrice, BookingStatus status, LocalDateTime createdAt, List<LostFoundItem> lostFoundItems,Boolean acceptedTerms, LocalDateTime acceptedAt ) {
         this.customer = customer;
         this.resort = resort;
         this.checkInDate = checkInDate;
@@ -70,7 +74,8 @@ public class Booking {
         this.status = status;
         this.createdAt = LocalDateTime.now();
         this.lostFoundItems = lostFoundItems;
-        this.contracts = contracts;
+        this.acceptedTerms  = acceptedTerms;
+        this.acceptedAt = acceptedAt;
     }
 
     public int getBookingId() {
@@ -146,14 +151,22 @@ public class Booking {
     public void setLostFoundItems(List<LostFoundItem> lostFoundItems) {
         this.lostFoundItems = lostFoundItems;
     }
-
-    public List<Contract> getContracts() {
-        return contracts;
+    
+    public Boolean isAcceptedTerms() {
+        return acceptedTerms;
     }
 
-    public void setContracts(List<Contract> contracts) {
-        this.contracts = contracts;
+    public void setAcceptedTerms(Boolean acceptedTerms) {
+        this.acceptedTerms = acceptedTerms;
     }
+
+    public LocalDateTime getAcceptedAt() {
+        return acceptedAt;
+    }
+
+    public void setAcceptedAt(LocalDateTime acceptedAt) {
+        this.acceptedAt = acceptedAt;
+    } 
 
     @Override
     public String toString() {
@@ -166,7 +179,8 @@ public class Booking {
                 ", totalPrice=" + totalPrice +
                 ", status='" + status + '\'' +
                 ", createdAt=" + createdAt +
-                ", contracts=" + contracts +
+                ", acceptedTerms=" + acceptedTerms +
+                ", acceptedAt=" + acceptedAt +
                 '}';
     }
 }

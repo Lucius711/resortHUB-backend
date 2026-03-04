@@ -3,7 +3,6 @@ package com.threektechone.resorthub.controller.AdminModuleController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.threektechone.resorthub.dto.AdminModuleDTO.UpdateRoleRequestDTO;
@@ -34,7 +34,7 @@ public class UserController {
     private UserService userService;
      
     @GetMapping("/users")
-    public Page<UserListResponseDTO> getUserList(@Param("search") String search,@Param("gender") Boolean gender, @Param("roleName") RoleName roleName,@Param("status") UserStatus status,@PageableDefault(size=5) Pageable pageable) {
+    public Page<UserListResponseDTO> getUserList(@RequestParam(required=false) String search,@RequestParam(required=false) Boolean gender, @RequestParam(required=false) RoleName roleName,@RequestParam(required=false) UserStatus status,@PageableDefault(size=5) Pageable pageable) {
         Page<UserListResponseDTO> userList = userService.getAllUsers(search,gender,roleName,status,pageable);
 
         return userList;

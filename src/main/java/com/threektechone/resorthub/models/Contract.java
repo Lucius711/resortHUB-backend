@@ -1,10 +1,13 @@
 package com.threektechone.resorthub.models;
 import java.time.LocalDate;
 
+import com.threektechone.resorthub.enums.ContractStatus;
 import com.threektechone.resorthub.enums.ContractType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,16 +25,12 @@ public class Contract {
     private int contractId;
 
     @ManyToOne
-    @JoinColumn(name = "created_by", nullable = false)
-    private User createdBy;
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
     @ManyToOne
-    @JoinColumn(name = "related_to", nullable = false)
-    private User relatedUser;
-
-    @ManyToOne
-    @JoinColumn(name = "booking_id", nullable = false)
-    private Booking booking;
+    @JoinColumn(name = "staff_id", nullable = false)
+    private User staff;
 
     @ManyToOne
     @JoinColumn(name = "resort_id", nullable = false)
@@ -46,16 +45,20 @@ public class Contract {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ContractStatus status;
+
     public Contract() {
     }
-    public Contract(User createdBy, User relatedUser, Booking booking, Resort resort, ContractType contractType, LocalDate startDate, LocalDate endDate) {
-        this.createdBy = createdBy;
-        this.relatedUser = relatedUser;
-        this.booking = booking;
+    public Contract(User owner, User staff, Resort resort, ContractType contractType, LocalDate startDate, LocalDate endDate,ContractStatus status) {
+        this.owner = owner;
+        this.staff = staff;
         this.resort = resort;
         this.contractType = contractType;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.status = status;
     }
 
     public int getContractId() {
@@ -66,29 +69,21 @@ public class Contract {
         this.contractId = contractId;
     }
 
-    public User getCreatedBy() {
-        return createdBy;
+    public User getOwner() {
+        return owner;
     }
 
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
-    public User getRelatedUser() {
-        return relatedUser;
+    public User getStaff() {
+        return staff;
     }
 
 
-    public void setRelatedUser(User relatedUser) {
-        this.relatedUser = relatedUser;
-    }
-
-    public Booking getBooking() {
-        return booking;
-    }
-
-    public void setBooking(Booking booking) {
-        this.booking = booking;
+    public void setStaff(User staff) {
+        this.staff = staff;
     }
 
     public Resort getResort() {
@@ -122,18 +117,26 @@ public class Contract {
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
+
+    public ContractStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ContractStatus status) {
+        this.status = status;
+    }
     
     @Override
     public String toString() {
         return "Contract{" +
                 "contractId=" + contractId +
-                ", createdBy=" + createdBy +
-                ", relatedUser=" + relatedUser +
-                ", booking=" + booking +
+                ", owner=" + owner +
+                ", staff=" + staff +
                 ", resort=" + resort +
                 ", contractType=" + contractType +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
+                ", status=" + status +
                 '}';
     }
 

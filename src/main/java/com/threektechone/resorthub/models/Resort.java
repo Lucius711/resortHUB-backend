@@ -3,7 +3,6 @@ package com.threektechone.resorthub.models;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +30,9 @@ public class Resort {
     @Column(name = "resort_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int resort_id;
+
+    @Column(name = "resort_code", unique = true, nullable = false)
+    private String resortCode;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
@@ -82,11 +84,10 @@ public class Resort {
 
 
     public Resort() {
-        this.amenities = new HashSet<>();
     }
 
-    public Resort(User owner, String name, String description,int maxGuest,BigDecimal averageRating, String location, BigDecimal price,List<ResortReview> reviews,Set<ResortAmenity> amenities,List<ResortMenu> menuItems,List<ResortImage> images, ResortStatus status, LocalDateTime createdAt, List<Booking> bookings, List<Contract> contracts) {
-        this.amenities = new HashSet<>();
+    public Resort(String resortCode,User owner, String name, String description,int maxGuest,BigDecimal averageRating, String location, BigDecimal price,List<ResortReview> reviews,Set<ResortAmenity> amenities,List<ResortMenu> menuItems,List<ResortImage> images, ResortStatus status, LocalDateTime createdAt, List<Booking> bookings, List<Contract> contracts) {
+        this.resortCode = resortCode;
         this.owner = owner;
         this.name = name;
         this.description = description;
@@ -110,6 +111,14 @@ public class Resort {
 
     public void setResortId(int resort_id) {
         this.resort_id = resort_id;
+    }
+
+    public String getResortCode() {
+        return resortCode;
+    }
+
+    public void setResortCode(String resortCode) {
+        this.resortCode = resortCode;
     }
 
     public User getOwner() {
@@ -231,6 +240,7 @@ public class Resort {
     public String toString() {
         return "Resort{" +
                 "resort_id=" + resort_id +
+                "resort_code=" + resortCode +
                 ", owner=" + owner +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +

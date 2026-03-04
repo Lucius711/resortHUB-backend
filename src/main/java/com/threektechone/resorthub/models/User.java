@@ -75,10 +75,10 @@ public class User {
     @OneToMany(mappedBy = "reporter")
     private List<LostFoundItem> lostFoundItems;
 
-    @OneToMany(mappedBy = "createdBy")
+    @OneToMany(mappedBy = "owner")
     private List<Contract> ASideContracts;
 
-    @OneToMany(mappedBy = "relatedUser")
+    @OneToMany(mappedBy = "staff")
     private List<Contract> BSideContracts;
 
     @OneToMany(mappedBy = "sender")
