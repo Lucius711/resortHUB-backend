@@ -64,4 +64,7 @@ public class EditResortRequest {
 
     @Column(name = "updated_at",updatable=false)
     private LocalDateTime updatedAt;
+
+    @Column(name="note",columnDefinition="NVARCHAR(MAX)",nullable=true)
+    private String note;
 }

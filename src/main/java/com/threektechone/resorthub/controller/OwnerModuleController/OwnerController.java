@@ -18,7 +18,6 @@ import com.threektechone.resorthub.common.response.ApiResponse;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.EditRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerResortsResponseDTO;
 import com.threektechone.resorthub.enums.ResortStatus;
-import com.threektechone.resorthub.service.OwnerModule.EditResortRequestService;
 import com.threektechone.resorthub.service.OwnerModule.ResortService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 public class OwnerController {
 
     private final ResortService resortService;
-    private final EditResortRequestService requestService;
      
     @GetMapping("/resorts")
     public ResponseEntity<ApiResponse<Page<OwnerResortsResponseDTO>>> getAllOwnerResorst(
@@ -50,7 +48,7 @@ public class OwnerController {
     @PostMapping("/edit-request")
     public ResponseEntity<ApiResponse<String>> sendEditRequest(@RequestBody EditRequestDTO dto, Authentication authentication) {
         String email = authentication.getName();
-        requestService.createEditRequest(dto, email);
+        resortService.createEditRequest(dto, email);
 
         ApiResponse<String> response = new ApiResponse<>(201,null,"Send request successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
