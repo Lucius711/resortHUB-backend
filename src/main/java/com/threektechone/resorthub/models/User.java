@@ -104,4 +104,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<ResortReview> reviews;
+
+    @OneToMany(mappedBy = "createdBy")
+    private List<EditResortRequest> requests;
 }

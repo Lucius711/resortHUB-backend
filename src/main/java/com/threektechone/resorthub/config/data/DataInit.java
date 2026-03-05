@@ -2,21 +2,23 @@ package com.threektechone.resorthub.config.data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.threektechone.resorthub.enums.ContractStatus;
-import com.threektechone.resorthub.enums.ContractType;
+import com.threektechone.resorthub.enums.AmenityName;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.enums.RoleName;
 import com.threektechone.resorthub.enums.UserStatus;
-import com.threektechone.resorthub.models.Contract;
 import com.threektechone.resorthub.models.Resort;
+import com.threektechone.resorthub.models.ResortAmenity;
+import com.threektechone.resorthub.models.ResortImage;
 import com.threektechone.resorthub.models.Role;
 import com.threektechone.resorthub.models.User;
-import com.threektechone.resorthub.repositories.ContractRepository;
+import com.threektechone.resorthub.repositories.ResortAmenityRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.repositories.RoleRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
@@ -30,8 +32,9 @@ public class DataInit implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final ResortRepository resortRepository;
-    private final ContractRepository contractRepository;
+    private final ResortAmenityRepository resortAmenityRepository;
     private final PasswordEncoder passwordEncoder;
+
 
     @Override
     public void run(String... args) throws Exception {
@@ -88,20 +91,35 @@ for (String[] d : data) {
         userRepository.save(u);
     }
 }
-    User owner = userRepository.findById(8)
+ User owner = userRepository.findById(8)
                 .orElseThrow();
-        Resort r1 = new Resort();
-        r1.setResortCode("RS201");
-        r1.setName("Azure Sky Resort");
-        r1.setLocation("Da Nang");
-        r1.setPrice(BigDecimal.valueOf(1500000));
-        r1.setStatus(ResortStatus.APPROVED);
-        r1.setMaxGuest(4);
-        r1.setAverageRating(BigDecimal.valueOf(4.5));
-        r1.setCreatedAt(LocalDateTime.now());
-        r1.setOwner(owner);
-        resortRepository.save(r1);
+      User staff = userRepository.findById(2).orElseThrow();
+// 2. Tạo các Amenity (Lưu riêng lẻ trước)
+    ResortAmenity wifi = ResortAmenity.builder().name(AmenityName.WIFI).build();
+    ResortAmenity pool = ResortAmenity.builder().name(AmenityName.POOL).build();
+    resortAmenityRepository.saveAll(List.of(wifi, pool));
 
+    // 3. Khởi tạo Resort 1
+    Resort r1 = Resort.builder()
+            .resortCode("RS201")
+            .name("Azure Sky Resort")
+            .location("Da Nang")
+            .price(new BigDecimal("1500000"))
+            .status(ResortStatus.APPROVED)
+            .maxGuest(4)
+            .averageRating(new BigDecimal("4.5"))
+            .owner(owner)
+            .staff(staff)
+            .amenities(Set.of(wifi, pool)) // Gán Many-to-Many
+            .build();
+
+    // 4. Tạo List Images cho Resort 1 (Gán thủ công để đảm bảo resort_id không null)
+    ResortImage img1 = ResortImage.builder().imageUrl("https://example.com/r1_1.jpg").resort(r1).build();
+    ResortImage img2 = ResortImage.builder().imageUrl("https://example.com/r1_2.jpg").resort(r1).build();
+    r1.setImages(List.of(img1, img2));
+
+    // 5. Lưu Resort 1 (Lưu cái này sẽ tự lưu luôn Images nếu bạn có CascadeType.ALL)
+    resortRepository.save(r1);
 
 
         Resort r2 = new Resort();
@@ -117,34 +135,5 @@ for (String[] d : data) {
         r2.setOwner(owner);
         resortRepository.save(r2);
 
-        User staff = userRepository.findById(2).orElseThrow();
-
-        Resort resort1 = resortRepository.findById(1).orElseThrow();
-        Resort resort2 = resortRepository.findById(2).orElseThrow();
-
-        Contract c1 = new Contract();
-        c1.setResort(resort1);
-        c1.setOwner(owner);
-        c1.setStaff(staff);
-        c1.setStatus(ContractStatus.ACTIVE);
-        c1.setContractType(ContractType.PARTNERSHIP);
-        c1.setStartDate((LocalDate.now()));
-        c1.setEndDate((LocalDate.of(2030, 12, 5)));
-        contractRepository.save(c1);
-
-
-        Contract c2 = new Contract();
-        c2.setResort(resort2);
-        c2.setOwner(owner);
-        c2.setStaff(staff);
-        c2.setStatus(ContractStatus.EXPIRED);
-        c2.setContractType(ContractType.EXCLUSIVE);
-        c2.setStartDate(((LocalDate.of(2000, 05, 12))));
-        c2.setEndDate((LocalDate.now()));
-        contractRepository.save(c2);
-
-        
-
-    
     } 
 }

@@ -1,6 +1,6 @@
 package com.threektechone.resorthub.enums;
 
-public enum ResortAmenity {
+public enum AmenityName {
     WIFI,
     POOL,
     GYM,

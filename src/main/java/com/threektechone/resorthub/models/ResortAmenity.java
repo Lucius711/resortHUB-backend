@@ -2,6 +2,8 @@ package com.threektechone.resorthub.models;
 
 import java.util.Set;
 
+import com.threektechone.resorthub.enums.AmenityName;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +31,7 @@ public class ResortAmenity {
     private int amenityId;
 
     @Column(name = "name", nullable = false, unique = true, length = 100)
-    private String name;
+    private AmenityName name;
 
     @Column(name = "icon", length = 255)
     private String icon;

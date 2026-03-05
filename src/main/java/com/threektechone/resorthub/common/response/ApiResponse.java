@@ -1,4 +1,4 @@
-package com.threektechone.resorthub.ExceptionHandler;
+package com.threektechone.resorthub.common.response;
 
 import java.time.LocalDateTime;
 
@@ -13,14 +13,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class ExceptionResponse {
+public class ApiResponse<T> {
     private int status;
     private String error;
+    private T data;
     private LocalDateTime timestamp;
-
-    public ExceptionResponse(int status, String error) {
-        this.status = status;
-        this.error = error;
-        this.timestamp = LocalDateTime.now();
-    }
 }

@@ -47,6 +47,10 @@ public class Resort {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
+    @ManyToOne
+    @JoinColumn(name="staff_id",nullable=true)
+    private User staff;
+
     @Column(name = "name", nullable = false, length = 150)
     private String name;
 
@@ -66,7 +70,7 @@ public class Resort {
     private List<ResortReview> reviews;
 
     @ManyToMany
-    @JoinTable(name = "resort_amenities",joinColumns = @JoinColumn(name = "resort_id"),inverseJoinColumns = @JoinColumn(name = "amenity_id"))
+    @JoinTable(name = "resort_amenity_map",joinColumns = @JoinColumn(name = "resort_id"),inverseJoinColumns = @JoinColumn(name = "amenity_id"))
     private Set<ResortAmenity> amenities;
 
     @OneToMany(mappedBy = "resort", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -91,5 +95,8 @@ public class Resort {
 
     @OneToMany(mappedBy = "resort")
     private List<Contract> contracts;
+
+    @OneToMany(mappedBy= "resort")
+    private List<EditResortRequest> requests;
     
 }

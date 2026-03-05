@@ -1,5 +1,7 @@
 package com.threektechone.resorthub.controller.AdminModuleController;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.threektechone.resorthub.common.response.ApiResponse;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UpdateRoleRequestDTO;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UpdateStatusRequestDTO;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UserDetailRequestDTO;
@@ -35,7 +38,7 @@ public class UserController {
     private final UserService userService;
      
     @GetMapping("/users")
-    public ResponseEntity<Page<UserListResponseDTO>> getUserList(
+    public ResponseEntity<ApiResponse<Page<UserListResponseDTO>>> getUserList(
         @RequestParam(required=false) String search,
         @RequestParam(required=false) Boolean gender, 
         @RequestParam(required=false) RoleName roleName,
@@ -44,31 +47,38 @@ public class UserController {
 
         Page<UserListResponseDTO> userList = userService.getAllUsers(search,gender,roleName,status,pageable);
 
-        return ResponseEntity.ok(userList);
+        ApiResponse<Page<UserListResponseDTO>> response =new ApiResponse<>(200, null, userList, LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<UserDetailResponseDTO> updateUser(@PathVariable int id, @RequestBody UserDetailRequestDTO dto) {
-    
-        return ResponseEntity.ok(userService.updateUser(id, dto));
+    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateUser(@PathVariable int id, @RequestBody UserDetailRequestDTO dto) {
+        
+        ApiResponse<UserDetailResponseDTO> response =new ApiResponse<>(200, null, userService.updateUser(id, dto), LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable int id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/users/{id}/role")
-    public ResponseEntity<UserDetailResponseDTO> updateRole(@PathVariable int id, @RequestBody UpdateRoleRequestDTO dto) {
-    
-        return ResponseEntity.ok(userService.updateRole(id, dto));
+    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateRole(@PathVariable int id, @RequestBody UpdateRoleRequestDTO dto) {
+        
+        ApiResponse<UserDetailResponseDTO> response =new ApiResponse<>(200, null, userService.updateRole(id, dto), LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/users/{id}/status")
-    public ResponseEntity<UserDetailResponseDTO> updateStatus(@PathVariable int id, @RequestBody UpdateStatusRequestDTO dto) {
+    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateStatus(@PathVariable int id, @RequestBody UpdateStatusRequestDTO dto) {
+        ApiResponse<UserDetailResponseDTO> response =new ApiResponse<>(200, null, userService.updateStatus(id, dto), LocalDateTime.now());
     
-        return ResponseEntity.ok(userService.updateStatus(id, dto));
+        return ResponseEntity.ok(response);
     }
     
 
