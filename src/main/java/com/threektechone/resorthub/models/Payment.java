@@ -9,6 +9,8 @@ import com.threektechone.resorthub.enums.PaymentStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -44,7 +46,8 @@ public class Payment {
 
     @Column(name = "payment_method", nullable = false, length = 30)
     private String paymentMethod;
-
+    
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false, length = 20)
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;

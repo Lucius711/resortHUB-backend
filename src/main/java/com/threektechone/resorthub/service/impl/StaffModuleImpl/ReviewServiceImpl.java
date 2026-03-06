@@ -1,17 +1,22 @@
 package com.threektechone.resorthub.service.impl.StaffModuleImpl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
+import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestDetailDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestListDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseViewDTO;
 import com.threektechone.resorthub.enums.RequestStatus;
 import com.threektechone.resorthub.enums.ReviewAction;
+import com.threektechone.resorthub.mapper.EditRequestMapper;
 import com.threektechone.resorthub.models.EditResortRequest;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortAmenity;
@@ -37,6 +42,25 @@ public class ReviewServiceImpl implements ReviewService {
     private final ResortMenuRepository resortMenuRepository;
     private final ResortImageRepository resortImageRepository;
     private final ResortRepository resortRepository;
+    private final EditRequestMapper requestMapper;
+
+    //Get pending request list
+    @Override
+    public Page<EditRequestListDTO> getEditRequests(RequestStatus status,Pageable pageable) {
+        Page<EditResortRequest> requestList = requestRepository.getEditRequests(status, pageable);
+
+        return requestList.map(requestMapper::toEditRequestListDTO);
+    }
+    
+    //View edit request detail
+    @Override
+    public EditRequestDetailDTO getRequestDetail(int requestId) {
+        EditResortRequest request = requestRepository.findById(requestId)
+        .orElseThrow(() -> new ResourceNotFoundException("Request not found!"));
+
+        EditRequestDetailDTO dto = requestMapper.toEditRequestDetailDTO(request);
+        return dto;
+    }
     
 
     //Handle Edit request
@@ -80,7 +104,7 @@ public class ReviewServiceImpl implements ReviewService {
             }
 
             if (newData.containsKey("amenities")) {
-                Set<Integer> amenityIds = (Set<Integer>) newData.get("amenities");
+                List<Integer> amenityIds = (List<Integer>) newData.get("amenities");
 
                 List<ResortAmenity> amenities =resortAmenityRepository.findAllById(amenityIds);
 
@@ -100,9 +124,11 @@ public class ReviewServiceImpl implements ReviewService {
 
                 List<ResortImage> images = resortImageRepository.findAllById(imageIds);
 
-                resort.setImages(images);
+                resort.getImages().clear();
+                resort.getImages().addAll(images);
             }
             resortRepository.save(resort);
+            request.setUpdatedAt(LocalDateTime.now());
             request.setRequestStatus(RequestStatus.APPROVED);
         }
         else {

@@ -2,6 +2,7 @@ package com.threektechone.resorthub.common.response;
 
 import java.time.LocalDateTime;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,4 +19,5 @@ public class ApiResponse<T> {
     private String error;
     private T data;
     private LocalDateTime timestamp;
+
 }

@@ -45,7 +45,7 @@ public class OwnerController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/edit-request")
+    @PostMapping("/send-edit-request")
     public ResponseEntity<ApiResponse<String>> sendEditRequest(@RequestBody EditRequestDTO dto, Authentication authentication) {
         String email = authentication.getName();
         resortService.createEditRequest(dto, email);

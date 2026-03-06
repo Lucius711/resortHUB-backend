@@ -62,7 +62,7 @@ public class EditResortRequest {
     @JoinColumn(name="staff_id",nullable=false)
     private User approvedBy;
 
-    @Column(name = "updated_at",updatable=false)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name="note",columnDefinition="NVARCHAR(MAX)",nullable=true)

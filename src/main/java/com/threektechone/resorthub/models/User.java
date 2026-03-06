@@ -11,6 +11,8 @@ import com.threektechone.resorthub.enums.UserStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -61,7 +63,8 @@ public class User {
 
     @Column(name="city", length = 50,nullable = false)
     private String city;
-
+    
+    @Enumerated(EnumType.STRING)
     @Column(name="status", nullable = false, length = 20)
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;

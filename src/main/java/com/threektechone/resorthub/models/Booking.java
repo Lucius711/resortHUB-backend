@@ -10,6 +10,8 @@ import com.threektechone.resorthub.enums.BookingStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,7 +55,8 @@ public class Booking {
 
     @Column(name = "total_price", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalPrice;
-
+    
+    @Enumerated(EnumType.STRING)
     @Column(name="status", nullable = false, length = 20)
     @Builder.Default
     private BookingStatus status = BookingStatus.PENDING;

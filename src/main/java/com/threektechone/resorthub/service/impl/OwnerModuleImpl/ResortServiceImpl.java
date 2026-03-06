@@ -82,7 +82,7 @@ public class ResortServiceImpl implements ResortService {
 
     @Override
     public void createEditRequest(EditRequestDTO dto, String email) {
-        var resort = resortRepository.findById(dto.getResortId())
+        Resort resort = resortRepository.findById(dto.getResortId())
         .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         User user = userRepository.findByEmail(email)

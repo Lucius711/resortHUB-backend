@@ -12,6 +12,8 @@ import com.threektechone.resorthub.enums.ResortStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -81,7 +83,8 @@ public class Resort {
 
     @OneToMany(mappedBy = "resort",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ResortImage> images;
-
+    
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     @Builder.Default
     private ResortStatus status = ResortStatus.PENDING;
