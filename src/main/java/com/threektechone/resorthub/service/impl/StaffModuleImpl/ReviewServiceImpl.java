@@ -83,8 +83,16 @@ public class ReviewServiceImpl implements ReviewService {
                 resort.setName((String) newData.get("name"));
             }
 
-            if (newData.containsKey("location")) {
-                resort.setLocation((String) newData.get("location"));
+            if (newData.containsKey("city")) {
+                resort.setCity(((String) newData.get("location")));
+            }
+
+            if (newData.containsKey("district")) {
+                resort.setDistrict((String) newData.get("district"));
+            }
+
+            if (newData.containsKey("address")) {
+                resort.setAddress((String) newData.get("address"));
             }
 
             if (newData.containsKey("description")) {

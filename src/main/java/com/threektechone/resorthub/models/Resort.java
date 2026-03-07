@@ -58,11 +58,17 @@ public class Resort {
 
     @Column(name = "description", nullable = true, length = 255)
     private String description;
+    
+    @Column(name = "city", length = 255)
+    private String city;
+    
+    @Column(name = "district", length = 255)
+    private String district;
 
-    @Column(name = "location", nullable = false, length = 255)
-    private String location;
+    @Column(name = "address", length = 255)
+    private String address;
 
-    @Column(name = "max_guests", nullable = false)
+    @Column(name = "max_guests")
     private int maxGuest;
 
     @Column(name = "rating", precision = 2, scale = 1)
@@ -78,7 +84,7 @@ public class Resort {
     @OneToMany(mappedBy = "resort", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ResortMenu> menuItems;
 
-    @Column(name = "price", nullable = false, precision = 12, scale = 2)
+    @Column(name = "price", precision = 12, scale = 2)
     private BigDecimal price;
 
     @OneToMany(mappedBy = "resort",cascade = CascadeType.ALL,orphanRemoval = true)
@@ -86,11 +92,10 @@ public class Resort {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    @Builder.Default
-    private ResortStatus status = ResortStatus.PENDING;
+    private ResortStatus status;
     
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false,updatable=false)
+    @Column(name = "created_at",updatable=false)
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "resort")

@@ -19,7 +19,9 @@ public class OwnerResortsResponseDTO {
     private String approvedByName;
     private String approvedByPhone;
     private ResortStatus resortStatus;
-    private String location;
+    private String city;
+    private String district;
+    private String address;
     private LocalDateTime createdAt;
     
 }

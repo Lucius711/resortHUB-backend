@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.EditRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerResortsResponseDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterRequestDTO;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.mapper.EditRequestMapper;
 import com.threektechone.resorthub.mapper.ResortMapper;
@@ -43,13 +47,21 @@ public class ResortServiceImpl implements ResortService {
 
     private final EditRequestMapper editRequestMapper;
 
+    private String generateResortCode(){
+        return "RS" + System.currentTimeMillis();
+    }
+
     private Map<String, Object> getOldData(Resort resort, Map<String, Object> newData) {
         Map<String, Object> oldData = new HashMap<>();
         for (String key : newData.keySet()) {
         switch (key) {
             case "name" -> oldData.put("name", resort.getName());
 
-            case "location" -> oldData.put("location", resort.getLocation());
+            case "city" -> oldData.put("city", resort.getCity());
+
+            case "district" -> oldData.put("district", resort.getDistrict());
+
+            case "address" -> oldData.put("address", resort.getAddress());
 
             case "description" -> oldData.put("description", resort.getDescription());
 
@@ -72,6 +84,38 @@ public class ResortServiceImpl implements ResortService {
     }
     return oldData;
 }
+    
+    @Override
+    public int createRegistrationResort(RegisterRequestDTO dto, String email) {
+        User owner = userRepository.findByEmail(email)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+
+        dto.setResortCode(generateResortCode());
+        dto.setOwnerName(owner.getFullName());
+
+        Resort resort = resortMapper.toResort(dto);
+        resortRepository.save(resort);
+        return resort.getResortId();
+    }
+
+    @Override
+    public void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto,int resortId) {
+        Resort resort = resortMapper.toResort(dto,resortId);
+        resortRepository.save(resort);
+    }
+
+    @Override
+    public void updateCapacityPriceResort(RegisterCapacityPricingRequestDTO dto, int resortId) {
+        Resort resort = resortMapper.toResort(dto, resortId);
+        resortRepository.save(resort);
+    }
+
+    @Override
+    public void updateAmenitiesResort(RegisterAmenitiesRequestDTO dto, int resortId) {
+        Resort resort = resortMapper.toResort(dto, resortId);
+        resortRepository.save(resort);
+    }
+
 
     @Override
     public Page<OwnerResortsResponseDTO> getAllOwnerResorts(String email,String searchkey, ResortStatus status, Pageable pageable) {
@@ -99,5 +143,7 @@ public class ResortServiceImpl implements ResortService {
 
         editResortRequestRepository.save(request);
     }
+
+     
     
 }

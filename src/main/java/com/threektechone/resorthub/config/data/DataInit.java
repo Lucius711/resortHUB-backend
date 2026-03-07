@@ -103,7 +103,7 @@ for (String[] d : data) {
     Resort r1 = Resort.builder()
             .resortCode("RS201")
             .name("Azure Sky Resort")
-            .location("Da Nang")
+            .city("Da Nang")
             .price(new BigDecimal("1500000"))
             .status(ResortStatus.APPROVED)
             .maxGuest(4)
@@ -125,7 +125,7 @@ for (String[] d : data) {
         Resort r2 = new Resort();
         r2.setResortCode("RS202");
         r2.setName("Palm Tree Resort");
-        r2.setLocation("Da Nang");
+        r2.setCity("Da Nang");
         r2.setPrice(BigDecimal.valueOf(1500000));
         r2.setStatus(ResortStatus.APPROVED);
         r2.setMaxGuest(4);
