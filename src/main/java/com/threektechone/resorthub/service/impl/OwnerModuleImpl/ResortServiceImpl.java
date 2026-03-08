@@ -7,13 +7,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidRegisterStepException;
+import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidResortStatusException;
 import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.EditRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerResortsResponseDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterRequestDTO;
+import com.threektechone.resorthub.enums.ResortRegistrationStep;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.mapper.EditRequestMapper;
 import com.threektechone.resorthub.mapper.ResortMapper;
@@ -101,18 +105,57 @@ public class ResortServiceImpl implements ResortService {
     @Override
     public void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto,int resortId) {
         Resort resort = resortMapper.toResort(dto,resortId);
+        resort.setStep(ResortRegistrationStep.BASIC_INFO);
         resortRepository.save(resort);
     }
 
     @Override
     public void updateCapacityPriceResort(RegisterCapacityPricingRequestDTO dto, int resortId) {
         Resort resort = resortMapper.toResort(dto, resortId);
+
+        if (resort.getStep() != ResortRegistrationStep.BASIC_INFO) {
+            throw new InvalidRegisterStepException("Please completed basic-info first!");
+        }
+        resort.setStep(ResortRegistrationStep.CAPACITY_PRICE);
         resortRepository.save(resort);
     }
 
     @Override
     public void updateAmenitiesResort(RegisterAmenitiesRequestDTO dto, int resortId) {
         Resort resort = resortMapper.toResort(dto, resortId);
+
+        if (resort.getStep() != ResortRegistrationStep.CAPACITY_PRICE) {
+            throw new InvalidRegisterStepException("Please completed capacity-price first!");
+        }
+        resort.setStep(ResortRegistrationStep.AMENITIES);
+        resortRepository.save(resort);
+    }
+
+    @Override
+    public void updateImagesResort(RegisterImagesRequestDTO dto, int resortId) {
+        Resort resort = resortMapper.toResort(dto,resortId);
+
+        if (resort.getStep() != ResortRegistrationStep.AMENITIES) {
+            throw new InvalidRegisterStepException("Please completed amenities first!");
+        }
+        resort.setStep(ResortRegistrationStep.IMAGES);
+        resortRepository.save(resort);
+    }
+
+    @Override
+    public void submitRegisterResort(int resortId) {
+        Resort resort = resortRepository.findById(resortId)
+        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        if(resort.getStatus() != ResortStatus.DRAFT){
+            throw new InvalidResortStatusException("Only draft resort can submit");
+        }
+
+        if (resort.getStep() != ResortRegistrationStep.IMAGES) {
+            throw new InvalidRegisterStepException("Please completed images first!");
+        }
+        resort.setStatus(ResortStatus.PENDING_REVIEW);
+        resort.setStep(ResortRegistrationStep.COMPLETED);
         resortRepository.save(resort);
     }
 
@@ -123,6 +166,7 @@ public class ResortServiceImpl implements ResortService {
         
         return resortList.map(resortMapper::toOwnerResortList);
     }
+
 
     @Override
     public void createEditRequest(EditRequestDTO dto, String email) {
@@ -143,7 +187,5 @@ public class ResortServiceImpl implements ResortService {
 
         editResortRequestRepository.save(request);
     }
-
-     
-    
+  
 }

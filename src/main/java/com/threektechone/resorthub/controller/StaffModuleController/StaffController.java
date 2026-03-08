@@ -18,7 +18,9 @@ import com.threektechone.resorthub.common.response.ApiResponse;
 import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestDetailDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestListDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseViewDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterRequestListDTO;
 import com.threektechone.resorthub.enums.RequestStatus;
+import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.service.StaffModule.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StaffController {
     private final ReviewService reviewService;
+
+    @GetMapping("/register-requests")
+    public ResponseEntity<ApiResponse<Page<RegisterRequestListDTO>>> getRegisterRequest(@RequestParam(required=false) String searchkey,@RequestParam(required=false) ResortStatus status,@PageableDefault(size=5) Pageable pageable) {
+        Page<RegisterRequestListDTO> dtoList = reviewService.getAllRegisterResort(searchkey, status, pageable);
+
+        ApiResponse<Page<RegisterRequestListDTO>> response = new ApiResponse<>(200,null,dtoList,LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/register-requests/{id}")
+    public String getMethodName(@RequestParam String param) {
+        return new String();
+    }
+    
      
     @GetMapping("/edit-requests")
     public ResponseEntity<ApiResponse<Page<EditRequestListDTO>>> getEditRequest(@RequestParam(required=false) RequestStatus status,@PageableDefault(size=5) Pageable pageable) {

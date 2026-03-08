@@ -10,12 +10,16 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerResortsResponseDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterRequestDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterRequestListDTO;
 import com.threektechone.resorthub.enums.ContractStatus;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortAmenity;
+import com.threektechone.resorthub.models.ResortImage;
 import com.threektechone.resorthub.repositories.ResortAmenityRepository;
+import com.threektechone.resorthub.repositories.ResortImageRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,7 @@ public class ResortMapper {
 
     private final ResortRepository resortRepository;
     private final ResortAmenityRepository resortAmenityRepository;
+    private final ResortImageRepository resortImageRepository;
 
     public OwnerResortsResponseDTO toOwnerResortList(Resort resort) {
         OwnerResortsResponseDTO dto = new OwnerResortsResponseDTO();
@@ -92,6 +97,26 @@ public class ResortMapper {
 
         resort.setAmenities(new HashSet<>(amenities));
         return resort;
+    }
+
+    public Resort toResort(RegisterImagesRequestDTO request,int resortId) {
+        Resort resort = resortRepository.findById(resortId)
+        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        List<ResortImage> images = resortImageRepository
+            .findAllById(request.getImageIds());
+
+        resort.setImages(images);
+        return resort;
+    }
+
+    public RegisterRequestListDTO toRegisterRequestListDTO(Resort resort) {
+        RegisterRequestListDTO dto = new RegisterRequestListDTO();
+        dto.setResortId(resort.getResortId());
+        dto.setResortCode(resort.getResortCode());
+        dto.setOwnerName(resort.getOwner().getFullName());
+        dto.setOwnerPhone(resort.getOwner().getPhone());
+        return dto;
     }
     
 }

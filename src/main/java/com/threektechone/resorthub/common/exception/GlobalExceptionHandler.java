@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.threektechone.resorthub.ExceptionHandler.CustomException.DuplicateResourceException;
 import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidOtpException;
 import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidRefreshTokenException;
+import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidRegisterStepException;
+import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidResortStatusException;
 import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
 import com.threektechone.resorthub.common.response.ApiResponse;
 
@@ -38,8 +40,8 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<ApiResponse<Object>> handleConflict(DuplicateResourceException ex) {
+    @ExceptionHandler({DuplicateResourceException.class,InvalidResortStatusException.class,InvalidRegisterStepException.class})
+    public ResponseEntity<ApiResponse<Object>> handleConflict(Exception ex) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 

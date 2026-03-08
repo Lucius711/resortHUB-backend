@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.threektechone.resorthub.enums.ResortRegistrationStep;
 import com.threektechone.resorthub.enums.ResortStatus;
 
 import jakarta.persistence.CascadeType;
@@ -93,6 +94,10 @@ public class Resort {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private ResortStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "register_step", nullable = false, length = 20)
+    private ResortRegistrationStep step;
     
     @CreationTimestamp
     @Column(name = "created_at",updatable=false)

@@ -14,9 +14,12 @@ import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotF
 import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestDetailDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestListDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseViewDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterRequestListDTO;
 import com.threektechone.resorthub.enums.RequestStatus;
+import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.enums.ReviewAction;
 import com.threektechone.resorthub.mapper.EditRequestMapper;
+import com.threektechone.resorthub.mapper.ResortMapper;
 import com.threektechone.resorthub.models.EditResortRequest;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortAmenity;
@@ -43,6 +46,16 @@ public class ReviewServiceImpl implements ReviewService {
     private final ResortImageRepository resortImageRepository;
     private final ResortRepository resortRepository;
     private final EditRequestMapper requestMapper;
+    private final ResortMapper resortMapper;
+    
+
+    //Get register resort list
+    @Override
+    public Page<RegisterRequestListDTO> getAllRegisterResort(String searchkey, ResortStatus status, Pageable pageable) {
+        Page<Resort> registerList = resortRepository.getRegisterResorts(searchkey, status, pageable);
+
+        return registerList.map(resortMapper::toRegisterRequestListDTO);
+    }
 
     //Get pending request list
     @Override

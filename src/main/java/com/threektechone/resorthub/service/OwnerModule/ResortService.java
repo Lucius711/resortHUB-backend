@@ -8,6 +8,7 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerResortsResponseDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterRequestDTO;
 import com.threektechone.resorthub.enums.ResortStatus;
 
@@ -17,5 +18,7 @@ public interface ResortService {
     int createRegistrationResort(RegisterRequestDTO dto,String email);
     void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto,int resortId);
     void updateCapacityPriceResort(RegisterCapacityPricingRequestDTO dto,int resortId);
-    void updateAmenitiesResort(RegisterAmenitiesRequestDTO dtom,int resortId);
+    void updateAmenitiesResort(RegisterAmenitiesRequestDTO dto,int resortId);
+    void updateImagesResort(RegisterImagesRequestDTO dto,int resortId);
+    void submitRegisterResort(int resortId);   
 }

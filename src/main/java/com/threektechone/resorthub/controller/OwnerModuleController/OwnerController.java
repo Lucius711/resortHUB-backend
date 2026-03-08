@@ -22,6 +22,7 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerResortsResponseDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterRequestDTO;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.service.OwnerModule.ResortService;
@@ -87,6 +88,27 @@ public class OwnerController {
         ApiResponse<String> response = new ApiResponse<>(200,null,"Update amenities successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/register-resort/{id}/images")
+    public ResponseEntity<ApiResponse<String>> updateImagesResort(@RequestBody RegisterImagesRequestDTO dto,@PathVariable int id) {
+
+        resortService.updateImagesResort(dto, id);
+        
+        ApiResponse<String> response = new ApiResponse<>(200,null,"Update images successfully!",LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register-resort/{id}/submit")
+    public ResponseEntity<ApiResponse<String>> submitRegisterResort(@PathVariable int id) {
+        resortService.submitRegisterResort(id);
+        
+        ApiResponse<String> response = new ApiResponse<>(200,null,"Submit successfully!",LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
+    }
+    
+
+    
 
     
 
