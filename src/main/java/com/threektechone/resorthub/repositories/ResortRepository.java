@@ -34,6 +34,7 @@ public interface ResortRepository extends JpaRepository<Resort, Integer> {
     @Query("""
     SELECT r FROM Resort r
     WHERE r.status <> 'DRAFT'
+    AND r.step = 'COMPLETED' 
     AND (:searchkey IS NULL OR 
          LOWER(r.resortCode) LIKE LOWER(CONCAT('%', :searchkey, '%')) 
          OR LOWER(r.name) LIKE LOWER(CONCAT('%', :searchkey, '%'))

@@ -5,8 +5,8 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.threektechone.resorthub.dto.OwnerModuleDTO.EditRequestDTO;
-import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestDetailDTO;
-import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestListDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseDetailDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseListDTO;
 import com.threektechone.resorthub.enums.RequestStatus;
 import com.threektechone.resorthub.models.EditResortRequest;
 
@@ -24,8 +24,8 @@ public class EditRequestMapper {
         return request;
      }
 
-     public EditRequestListDTO toEditRequestListDTO(EditResortRequest request) {
-        EditRequestListDTO dto = new EditRequestListDTO();
+     public EditResponseListDTO toEditResponseListDTO(EditResortRequest request) {
+        EditResponseListDTO dto = new EditResponseListDTO();
         dto.setRequestId(request.getRequestId());
         dto.setResortName(request.getResort().getName());
         dto.setOwnerEmail(request.getCreatedBy().getEmail());
@@ -33,8 +33,8 @@ public class EditRequestMapper {
         return dto;
      }
 
-     public EditRequestDetailDTO toEditRequestDetailDTO(EditResortRequest request) {
-        EditRequestDetailDTO dto = new EditRequestDetailDTO();
+     public EditResponseDetailDTO toEditResponseDetailDTO(EditResortRequest request) {
+        EditResponseDetailDTO dto = new EditResponseDetailDTO();
         dto.setRequestId(request.getRequestId());
         
         Map<String,Object> oldData =objectMapper.readValue(request.getOldData(), Map.class);

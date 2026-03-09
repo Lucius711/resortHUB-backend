@@ -16,7 +16,6 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDT
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
-import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterRequestDTO;
 import com.threektechone.resorthub.enums.ResortRegistrationStep;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.mapper.EditRequestMapper;
@@ -50,11 +49,15 @@ public class ResortServiceImpl implements ResortService {
     private final EditResortRequestRepository editResortRequestRepository;
 
     private final EditRequestMapper editRequestMapper;
+    
 
+    //Generate Resort code
     private String generateResortCode(){
         return "RS" + System.currentTimeMillis();
     }
+    
 
+    //Get old data of resort
     private Map<String, Object> getOldData(Resort resort, Map<String, Object> newData) {
         Map<String, Object> oldData = new HashMap<>();
         for (String key : newData.keySet()) {
@@ -89,59 +92,73 @@ public class ResortServiceImpl implements ResortService {
     return oldData;
 }
     
+    //Create resort registraton request 
     @Override
-    public int createRegistrationResort(RegisterRequestDTO dto, String email) {
+    public int createRegistrationResort(String email) {
         User owner = userRepository.findByEmail(email)
         .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        dto.setResortCode(generateResortCode());
-        dto.setOwnerName(owner.getFullName());
-
-        Resort resort = resortMapper.toResort(dto);
+        Resort resort = new Resort();
+        resort.setStatus(ResortStatus.DRAFT);
+        resort.setResortCode(generateResortCode());
+        resort.setStep(ResortRegistrationStep.START);
+        resort.setOwner(owner);
         resortRepository.save(resort);
         return resort.getResortId();
     }
+    
 
+    //Update resort basic-info
     @Override
     public void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto,int resortId) {
         Resort resort = resortMapper.toResort(dto,resortId);
+
+        if (resort.getStep().ordinal() < ResortRegistrationStep.START.ordinal()) {
+            throw new InvalidRegisterStepException("Please read the tutorial first!");
+        }
+
         resort.setStep(ResortRegistrationStep.BASIC_INFO);
         resortRepository.save(resort);
     }
-
+    
+    //Update capacity price resort
     @Override
     public void updateCapacityPriceResort(RegisterCapacityPricingRequestDTO dto, int resortId) {
         Resort resort = resortMapper.toResort(dto, resortId);
 
-        if (resort.getStep() != ResortRegistrationStep.BASIC_INFO) {
+        if (resort.getStep().ordinal() != ResortRegistrationStep.BASIC_INFO.ordinal()) {
             throw new InvalidRegisterStepException("Please completed basic-info first!");
         }
         resort.setStep(ResortRegistrationStep.CAPACITY_PRICE);
         resortRepository.save(resort);
     }
-
+    
+    //Update resort amenities
     @Override
     public void updateAmenitiesResort(RegisterAmenitiesRequestDTO dto, int resortId) {
         Resort resort = resortMapper.toResort(dto, resortId);
 
-        if (resort.getStep() != ResortRegistrationStep.CAPACITY_PRICE) {
+        if (resort.getStep().ordinal() != ResortRegistrationStep.CAPACITY_PRICE.ordinal()) {
             throw new InvalidRegisterStepException("Please completed capacity-price first!");
         }
         resort.setStep(ResortRegistrationStep.AMENITIES);
         resortRepository.save(resort);
     }
+    
 
+    //Update resort images
     @Override
     public void updateImagesResort(RegisterImagesRequestDTO dto, int resortId) {
         Resort resort = resortMapper.toResort(dto,resortId);
 
-        if (resort.getStep() != ResortRegistrationStep.AMENITIES) {
+        if (resort.getStep().ordinal() != ResortRegistrationStep.AMENITIES.ordinal()) {
             throw new InvalidRegisterStepException("Please completed amenities first!");
         }
         resort.setStep(ResortRegistrationStep.IMAGES);
         resortRepository.save(resort);
     }
-
+    
+    //Submit resort registration
     @Override
     public void submitRegisterResort(int resortId) {
         Resort resort = resortRepository.findById(resortId)
@@ -151,7 +168,7 @@ public class ResortServiceImpl implements ResortService {
             throw new InvalidResortStatusException("Only draft resort can submit");
         }
 
-        if (resort.getStep() != ResortRegistrationStep.IMAGES) {
+        if (resort.getStep().ordinal() != ResortRegistrationStep.IMAGES.ordinal()) {
             throw new InvalidRegisterStepException("Please completed images first!");
         }
         resort.setStatus(ResortStatus.PENDING_REVIEW);
@@ -159,7 +176,7 @@ public class ResortServiceImpl implements ResortService {
         resortRepository.save(resort);
     }
 
-
+    //Get all owner resorts
     @Override
     public Page<OwnerResortsResponseDTO> getAllOwnerResorts(String email,String searchkey, ResortStatus status, Pageable pageable) {
         Page<Resort> resortList = resortRepository.getOwnerResorts(email,searchkey, status, pageable);
@@ -167,7 +184,7 @@ public class ResortServiceImpl implements ResortService {
         return resortList.map(resortMapper::toOwnerResortList);
     }
 
-
+    //Create edit resort request
     @Override
     public void createEditRequest(EditRequestDTO dto, String email) {
         Resort resort = resortRepository.findById(dto.getResortId())

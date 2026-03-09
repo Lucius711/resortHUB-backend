@@ -1,6 +1,6 @@
 package com.threektechone.resorthub.dto.StaffModuleDTO;
 
-import com.threektechone.resorthub.enums.ReviewAction;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,8 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class EditResponseViewDTO {
+public class EditResponseDetailDTO {
     private int requestId;
-    private ReviewAction action;
-    private String note;
+    private int resortId;
+    private Map<String,Object> oldData;
+    private Map<String,Object> newData;
 }

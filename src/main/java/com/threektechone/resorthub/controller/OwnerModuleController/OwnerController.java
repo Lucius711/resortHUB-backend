@@ -23,7 +23,6 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDT
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
-import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterRequestDTO;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.service.OwnerModule.ResortService;
 
@@ -53,10 +52,10 @@ public class OwnerController {
     }
 
     @PostMapping("/register-resort")
-    public ResponseEntity<ApiResponse<Integer>> createRegistrationResort(@RequestBody RegisterRequestDTO dto,Authentication authentication) {
+    public ResponseEntity<ApiResponse<Integer>> createRegistrationResort(Authentication authentication) {
         String email = authentication.getName();
 
-        int resortId = resortService.createRegistrationResort(dto, email);
+        int resortId = resortService.createRegistrationResort(email);
         
         ApiResponse<Integer> response = new ApiResponse<>(201,null,resortId,LocalDateTime.now());
         return ResponseEntity.status(201).body(response);
@@ -106,11 +105,7 @@ public class OwnerController {
 
         return ResponseEntity.ok(response);
     }
-    
-
-    
-
-    
+     
 
     @PostMapping("/send-edit-request")
     public ResponseEntity<ApiResponse<String>> sendEditRequest(@RequestBody EditRequestDTO dto, Authentication authentication) {

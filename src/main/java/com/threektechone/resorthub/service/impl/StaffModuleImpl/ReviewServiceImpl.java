@@ -10,11 +10,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.threektechone.resorthub.ExceptionHandler.CustomException.RequestAlreadyReviewedException;
 import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
-import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestDetailDTO;
-import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestListDTO;
-import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseViewDTO;
-import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterRequestListDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestDecisionDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseDetailDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseListDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterRequestDecisionDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseDetailDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseListDTO;
 import com.threektechone.resorthub.enums.RequestStatus;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.enums.ReviewAction;
@@ -51,35 +54,65 @@ public class ReviewServiceImpl implements ReviewService {
 
     //Get register resort list
     @Override
-    public Page<RegisterRequestListDTO> getAllRegisterResort(String searchkey, ResortStatus status, Pageable pageable) {
+    public Page<RegisterResponseListDTO> getAllRegisterResort(String searchkey, ResortStatus status, Pageable pageable) {
         Page<Resort> registerList = resortRepository.getRegisterResorts(searchkey, status, pageable);
 
-        return registerList.map(resortMapper::toRegisterRequestListDTO);
+        return registerList.map(resortMapper::toRegisterResponseListDTO);
+    }
+    
+    //Get register resort detail
+    @Override
+    public RegisterResponseDetailDTO getRegisterDetail(int resortId) {
+        Resort resort = resortRepository.findById(resortId)
+        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        RegisterResponseDetailDTO dto = resortMapper.toRegisterResponseDetailDTO(resort);
+        return dto;
+    }
+    
+    //Review register request from owner
+    @Override
+    public void reviewRegisterRequest(RegisterRequestDecisionDTO dto,int resortId) {
+        Resort resort = resortRepository.findById(resortId)
+        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        if (resort.getStatus() != ResortStatus.PENDING_REVIEW) {
+           throw new RequestAlreadyReviewedException("Request already reviewed");
+        }
+
+        if (dto.getAction() == ReviewAction.APPROVE) {
+            resort.setStatus(ResortStatus.APPROVED);
+        }
+        else if (dto.getAction() == ReviewAction.REJECT) {
+            resort.setStatus(ResortStatus.REJECTED);
+            resort.setReason(dto.getReason());
+        }      
+        resortRepository.save(resort);
     }
 
     //Get pending request list
     @Override
-    public Page<EditRequestListDTO> getEditRequests(RequestStatus status,Pageable pageable) {
+    public Page<EditResponseListDTO> getEditRequests(RequestStatus status,Pageable pageable) {
         Page<EditResortRequest> requestList = requestRepository.getEditRequests(status, pageable);
 
-        return requestList.map(requestMapper::toEditRequestListDTO);
+        return requestList.map(requestMapper::toEditResponseListDTO);
     }
     
     //View edit request detail
     @Override
-    public EditRequestDetailDTO getRequestDetail(int requestId) {
+    public EditResponseDetailDTO getRequestDetail(int requestId) {
         EditResortRequest request = requestRepository.findById(requestId)
         .orElseThrow(() -> new ResourceNotFoundException("Request not found!"));
 
-        EditRequestDetailDTO dto = requestMapper.toEditRequestDetailDTO(request);
+        EditResponseDetailDTO dto = requestMapper.toEditResponseDetailDTO(request);
         return dto;
     }
     
 
     //Handle Edit request
     @Override
-    public void reviewEditRequest(EditResponseViewDTO dto) {
-        EditResortRequest request = requestRepository.findById(dto.getRequestId())
+    public void reviewEditRequest(EditRequestDecisionDTO dto,int requestId) {
+        EditResortRequest request = requestRepository.findById(requestId)
         .orElseThrow(() -> new ResourceNotFoundException("Request not found!"));
 
         if (ReviewAction.APPROVE.equals(dto.getAction())) {
@@ -159,6 +192,5 @@ public class ReviewServiceImpl implements ReviewService {
         request.setNote(dto.getNote());
         requestRepository.save(request);
     }
-
-    
+  
 }

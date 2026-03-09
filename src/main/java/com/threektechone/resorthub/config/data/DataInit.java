@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.threektechone.resorthub.enums.AmenityName;
+import com.threektechone.resorthub.enums.ResortRegistrationStep;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.enums.RoleName;
 import com.threektechone.resorthub.enums.UserStatus;
@@ -106,6 +107,7 @@ for (String[] d : data) {
             .city("Da Nang")
             .price(new BigDecimal("1500000"))
             .status(ResortStatus.APPROVED)
+            .step(ResortRegistrationStep.COMPLETED)
             .maxGuest(4)
             .averageRating(new BigDecimal("4.5"))
             .owner(owner)
@@ -128,6 +130,7 @@ for (String[] d : data) {
         r2.setCity("Da Nang");
         r2.setPrice(BigDecimal.valueOf(1500000));
         r2.setStatus(ResortStatus.APPROVED);
+        r2.setStep(ResortRegistrationStep.COMPLETED);
         r2.setMaxGuest(4);
         r2.setAverageRating(BigDecimal.valueOf(4.5));
         r2.setCreatedAt(LocalDateTime.now());

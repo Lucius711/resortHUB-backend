@@ -1,6 +1,7 @@
 package com.threektechone.resorthub.dto.StaffModuleDTO;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class RegisterRequestDetailDTO {
+public class RegisterResponseDetailDTO {
     private int resortId;
     private String resortCode;
     private String ownerName;
@@ -22,4 +23,6 @@ public class RegisterRequestDetailDTO {
     private String address;
     private int maxGuest;
     private BigDecimal price;
+    private List<Integer> amenityIds;
+    private List<Integer> imageIds;
 }

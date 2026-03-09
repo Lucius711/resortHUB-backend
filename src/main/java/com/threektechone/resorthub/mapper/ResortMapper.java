@@ -11,10 +11,9 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDT
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
-import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterRequestDTO;
-import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterRequestListDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseDetailDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseListDTO;
 import com.threektechone.resorthub.enums.ContractStatus;
-import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortAmenity;
 import com.threektechone.resorthub.models.ResortImage;
@@ -62,13 +61,6 @@ public class ResortMapper {
         return dto;
     }
 
-    public Resort toResort(RegisterRequestDTO request) {
-        Resort resort = new Resort();
-        resort.setResortCode(request.getResortCode());
-        resort.setStatus(ResortStatus.DRAFT);
-        return resort;
-    }
-
     public Resort toResort(RegisterBasicInfoRequestDTO request,int resortId) {
         Resort resort = resortRepository.findById(resortId)
         .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
@@ -106,16 +98,39 @@ public class ResortMapper {
         List<ResortImage> images = resortImageRepository
             .findAllById(request.getImageIds());
 
-        resort.setImages(images);
+        resort.getImages().clear();
+
+        for (ResortImage img : images) {
+            img.setResort(resort);
+            resort.getImages().add(img);
+        }
         return resort;
     }
 
-    public RegisterRequestListDTO toRegisterRequestListDTO(Resort resort) {
-        RegisterRequestListDTO dto = new RegisterRequestListDTO();
+    public RegisterResponseListDTO toRegisterResponseListDTO(Resort resort) {
+        RegisterResponseListDTO dto = new RegisterResponseListDTO();
         dto.setResortId(resort.getResortId());
+        dto.setResortName(resort.getName());
         dto.setResortCode(resort.getResortCode());
         dto.setOwnerName(resort.getOwner().getFullName());
         dto.setOwnerPhone(resort.getOwner().getPhone());
+        return dto;
+    }
+
+    public RegisterResponseDetailDTO toRegisterResponseDetailDTO(Resort resort) {
+        RegisterResponseDetailDTO dto = new RegisterResponseDetailDTO();
+        dto.setResortId(resort.getResortId());
+        dto.setResortName(resort.getName());
+        dto.setOwnerName(resort.getOwner().getFullName());
+        dto.setResortCode(resort.getResortCode());
+        dto.setDescription(resort.getDescription());
+        dto.setAddress(resort.getAddress());
+        dto.setCity(resort.getCity());
+        dto.setDistrict(resort.getDistrict());
+        dto.setMaxGuest(resort.getMaxGuest());
+        dto.setPrice(resort.getPrice());
+        dto.setAmenityIds(resort.getAmenities().stream().map(ResortAmenity::getAmenityId).toList());
+        dto.setImageIds(resort.getImages().stream().map(ResortImage::getImageId).toList());
         return dto;
     }
     

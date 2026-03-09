@@ -54,7 +54,7 @@ public class Resort {
     @JoinColumn(name="staff_id",nullable=true)
     private User staff;
 
-    @Column(name = "name", nullable = false, length = 150)
+    @Column(name = "name", nullable = true, length = 150)
     private String name;
 
     @Column(name = "description", nullable = true, length = 255)
@@ -74,6 +74,9 @@ public class Resort {
 
     @Column(name = "rating", precision = 2, scale = 1)
     private BigDecimal averageRating;
+
+    @Column(name = "reason",length=255,nullable=true)
+    private String reason;
 
     @OneToMany(mappedBy = "resort")
     private List<ResortReview> reviews;

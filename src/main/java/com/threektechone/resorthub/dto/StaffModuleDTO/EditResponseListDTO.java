@@ -1,6 +1,6 @@
 package com.threektechone.resorthub.dto.StaffModuleDTO;
 
-import com.threektechone.resorthub.enums.ResortStatus;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,12 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class RegisterRequestListDTO {
-    private int resortId;
-    private String resortCode;
+public class EditResponseListDTO {
+    private int requestId;
     private String resortName;
-    private String ownerName;
-    private String ownerPhone;
-    private ResortStatus resortStatus;
-    
+    private String ownerEmail;
+    private LocalDateTime createdAt;
 }

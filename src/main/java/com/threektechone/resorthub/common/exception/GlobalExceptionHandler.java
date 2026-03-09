@@ -14,6 +14,7 @@ import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidOtpEx
 import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidRefreshTokenException;
 import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidRegisterStepException;
 import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidResortStatusException;
+import com.threektechone.resorthub.ExceptionHandler.CustomException.RequestAlreadyReviewedException;
 import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
 import com.threektechone.resorthub.common.response.ApiResponse;
 
@@ -40,7 +41,9 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    @ExceptionHandler({DuplicateResourceException.class,InvalidResortStatusException.class,InvalidRegisterStepException.class})
+    @ExceptionHandler({DuplicateResourceException.class,InvalidResortStatusException.class,InvalidRegisterStepException.class
+        ,RequestAlreadyReviewedException.class
+    })
     public ResponseEntity<ApiResponse<Object>> handleConflict(Exception ex) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }

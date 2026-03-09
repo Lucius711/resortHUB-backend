@@ -1,6 +1,6 @@
 package com.threektechone.resorthub.dto.StaffModuleDTO;
 
-import java.time.LocalDateTime;
+import com.threektechone.resorthub.enums.ReviewAction;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,9 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class EditRequestListDTO {
-    private int requestId;
-    private String resortName;
-    private String ownerEmail;
-    private LocalDateTime createdAt;
+public class RegisterRequestDecisionDTO {
+    private ReviewAction action;
+    private String reason;
 }

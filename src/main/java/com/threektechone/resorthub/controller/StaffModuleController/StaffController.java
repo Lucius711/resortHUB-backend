@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.threektechone.resorthub.common.response.ApiResponse;
-import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestDetailDTO;
-import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestListDTO;
-import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseViewDTO;
-import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterRequestListDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestDecisionDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseDetailDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseListDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterRequestDecisionDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseDetailDTO;
+import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseListDTO;
 import com.threektechone.resorthub.enums.RequestStatus;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.service.StaffModule.ReviewService;
@@ -34,38 +36,51 @@ public class StaffController {
     private final ReviewService reviewService;
 
     @GetMapping("/register-requests")
-    public ResponseEntity<ApiResponse<Page<RegisterRequestListDTO>>> getRegisterRequest(@RequestParam(required=false) String searchkey,@RequestParam(required=false) ResortStatus status,@PageableDefault(size=5) Pageable pageable) {
-        Page<RegisterRequestListDTO> dtoList = reviewService.getAllRegisterResort(searchkey, status, pageable);
+    public ResponseEntity<ApiResponse<Page<RegisterResponseListDTO>>> getRegisterRequests(@RequestParam(required=false) String searchkey,@RequestParam(required=false) ResortStatus status,@PageableDefault(size=5) Pageable pageable) {
+        Page<RegisterResponseListDTO> dtoList = reviewService.getAllRegisterResort(searchkey, status, pageable);
 
-        ApiResponse<Page<RegisterRequestListDTO>> response = new ApiResponse<>(200,null,dtoList,LocalDateTime.now());
+        ApiResponse<Page<RegisterResponseListDTO>> response = new ApiResponse<>(200,null,dtoList,LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
     
     @GetMapping("/register-requests/{id}")
-    public String getMethodName(@RequestParam String param) {
-        return new String();
+    public ResponseEntity<ApiResponse<RegisterResponseDetailDTO>> getRegisterDetail(@PathVariable int id) {
+        RegisterResponseDetailDTO dto = reviewService.getRegisterDetail(id);
+        
+        ApiResponse<RegisterResponseDetailDTO> response = new ApiResponse<>(200,null,dto,LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/register-requests/{id}/review")
+    public ResponseEntity<ApiResponse<String>> reviewRegisterRequest(@PathVariable int id,@RequestBody RegisterRequestDecisionDTO dto) {
+        reviewService.reviewRegisterRequest(dto,id);
+        
+        ApiResponse<String> response = new ApiResponse<>(200,null,"Review successfully!",LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
+    }
+    
     
      
     @GetMapping("/edit-requests")
-    public ResponseEntity<ApiResponse<Page<EditRequestListDTO>>> getEditRequest(@RequestParam(required=false) RequestStatus status,@PageableDefault(size=5) Pageable pageable) {
-        Page<EditRequestListDTO> dtoList = reviewService.getEditRequests(status, pageable);
-        ApiResponse<Page<EditRequestListDTO>> response = new ApiResponse<>(200,null,dtoList,LocalDateTime.now());
+    public ResponseEntity<ApiResponse<Page<EditResponseListDTO>>> getEditRequest(@RequestParam(required=false) RequestStatus status,@PageableDefault(size=5) Pageable pageable) {
+        Page<EditResponseListDTO> dtoList = reviewService.getEditRequests(status, pageable);
+        ApiResponse<Page<EditResponseListDTO>> response = new ApiResponse<>(200,null,dtoList,LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/edit-requests/{id}")
-    public ResponseEntity<ApiResponse<EditRequestDetailDTO>> getRequestDetail(@PathVariable int id) {
-        EditRequestDetailDTO dto = reviewService.getRequestDetail(id);
+    public ResponseEntity<ApiResponse<EditResponseDetailDTO>> getRequestDetail(@PathVariable int id) {
+        EditResponseDetailDTO dto = reviewService.getRequestDetail(id);
 
-        ApiResponse<EditRequestDetailDTO> response = new ApiResponse<>(200,null,dto,LocalDateTime.now());
+        ApiResponse<EditResponseDetailDTO> response = new ApiResponse<>(200,null,dto,LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/edit-requests/{id}/review")
-    public ResponseEntity<ApiResponse<String>> reviewRequest(@PathVariable int id,@RequestBody EditResponseViewDTO dto) {
+    public ResponseEntity<ApiResponse<String>> reviewEditRequest(@PathVariable int id,@RequestBody EditRequestDecisionDTO dto) {
         
-        reviewService.reviewEditRequest(dto);
+        reviewService.reviewEditRequest(dto,id);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Review successfully!",LocalDateTime.now());
 
