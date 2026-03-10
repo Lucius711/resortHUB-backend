@@ -1,4 +1,4 @@
-package com.threektechone.resorthub.ExceptionHandler.CustomException;
+package com.threektechone.resorthub.common.exception.custom;
 
 public class InvalidOtpException extends RuntimeException {
     public InvalidOtpException(String message) {

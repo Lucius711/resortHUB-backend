@@ -1,11 +1,14 @@
 package com.threektechone.resorthub.mapper;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
-import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerResortsResponseDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
@@ -13,125 +16,102 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingReq
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseDetailDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseListDTO;
-import com.threektechone.resorthub.enums.ContractStatus;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortAmenity;
 import com.threektechone.resorthub.models.ResortImage;
-import com.threektechone.resorthub.repositories.ResortAmenityRepository;
-import com.threektechone.resorthub.repositories.ResortImageRepository;
-import com.threektechone.resorthub.repositories.ResortRepository;
 
-import lombok.RequiredArgsConstructor;
-
-@Component
-@RequiredArgsConstructor
-public class ResortMapper {
-
-    private final ResortRepository resortRepository;
-    private final ResortAmenityRepository resortAmenityRepository;
-    private final ResortImageRepository resortImageRepository;
-
-    public OwnerResortsResponseDTO toOwnerResortList(Resort resort) {
-        OwnerResortsResponseDTO dto = new OwnerResortsResponseDTO();
-        dto.setResortId(resort.getResortId());
-        dto.setResortName(resort.getName());
-        
-        String approvedByName = resort.getContracts()
-            .stream()
-            .filter(c -> c.getStatus() == ContractStatus.ACTIVE)
-            .findFirst()
-            .map(c -> c.getStaff().getFullName())
-            .orElse(null);
-
-        dto.setApprovedByName(approvedByName);
-
-        String approvedByPhone = resort.getContracts()
-            .stream()
-            .filter(c -> c.getStatus() == ContractStatus.ACTIVE)
-            .findFirst()
-            .map(c -> c.getStaff().getPhone())
-            .orElse(null);
-        
-        dto.setApprovedByPhone(approvedByPhone);
-        dto.setResortStatus(resort.getStatus());
-        dto.setCity(resort.getCity());
-        dto.setDistrict(resort.getDistrict());
-        dto.setAddress(resort.getAddress());
-        dto.setCreatedAt(resort.getCreatedAt());
-        return dto;
-    }
-
-    public Resort toResort(RegisterBasicInfoRequestDTO request,int resortId) {
-        Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
-        resort.setName(request.getResortName());
-        resort.setDescription(request.getDescription());
-        resort.setCity(request.getCity());
-        resort.setDistrict(request.getDistrict());
-        resort.setAddress(request.getAddress());
-        return resort;
-    }
-
-    public Resort toResort(RegisterCapacityPricingRequestDTO request,int resortId) {
-        Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
-        resort.setMaxGuest(request.getMaxGuest());
-        resort.setPrice(request.getPrice());
-        return resort;
-    }
-
-    public Resort toResort(RegisterAmenitiesRequestDTO request,int resortId) {
-        Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
-
-        List<ResortAmenity> amenities = resortAmenityRepository
-            .findAllById(request.getAmenityIds());
-
-        resort.setAmenities(new HashSet<>(amenities));
-        return resort;
-    }
-
-    public Resort toResort(RegisterImagesRequestDTO request,int resortId) {
-        Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
-
-        List<ResortImage> images = resortImageRepository
-            .findAllById(request.getImageIds());
-
-        resort.getImages().clear();
-
-        for (ResortImage img : images) {
-            img.setResort(resort);
-            resort.getImages().add(img);
-        }
-        return resort;
-    }
-
-    public RegisterResponseListDTO toRegisterResponseListDTO(Resort resort) {
-        RegisterResponseListDTO dto = new RegisterResponseListDTO();
-        dto.setResortId(resort.getResortId());
-        dto.setResortName(resort.getName());
-        dto.setResortCode(resort.getResortCode());
-        dto.setOwnerName(resort.getOwner().getFullName());
-        dto.setOwnerPhone(resort.getOwner().getPhone());
-        return dto;
-    }
-
-    public RegisterResponseDetailDTO toRegisterResponseDetailDTO(Resort resort) {
-        RegisterResponseDetailDTO dto = new RegisterResponseDetailDTO();
-        dto.setResortId(resort.getResortId());
-        dto.setResortName(resort.getName());
-        dto.setOwnerName(resort.getOwner().getFullName());
-        dto.setResortCode(resort.getResortCode());
-        dto.setDescription(resort.getDescription());
-        dto.setAddress(resort.getAddress());
-        dto.setCity(resort.getCity());
-        dto.setDistrict(resort.getDistrict());
-        dto.setMaxGuest(resort.getMaxGuest());
-        dto.setPrice(resort.getPrice());
-        dto.setAmenityIds(resort.getAmenities().stream().map(ResortAmenity::getAmenityId).toList());
-        dto.setImageIds(resort.getImages().stream().map(ResortImage::getImageId).toList());
-        return dto;
-    }
+@Mapper(componentModel = "spring")
+public interface ResortMapper {
     
+    @Mapping(target = "resortId", source = "resortId")
+    @Mapping(target = "resortName", source = "resort.name")
+    @Mapping(target = "resortStatus", source = "resort.status")
+    @Mapping(target = "approvedByName", source = "resort.staff.fullName")
+    @Mapping(target = "approvedByPhone", source = "resort.staff.phone")
+    @Mapping(target = "city", source = "city")
+    @Mapping(target = "district", source = "district")
+    @Mapping(target = "address", source = "address")
+    @Mapping(target = "createdAt", source = "createdAt")
+    OwnerResortsResponseDTO toOwnerResortList(Resort resort);
+    
+    @Mapping(target = "resortId", source = "resortId")
+    @Mapping(target = "resortCode", source = "resortCode")
+    @Mapping(target = "resortName", source = "name")
+    @Mapping(target = "resortStatus", source = "status")
+    @Mapping(target = "ownerName", source = "resort.owner.fullName")
+    @Mapping(target = "ownerPhone", source = "resort.owner.phone")
+    RegisterResponseListDTO toRegisterResponseListDTO(Resort resort);
+    
+    @Mapping(target = "resortId", source = "resortId")
+    @Mapping(target = "resortCode", source = "resortCode")
+    @Mapping(target = "ownerName", source = "owner.fullName")
+    @Mapping(target = "resortName", source = "name")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "city", source = "city")
+    @Mapping(target = "district", source = "address")
+    @Mapping(target = "maxGuest", source = "maxGuest")
+    @Mapping(target = "price", source = "price")
+    @Mapping(target = "amenityIds", source = "amenities")
+    @Mapping(target = "imageIds", source = "images")
+    RegisterResponseDetailDTO toRegisterResponseDetailDTO(Resort resort);
+    
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "name", source = "resortName")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "city", source = "city")
+    @Mapping(target = "district", source = "district")
+    @Mapping(target = "address", source = "address")
+    void updateResortBasicInfo(@MappingTarget Resort resort, RegisterBasicInfoRequestDTO dto);
+    
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "maxGuest", source = "maxGuest")
+    @Mapping(target = "price", source = "price")
+    void updateResortCapacityPrice(@MappingTarget Resort resort, RegisterCapacityPricingRequestDTO dto);
+    
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "amenities", source = "amenityIds")
+    void updateResortAmenities(@MappingTarget Resort resort, RegisterAmenitiesRequestDTO dto);
+    
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "images", source = "imageUrls")
+    void updateResortImages(@MappingTarget Resort resort, RegisterImagesRequestDTO dto);
+
+    default List<Integer> mapAmenities(Set<ResortAmenity> amenities) {
+        if (amenities == null) return null;
+        return amenities.stream()
+            .map(ResortAmenity::getAmenityId)
+            .toList();
+    }
+
+
+    default List<Integer> mapImages(List<ResortImage> images) {
+        if (images == null) return null;
+        return images.stream()
+            .map(ResortImage::getImageId)
+            .toList();
+    }
+
+    default Set<ResortAmenity> mapAmenityIds(List<Integer> amenityIds) {
+        if (amenityIds == null) return null;
+
+        return amenityIds.stream()
+            .map(id -> {
+                ResortAmenity ra = new ResortAmenity();
+                ra.setAmenityId(id);
+                return ra;
+            })
+            .collect(Collectors.toSet());
+    }
+
+    default List<ResortImage> mapImageIds(List<String> imageUrls) {
+        if (imageUrls == null) return null;
+
+        return imageUrls.stream()
+            .map(url -> {
+                ResortImage image = new ResortImage();
+                image.setImageUrl(url);
+                return image;
+            })
+            .collect(Collectors.toList());
+    }
 }

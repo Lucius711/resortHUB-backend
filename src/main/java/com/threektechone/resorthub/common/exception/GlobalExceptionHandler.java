@@ -9,13 +9,14 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.threektechone.resorthub.ExceptionHandler.CustomException.DuplicateResourceException;
-import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidOtpException;
-import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidRefreshTokenException;
-import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidRegisterStepException;
-import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidResortStatusException;
-import com.threektechone.resorthub.ExceptionHandler.CustomException.RequestAlreadyReviewedException;
-import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
+import com.threektechone.resorthub.common.exception.custom.DuplicateResourceException;
+import com.threektechone.resorthub.common.exception.custom.InvalidEditRequestDataException;
+import com.threektechone.resorthub.common.exception.custom.InvalidOtpException;
+import com.threektechone.resorthub.common.exception.custom.InvalidRefreshTokenException;
+import com.threektechone.resorthub.common.exception.custom.InvalidRegisterStepException;
+import com.threektechone.resorthub.common.exception.custom.InvalidResortStatusException;
+import com.threektechone.resorthub.common.exception.custom.RequestAlreadyReviewedException;
+import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
 import com.threektechone.resorthub.common.response.ApiResponse;
 
 @RestControllerAdvice
@@ -36,8 +37,8 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(InvalidOtpException.class)
-    public ResponseEntity<ApiResponse<Object>> handleBadRequest(InvalidOtpException ex) {
+    @ExceptionHandler({InvalidOtpException.class,InvalidEditRequestDataException.class})
+    public ResponseEntity<ApiResponse<Object>> handleBadRequest(Exception ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 

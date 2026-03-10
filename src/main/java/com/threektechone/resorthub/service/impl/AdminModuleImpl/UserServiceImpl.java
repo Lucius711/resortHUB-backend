@@ -2,12 +2,13 @@ package com.threektechone.resorthub.service.impl.AdminModuleImpl;
 
 import java.time.LocalDate;
 import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
+import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UpdateRoleRequestDTO;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UpdateStatusRequestDTO;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UserDetailRequestDTO;

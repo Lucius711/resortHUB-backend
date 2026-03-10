@@ -12,5 +12,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RegisterImagesRequestDTO {
-    private List<Integer> imageIds;
+    private List<String> imageUrls;
 }

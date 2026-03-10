@@ -1,35 +1,35 @@
 package com.threektechone.resorthub.mapper;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import com.threektechone.resorthub.dto.AuthModuleDTO.AuthRequestDTO;
 import com.threektechone.resorthub.models.OTP;
 import com.threektechone.resorthub.models.User;
 
-@Component
-public class OTPMapper {
+@Mapper(componentModel = "spring")
+public interface OTPMapper {
 
-    public User toUser(OTP otp) {
-        User user = new User();
-        user.setEmail(otp.getEmail());
-        user.setFullName(otp.getName());
-        user.setPhone(otp.getPhone());
-        user.setGender(otp.getGender());
-        user.setDob(otp.getDob());
-        user.setCity(otp.getCity());
-        return user;
-    }
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "fullName", source = "name")
+    @Mapping(target = "password", source = "password")
+    @Mapping(target = "phone", source = "phone")
+    @Mapping(target = "gender", source = "gender")
+    @Mapping(target = "dob", source = "dob")
+    @Mapping(target = "city", source = "city")
+    @BeanMapping(ignoreByDefault = true)
+    User toUser(OTP otp);
 
-    public OTP toOTP(AuthRequestDTO dto) {
-        OTP otp = new OTP();
-        otp.setName(dto.getName());
-        otp.setEmail(dto.getEmail());
-        otp.setPhone(dto.getPhone());
-        otp.setGender(dto.getGender());
-        otp.setDob(dto.getDob());
-        otp.setCity(dto.getCity());
-        otp.setVerified(false);
-        return otp;
-    }
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "phone", source = "phone")
+    @Mapping(target = "gender", source = "gender")
+    @Mapping(target = "dob", source = "dob")
+    @Mapping(target = "city", source = "city")
+    @Mapping(target = "password", source = "password")
+    @Mapping(target = "verified", constant = "false")
+    OTP toOTP(AuthRequestDTO dto);
     
 }

@@ -8,10 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.threektechone.resorthub.ExceptionHandler.CustomException.DuplicateResourceException;
-import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidOtpException;
-import com.threektechone.resorthub.ExceptionHandler.CustomException.InvalidRefreshTokenException;
-import com.threektechone.resorthub.ExceptionHandler.CustomException.ResourceNotFoundException;
+import com.threektechone.resorthub.common.exception.custom.DuplicateResourceException;
+import com.threektechone.resorthub.common.exception.custom.InvalidOtpException;
+import com.threektechone.resorthub.common.exception.custom.InvalidRefreshTokenException;
+import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
 import com.threektechone.resorthub.config.properties.JwtProperties;
 import com.threektechone.resorthub.config.security.UserDetails.UserDetailsServiceImpl;
 import com.threektechone.resorthub.dto.AuthModuleDTO.AuthRequestDTO;

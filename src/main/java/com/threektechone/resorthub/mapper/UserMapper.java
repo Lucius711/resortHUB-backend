@@ -1,5 +1,7 @@
 package com.threektechone.resorthub.mapper;
-import org.springframework.stereotype.Component;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import com.threektechone.resorthub.dto.AdminModuleDTO.UserDetailResponseDTO;
 import com.threektechone.resorthub.dto.AdminModuleDTO.UserListResponseDTO;
@@ -7,46 +9,23 @@ import com.threektechone.resorthub.dto.AuthModuleDTO.AuthRequestDTO;
 import com.threektechone.resorthub.models.User;
 
 
-@Component
-public class UserMapper {
+@Mapper(componentModel = "spring")
+public interface UserMapper {
 
-    public User toUser(AuthRequestDTO dto) {
-        User user = new User();
-        user.setFullName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPhone(dto.getPhone());
-        user.setGender(dto.getGender());
-        user.setDob(dto.getDob());
-        user.setCity(dto.getCity());
-        return user;
-    }
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "fullName", source = "name")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target="password",source="password")
+    @Mapping(target = "phone", source = "phone")
+    @Mapping(target = "gender", source = "gender")
+    @Mapping(target = "dob", source = "dob")
+    @Mapping(target = "city", source = "city")
+    User toUser(AuthRequestDTO dto);
 
-    public UserDetailResponseDTO toUserDetailResponseDTO(User user) {
-        UserDetailResponseDTO dto = new UserDetailResponseDTO();
-        dto.setUserId(user.getUserId());
-        dto.setFullName(user.getFullName());
-        dto.setPhone(user.getPhone());
-        dto.setGender(user.getGender());
-        dto.setDob(user.getDob());
-        dto.setCity(user.getCity());
-        dto.setEmail(user.getEmail());
-        dto.setRoleName(user.getRole().getRoleName());
-        dto.setStatus(user.getStatus());
-        return dto;
-    }
+    @Mapping(target = "roleName", source = "role.roleName")
+    UserDetailResponseDTO toUserDetailResponseDTO(User user);
 
-    public UserListResponseDTO toUserListDTO(User user) {
-        UserListResponseDTO dto = new UserListResponseDTO();
-        dto.setUserId(user.getUserId());
-        dto.setFullName(user.getFullName());
-        dto.setEmail(user.getEmail());
-        dto.setGender(user.getGender());
-        dto.setPhone(user.getPhone());
-        dto.setDob(user.getDob());
-        dto.setCity(user.getCity());
-        dto.setRoleName(user.getRole().getRoleName());
-        dto.setStatus(user.getStatus());
-        return dto;
-    }
+    @Mapping(target = "roleName", source = "role.roleName")
+    UserListResponseDTO toUserListDTO(User user);
     
 }
