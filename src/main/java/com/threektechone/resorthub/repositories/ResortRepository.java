@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.threektechone.resorthub.enums.ResortStatus;
+import com.threektechone.resorthub.enums.ResortType;
 import com.threektechone.resorthub.models.Resort;
 
 
@@ -46,4 +47,22 @@ public interface ResortRepository extends JpaRepository<Resort, Integer> {
         @Param("status") ResortStatus status,
         Pageable pageable
     );
+
+    @Query("""
+    SELECT r FROM Resort r
+    WHERE r.status = 'ACTIVE'
+    AND (:searchkey IS NULL OR 
+        LOWER(r.name) LIKE LOWER(CONCAT('%', :searchkey, '%'))
+        OR LOWER(r.district) LIKE LOWER(CONCAT('%', :searchkey, '%'))
+        OR LOWER(r.city) LIKE LOWER(CONCAT('%', :searchkey, '%')))
+    AND (:city IS NULL OR r.city = :city)
+    AND (:type IS NULL OR r.type = :type)
+    """)
+    Page<Resort> getPublicResorts(
+        @Param("searchkey") String searchkey,
+        @Param("city") String city,
+        @Param("type") ResortType type,
+        Pageable pageable
+    );
+
 }

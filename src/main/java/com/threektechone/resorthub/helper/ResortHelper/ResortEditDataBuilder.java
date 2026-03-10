@@ -32,6 +32,8 @@ public class ResortEditDataBuilder {
             case ADDRESS -> oldData.put(field.key(), resort.getAddress());
 
             case DESCRIPTION -> oldData.put(field.key(), resort.getDescription());
+    
+            case TYPE -> oldData.put(field.key(), resort.getType());
 
             case MAX_GUEST -> oldData.put(field.key(),resort.getMaxGuest());
 

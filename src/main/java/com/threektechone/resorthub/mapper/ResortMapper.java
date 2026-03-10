@@ -14,6 +14,7 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDT
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
+import com.threektechone.resorthub.dto.PublicModuleDTO.PublicResortResponseListDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseDetailDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseListDTO;
 import com.threektechone.resorthub.models.Resort;
@@ -43,10 +44,22 @@ public interface ResortMapper {
     RegisterResponseListDTO toRegisterResponseListDTO(Resort resort);
     
     @Mapping(target = "resortId", source = "resortId")
+    @Mapping(target = "resortName", source = "name")
+    @Mapping(target = "district", source = "district")
+    @Mapping(target = "city", source = "city")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "thumbnail", expression = "java(getThumbnail(resort))")
+    @Mapping(target = "maxGuest", source = "maxGuest")
+    @Mapping(target = "price", source = "price")
+    @Mapping(target = "averageRating", source = "averageRating")
+    PublicResortResponseListDTO toPublicResortResponseListDTO(Resort resort);
+    
+    @Mapping(target = "resortId", source = "resortId")
     @Mapping(target = "resortCode", source = "resortCode")
     @Mapping(target = "ownerName", source = "owner.fullName")
     @Mapping(target = "resortName", source = "name")
     @Mapping(target = "description", source = "description")
+    @Mapping(target = "type", source = "type")
     @Mapping(target = "city", source = "city")
     @Mapping(target = "district", source = "address")
     @Mapping(target = "maxGuest", source = "maxGuest")
@@ -58,6 +71,7 @@ public interface ResortMapper {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "name", source = "resortName")
     @Mapping(target = "description", source = "description")
+    @Mapping(target = "type", source = "type")
     @Mapping(target = "city", source = "city")
     @Mapping(target = "district", source = "district")
     @Mapping(target = "address", source = "address")
@@ -75,6 +89,14 @@ public interface ResortMapper {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "images", source = "imageUrls")
     void updateResortImages(@MappingTarget Resort resort, RegisterImagesRequestDTO dto);
+    
+
+    default String getThumbnail(Resort resort) {
+        if (resort.getImages() == null || resort.getImages().isEmpty()) {
+            return null;
+        }
+        return resort.getImages().get(0).getImageUrl();
+    }
 
     default List<Integer> mapAmenities(Set<ResortAmenity> amenities) {
         if (amenities == null) return null;

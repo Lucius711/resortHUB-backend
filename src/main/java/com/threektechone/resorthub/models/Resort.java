@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.threektechone.resorthub.enums.ResortRegistrationStep;
 import com.threektechone.resorthub.enums.ResortStatus;
+import com.threektechone.resorthub.enums.ResortType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -59,6 +60,9 @@ public class Resort {
 
     @Column(name = "description", nullable = true, length = 255)
     private String description;
+
+    @Column(name = "type", nullable = true, length = 255)
+    private ResortType type;
     
     @Column(name = "city", length = 255)
     private String city;

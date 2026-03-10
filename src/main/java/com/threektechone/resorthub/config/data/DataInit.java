@@ -106,7 +106,7 @@ for (String[] d : data) {
             .name("Azure Sky Resort")
             .city("Da Nang")
             .price(new BigDecimal("1500000"))
-            .status(ResortStatus.APPROVED)
+            .status(ResortStatus.ACTIVE)
             .step(ResortRegistrationStep.COMPLETED)
             .maxGuest(4)
             .averageRating(new BigDecimal("4.5"))
@@ -129,7 +129,6 @@ for (String[] d : data) {
         r2.setName("Palm Tree Resort");
         r2.setCity("Da Nang");
         r2.setPrice(BigDecimal.valueOf(1500000));
-        r2.setStatus(ResortStatus.APPROVED);
         r2.setStep(ResortRegistrationStep.COMPLETED);
         r2.setMaxGuest(4);
         r2.setAverageRating(BigDecimal.valueOf(4.5));

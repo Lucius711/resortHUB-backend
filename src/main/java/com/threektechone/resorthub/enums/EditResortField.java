@@ -6,6 +6,7 @@ public enum EditResortField {
     DISTRICT("district"),
     ADDRESS("address"),
     DESCRIPTION("description"),
+    TYPE("type"),
     MAX_GUEST("maxGuest"),
     AVERAGE_RATING("averageRating"),
     AMENITIES("amenities"),

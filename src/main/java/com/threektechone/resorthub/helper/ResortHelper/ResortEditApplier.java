@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.threektechone.resorthub.enums.EditResortField;
+import com.threektechone.resorthub.enums.ResortType;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.repositories.ResortAmenityRepository;
 import com.threektechone.resorthub.repositories.ResortImageRepository;
@@ -22,7 +23,6 @@ public class ResortEditApplier {
     private final ResortMenuRepository resortMenuRepository;
     private final ResortImageRepository resortImageRepository;
 
-    @SuppressWarnings("unchecked")
     public void applyChanges(Resort resort, Map<String, Object> newData) {
         for (String key : newData.keySet()) {
             EditResortField field = EditResortField.fromKey(key);
@@ -33,6 +33,7 @@ public class ResortEditApplier {
                 case DISTRICT -> resort.setDistrict((String) value);
                 case ADDRESS -> resort.setAddress((String) value);
                 case DESCRIPTION -> resort.setDescription((String) value);
+                case TYPE -> resort.setType((ResortType) value);
                 case MAX_GUEST ->
                     resort.setMaxGuest(Integer.parseInt(value.toString()));
                 case AVERAGE_RATING ->

@@ -3,6 +3,8 @@ package com.threektechone.resorthub.dto.StaffModuleDTO;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.threektechone.resorthub.enums.ResortType;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,7 @@ public class RegisterResponseDetailDTO {
     private String resortCode;
     private String ownerName;
     private String resortName;
+    private ResortType type;
     private String description;
     private String city; 
     private String district;
