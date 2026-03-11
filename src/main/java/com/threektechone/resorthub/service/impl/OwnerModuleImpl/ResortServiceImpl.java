@@ -17,14 +17,17 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDT
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterMenusRequestDTO;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.helper.ResortHelper.ResortCodeGenerator;
 import com.threektechone.resorthub.helper.ResortHelper.ResortEditDataBuilder;
 import com.threektechone.resorthub.mapper.EditRequestMapper;
 import com.threektechone.resorthub.mapper.ResortMapper;
+import com.threektechone.resorthub.mapper.ResortMenuMapper;
 import com.threektechone.resorthub.models.EditResortRequest;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortImage;
+import com.threektechone.resorthub.models.ResortMenu;
 import com.threektechone.resorthub.models.User;
 import com.threektechone.resorthub.repositories.EditResortRequestRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
@@ -55,6 +58,8 @@ public class ResortServiceImpl implements ResortService {
     private final ResortRegistrationService resortRegistrationService;
 
     private final ResortCodeGenerator resortCodeGenerator;
+
+    private final ResortMenuMapper resortMenuMapper;
     
     
     //Create resort registraton request 
@@ -123,6 +128,24 @@ public class ResortServiceImpl implements ResortService {
         resort.getImages().clear();    
         resort.getImages().addAll(images);
         resortRegistrationService.moveToImagesStep(resort);
+        resortRepository.save(resort);
+    }
+    
+    //Update resort menu
+    @Override
+    public void updateMenusResort(RegisterMenusRequestDTO dto, int resortId) {
+        Resort resort = resortRepository.findById(resortId)
+        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        List<ResortMenu> menus = resortMenuMapper.toResortMenuList(dto.getMenus());
+
+        resortRegistrationService.ensureCanUpdateMenus(resort);
+        for (ResortMenu menu : menus) {
+            menu.setResort(resort);
+        }
+        resort.getMenuItems().clear();   
+        resort.getMenuItems().addAll(menus);
+        resortRegistrationService.moveToMenusStep(resort);
         resortRepository.save(resort);
     }
     

@@ -73,7 +73,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         if (dto.getAction() == ReviewAction.APPROVE) {
-            resort.setStatus(ResortStatus.APPROVED);
+            resort.setStatus(ResortStatus.ACTIVE);
         }
         else if (dto.getAction() == ReviewAction.REJECT) {
             resort.setStatus(ResortStatus.REJECTED);

@@ -23,6 +23,7 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDT
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterMenusRequestDTO;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.service.OwnerModule.ResortService;
 
@@ -94,6 +95,15 @@ public class OwnerController {
         resortService.updateImagesResort(dto, id);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Update images successfully!",LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/register-resort/{id}/menus")
+    public ResponseEntity<ApiResponse<String>> updateMenusResort(@RequestBody RegisterMenusRequestDTO dto,@PathVariable int id) {
+
+        resortService.updateMenusResort(dto, id);
+        
+        ApiResponse<String> response = new ApiResponse<>(200,null,"Update menus successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 

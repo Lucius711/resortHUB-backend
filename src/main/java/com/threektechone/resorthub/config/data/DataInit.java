@@ -114,7 +114,6 @@ for (String[] d : data) {
             .staff(staff)
             .amenities(Set.of(wifi, pool)) // Gán Many-to-Many
             .build();
-
     // 4. Tạo List Images cho Resort 1 (Gán thủ công để đảm bảo resort_id không null)
     ResortImage img1 = ResortImage.builder().imageUrl("https://example.com/r1_1.jpg").resort(r1).build();
     ResortImage img2 = ResortImage.builder().imageUrl("https://example.com/r1_2.jpg").resort(r1).build();

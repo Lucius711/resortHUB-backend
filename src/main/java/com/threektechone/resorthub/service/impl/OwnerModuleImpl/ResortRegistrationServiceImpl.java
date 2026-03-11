@@ -69,14 +69,27 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
         resort.setStep(ResortRegistrationStep.IMAGES);
     }
 
+     @Override
+    public void ensureCanUpdateMenus(Resort resort) {
+        if (resort.getStep().ordinal() != ResortRegistrationStep.IMAGES.ordinal()) {
+            throw new InvalidRegisterStepException("Please completed images first!");
+        }
+    }
+
+    @Override
+    public void moveToMenusStep(Resort resort) {
+        resort.setStep(ResortRegistrationStep.MENUS);
+    }
+
+
     @Override
     public void ensureCanSubmit(Resort resort) {
         if(resort.getStatus() != ResortStatus.DRAFT){
             throw new InvalidResortStatusException("Only draft resort can submit");
         }
 
-        if (resort.getStep().ordinal() != ResortRegistrationStep.IMAGES.ordinal()) {
-            throw new InvalidRegisterStepException("Please completed images first!");
+        if (resort.getStep().ordinal() != ResortRegistrationStep.MENUS.ordinal()) {
+            throw new InvalidRegisterStepException("Please completed menus first!");
         }
     }
 
@@ -85,5 +98,6 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
         resort.setStatus(ResortStatus.PENDING_REVIEW);
         resort.setStep(ResortRegistrationStep.COMPLETED);
     }
+
     
 }

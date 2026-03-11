@@ -14,14 +14,18 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDT
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterMenusRequestDTO;
+import com.threektechone.resorthub.dto.PublicModuleDTO.PublicResortResponseDetailDTO;
 import com.threektechone.resorthub.dto.PublicModuleDTO.PublicResortResponseListDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseDetailDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseListDTO;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortAmenity;
 import com.threektechone.resorthub.models.ResortImage;
+import com.threektechone.resorthub.models.ResortMenu;
+import com.threektechone.resorthub.models.ResortReview;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",uses = ResortMenuMapper.class)
 public interface ResortMapper {
     
     @Mapping(target = "resortId", source = "resortId")
@@ -47,12 +51,29 @@ public interface ResortMapper {
     @Mapping(target = "resortName", source = "name")
     @Mapping(target = "district", source = "district")
     @Mapping(target = "city", source = "city")
-    @Mapping(target = "description", source = "description")
+    @Mapping(target = "type", source = "type")
     @Mapping(target = "thumbnail", expression = "java(getThumbnail(resort))")
     @Mapping(target = "maxGuest", source = "maxGuest")
     @Mapping(target = "price", source = "price")
     @Mapping(target = "averageRating", source = "averageRating")
     PublicResortResponseListDTO toPublicResortResponseListDTO(Resort resort);
+    
+
+    @Mapping(target = "resortId", source = "resortId")
+    @Mapping(target = "resortName", source = "name")
+    @Mapping(target = "district", source = "district")
+    @Mapping(target = "city", source = "city")
+    @Mapping(target = "address", source = "address")
+    @Mapping(target = "type", source = "type")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "maxGuest", source = "maxGuest")
+    @Mapping(target = "price", source = "price")
+    @Mapping(target = "averageRating", source = "averageRating")
+    @Mapping(target = "amenityIds", source = "amenities")
+    @Mapping(target = "imageIds", source = "images")
+    @Mapping(target = "menuIds", source = "menuItems")
+    @Mapping(target = "reviewIds", source = "reviews")
+    PublicResortResponseDetailDTO toPublicResortResponseDetailDTO(Resort resort);
     
     @Mapping(target = "resortId", source = "resortId")
     @Mapping(target = "resortCode", source = "resortCode")
@@ -89,6 +110,10 @@ public interface ResortMapper {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "images", source = "imageUrls")
     void updateResortImages(@MappingTarget Resort resort, RegisterImagesRequestDTO dto);
+
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "menuItems", source = "menus")
+    void updateResortMenu(@MappingTarget Resort resort, RegisterMenusRequestDTO dto);
     
 
     default String getThumbnail(Resort resort) {
@@ -110,6 +135,20 @@ public interface ResortMapper {
         if (images == null) return null;
         return images.stream()
             .map(ResortImage::getImageId)
+            .toList();
+    }
+
+    default List<Integer> mapMenus(List<ResortMenu> menus) {
+        if (menus == null) return null;
+        return menus.stream()
+            .map(ResortMenu::getMenuId)
+            .toList();
+    }
+
+    default List<Integer> mapReviews(List<ResortReview> reviews) {
+        if (reviews == null) return null;
+        return reviews.stream()
+            .map(ResortReview::getReviewId)
             .toList();
     }
 

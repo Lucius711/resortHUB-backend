@@ -1,6 +1,5 @@
 package com.threektechone.resorthub.models;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -8,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.threektechone.resorthub.enums.BookingStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,7 +37,7 @@ public class Booking {
     @Id
     @Column(name = "booking_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int booking_id;
+    private int bookingId;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
@@ -53,8 +53,8 @@ public class Booking {
     @Column(name = "check_out_date", nullable = false)
     private LocalDateTime checkOutDate;
 
-    @Column(name = "total_price", nullable = false, precision = 12, scale = 2)
-    private BigDecimal totalPrice;
+    @Column(name="number_of_person",nullable=false)
+    private int numberOfPerson;
     
     @Enumerated(EnumType.STRING)
     @Column(name="status", nullable = false, length = 20)
@@ -67,12 +67,14 @@ public class Booking {
 
     @OneToMany(mappedBy = "booking")
     private List<LostFoundItem> lostFoundItems;
+
+    @OneToMany(mappedBy= "booking", cascade = CascadeType.ALL)
+    private List<BookingMeal> meals;
     
-    @Column(name = "accepted_terms", nullable = false)
+    @Column(name = "accepted_terms")
     private Boolean acceptedTerms;
 
-    @CreationTimestamp
-    @Column(name = "accepted_at",nullable=false)
+    @Column(name = "accepted_at")
     private LocalDateTime acceptedAt;
 
 }

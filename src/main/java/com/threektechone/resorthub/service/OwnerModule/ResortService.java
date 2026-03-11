@@ -9,6 +9,7 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDT
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterMenusRequestDTO;
 import com.threektechone.resorthub.enums.ResortStatus;
 
 public interface ResortService {
@@ -19,5 +20,6 @@ public interface ResortService {
     void updateCapacityPriceResort(RegisterCapacityPricingRequestDTO dto,int resortId);
     void updateAmenitiesResort(RegisterAmenitiesRequestDTO dto,int resortId);
     void updateImagesResort(RegisterImagesRequestDTO dto,int resortId);
+    void updateMenusResort(RegisterMenusRequestDTO dto,int resortId);
     void submitRegisterResort(int resortId);   
 }

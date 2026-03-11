@@ -6,5 +6,6 @@ public enum ResortRegistrationStep {
     CAPACITY_PRICE,
     AMENITIES,
     IMAGES,
+    MENUS,
     COMPLETED
 }

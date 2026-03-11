@@ -13,6 +13,8 @@ public interface ResortRegistrationService {
     void moveToAmenitiesStep(Resort resort);
     void ensureCanUpdateImages(Resort resort);
     void moveToImagesStep(Resort resort);
+    void ensureCanUpdateMenus(Resort resort);
+    void moveToMenusStep(Resort resort);
     void ensureCanSubmit(Resort resort);
     void submit(Resort resort);
 }

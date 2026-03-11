@@ -1,6 +1,7 @@
 package com.threektechone.resorthub.models;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.threektechone.resorthub.enums.MenuCategory;
 
@@ -13,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,4 +47,7 @@ public class ResortMenu {
     @Enumerated(EnumType.STRING)
     @Column(length = 50)
     private MenuCategory category;   
+
+    @OneToMany(mappedBy= "resortMenu")
+    private List<BookingMeal> meals;
 }
