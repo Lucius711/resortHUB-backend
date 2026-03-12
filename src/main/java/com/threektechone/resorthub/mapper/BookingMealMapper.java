@@ -11,9 +11,12 @@ import com.threektechone.resorthub.models.BookingMeal;
 public interface BookingMealMapper {
     
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "resortMenu.menuId", source= "menuId")
+    @Mapping(target= "date", source= "date")
     @Mapping(target = "quantity", source= "quantity")
     @Mapping(target = "mealTime", source = "mealTime")
     BookingMeal toBookingMeal(MealSelectionRequestDTO dto);
+
+    @Mapping(target = "menuId", source = "resortMenu.menuId")
+    MealSelectionRequestDTO toMealSelectionRequestDTO(BookingMeal meal);
     
 }

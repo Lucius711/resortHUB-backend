@@ -10,13 +10,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.threektechone.resorthub.enums.AmenityName;
+import com.threektechone.resorthub.enums.MenuCategory;
 import com.threektechone.resorthub.enums.ResortRegistrationStep;
 import com.threektechone.resorthub.enums.ResortStatus;
+import com.threektechone.resorthub.enums.ResortType;
 import com.threektechone.resorthub.enums.RoleName;
 import com.threektechone.resorthub.enums.UserStatus;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortAmenity;
 import com.threektechone.resorthub.models.ResortImage;
+import com.threektechone.resorthub.models.ResortMenu;
 import com.threektechone.resorthub.models.Role;
 import com.threektechone.resorthub.models.User;
 import com.threektechone.resorthub.repositories.ResortAmenityRepository;
@@ -102,26 +105,55 @@ for (String[] d : data) {
 
     // 3. Khởi tạo Resort 1
     Resort r1 = Resort.builder()
-            .resortCode("RS201")
-            .name("Azure Sky Resort")
-            .city("Da Nang")
-            .price(new BigDecimal("1500000"))
-            .status(ResortStatus.ACTIVE)
-            .step(ResortRegistrationStep.COMPLETED)
-            .maxGuest(4)
-            .averageRating(new BigDecimal("4.5"))
-            .owner(owner)
-            .staff(staff)
-            .amenities(Set.of(wifi, pool)) // Gán Many-to-Many
-            .build();
-    // 4. Tạo List Images cho Resort 1 (Gán thủ công để đảm bảo resort_id không null)
-    ResortImage img1 = ResortImage.builder().imageUrl("https://example.com/r1_1.jpg").resort(r1).build();
-    ResortImage img2 = ResortImage.builder().imageUrl("https://example.com/r1_2.jpg").resort(r1).build();
-    r1.setImages(List.of(img1, img2));
+        .resortCode("RS201")
+        .name("Azure Sky Resort")
+        .type(ResortType.BEACH)
+        .city("Da Nang")
+        .price(new BigDecimal("1500000"))
+        .status(ResortStatus.ACTIVE)
+        .step(ResortRegistrationStep.COMPLETED)
+        .maxGuest(4)
+        .averageRating(new BigDecimal("4.5"))
+        .owner(owner)
+        .staff(staff)
+        .amenities(Set.of(wifi, pool))
+        .build();
 
-    // 5. Lưu Resort 1 (Lưu cái này sẽ tự lưu luôn Images nếu bạn có CascadeType.ALL)
-    resortRepository.save(r1);
 
+// Images
+ResortImage img1 = ResortImage.builder()
+        .imageUrl("https://example.com/r1_1.jpg")
+        .resort(r1)
+        .build();
+
+ResortImage img2 = ResortImage.builder()
+        .imageUrl("https://example.com/r1_2.jpg")
+        .resort(r1)
+        .build();
+
+r1.setImages(List.of(img1, img2));
+
+
+// Resort Menu
+ResortMenu breakfast = ResortMenu.builder()
+        .name("Breakfast Buffet")
+        .price(new BigDecimal("150000"))
+        .category(MenuCategory.MAIN)
+        .resort(r1)
+        .build();
+
+ResortMenu lunch = ResortMenu.builder()
+        .name("Seafood Lunch")
+        .price(new BigDecimal("300000"))
+        .category(MenuCategory.MAIN)
+        .resort(r1)
+        .build();
+
+r1.setMenuItems(List.of(breakfast, lunch));
+
+
+// Save
+resortRepository.save(r1);
 
         Resort r2 = new Resort();
         r2.setResortCode("RS202");

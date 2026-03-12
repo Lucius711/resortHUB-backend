@@ -1,5 +1,6 @@
 package com.threektechone.resorthub.models;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +48,13 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "resort_id", nullable = false)
     private Resort resort;
+    
+    @OneToOne
+    @JoinColumn(name = "payment_id",unique = true)
+    private Payment payment;
+
+    @Column(name= "booking_code", nullable=false)
+    private String bookingCode;
 
     @Column(name = "check_in_date", nullable = false)
     private LocalDateTime checkInDate;
@@ -73,6 +82,9 @@ public class Booking {
     
     @Column(name = "accepted_terms")
     private Boolean acceptedTerms;
+
+    @Column(name= "total_price")
+    private BigDecimal totalPrice;
 
     @Column(name = "accepted_at")
     private LocalDateTime acceptedAt;

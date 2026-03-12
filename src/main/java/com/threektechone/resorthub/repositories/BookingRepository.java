@@ -1,8 +1,28 @@
 package com.threektechone.resorthub.repositories;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import com.threektechone.resorthub.enums.BookingStatus;
 import com.threektechone.resorthub.models.Booking;
 
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
+
+    @Query("""
+    SELECT b FROM Booking b
+    WHERE b.customer.email = :email 
+    AND (:searchkey IS NULL OR 
+         LOWER(b.bookingCode) LIKE LOWER(CONCAT('%', :searchkey, '%')) 
+         OR LOWER(b.resort.name) LIKE LOWER(CONCAT('%', :searchkey, '%')))
+    AND (:status IS NULL OR b.status = :status)
+    """)
+    Page<Booking> getCustomerBookings(
+        @Param("email") String email,
+        @Param("searchkey") String searchkey,
+        @Param("status") BookingStatus status,
+        Pageable pageable
+    );
     
 }

@@ -2,19 +2,28 @@ package com.threektechone.resorthub.controller.CustomerModuleController;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.threektechone.resorthub.common.response.ApiResponse;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.BookingRequestDTO;
+import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingDetailResponseDTO;
+import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingListResponseDTO;
+import com.threektechone.resorthub.enums.BookingStatus;
 import com.threektechone.resorthub.service.CustomerModule.BookingService;
 
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/api/customer")
@@ -32,4 +41,25 @@ public class CustomerController {
         ApiResponse<String> response = new ApiResponse<>(200,null,"Create booking successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/bookings")
+    public ResponseEntity<ApiResponse<Page<CustomerBookingListResponseDTO>>> getCustomerBookings(@RequestParam(required=false) String searchkey, @RequestParam(required=false) BookingStatus status,@PageableDefault(size=5) Pageable pageable,Authentication authentication) {
+        String email = authentication.getName();
+
+        Page<CustomerBookingListResponseDTO> dtoList = bookingService.getCustomerBookings(email, searchkey, status, pageable);
+
+        ApiResponse<Page<CustomerBookingListResponseDTO>> response = new ApiResponse<>(200,null,dtoList,LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/bookings/{id}")
+    public ResponseEntity<ApiResponse<CustomerBookingDetailResponseDTO>> getCustomerBookingDetail(@PathVariable int id) {
+        CustomerBookingDetailResponseDTO dto = bookingService.getCustomerBookingDetail(id);
+
+        ApiResponse<CustomerBookingDetailResponseDTO> response = new ApiResponse<>(200,null,dto,LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
+    }
+    
+    
 }

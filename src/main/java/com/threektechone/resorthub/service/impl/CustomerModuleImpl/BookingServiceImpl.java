@@ -2,21 +2,26 @@ package com.threektechone.resorthub.service.impl.CustomerModuleImpl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.BookingRequestDTO;
+import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingDetailResponseDTO;
+import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingListResponseDTO;
 import com.threektechone.resorthub.enums.BookingStatus;
+import com.threektechone.resorthub.helper.BookingHelper.BookingCodeGenerator;
+import com.threektechone.resorthub.helper.BookingHelper.BookingPriceCalculator;
 import com.threektechone.resorthub.mapper.BookingMapper;
 import com.threektechone.resorthub.models.Booking;
 import com.threektechone.resorthub.models.BookingMeal;
 import com.threektechone.resorthub.models.Resort;
-import com.threektechone.resorthub.models.ResortMenu;
 import com.threektechone.resorthub.models.User;
 import com.threektechone.resorthub.repositories.BookingRepository;
-import com.threektechone.resorthub.repositories.ResortMenuRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
+import com.threektechone.resorthub.service.CustomerModule.BookingMealService;
 import com.threektechone.resorthub.service.CustomerModule.BookingService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +34,9 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
     private final BookingRepository bookingRepository;
-    private final ResortMenuRepository resortMenuRepository;
+    private final BookingMealService bookingMealService;
+    private final BookingPriceCalculator bookingPriceCalculator;
+    private final BookingCodeGenerator bookingCodeGenerator;
 
     @Override
     public void createBooking(BookingRequestDTO dto,String email,int resortId) {
@@ -40,32 +47,37 @@ public class BookingServiceImpl implements BookingService {
         .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         Booking booking = bookingMapper.toBooking(dto);
+        booking.setBookingCode(bookingCodeGenerator.generateBookingCode());
         booking.setCustomer(customer);
         booking.setResort(resort);
         booking.setStatus(BookingStatus.PENDING);
 
         List<BookingMeal> meals = dto.getMeals()
             .stream()
-            .map(mealDto -> {
-
-                BookingMeal meal = new BookingMeal();
-                meal.setDate(mealDto.getDate());
-                meal.setMealTime(mealDto.getMealTime());
-                meal.setQuantity(mealDto.getQuantity());
-
-                ResortMenu menu = resortMenuRepository.findById(mealDto.getMenuId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Menu not found"));
-
-                meal.setResortMenu(menu);
-
-                meal.setBooking(booking);
-
-                return meal;
-            })
+            .map(meal -> bookingMealService.mapToBookingMeal(meal, booking))
             .toList();
         
         booking.setMeals(meals);
+        booking.setTotalPrice(bookingPriceCalculator.calculateTotalPrice(resort, dto));
         bookingRepository.save(booking);
+    }
+
+    @Override
+    public Page<CustomerBookingListResponseDTO> getCustomerBookings(String email, String searchkey, BookingStatus status, Pageable pageable) {
+        Page<Booking> bookingList = bookingRepository.getCustomerBookings(email, searchkey, status, pageable);
+
+        return bookingList.map(bookingMapper::toCustomerBookingListResponseDTO);
+    }
+
+    @Override
+    public CustomerBookingDetailResponseDTO getCustomerBookingDetail(int bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+        .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+
+        CustomerBookingDetailResponseDTO dto = bookingMapper.toCustomerBookingDetailResponseDTO(booking);
+        dto.setMealPrice(bookingPriceCalculator.calculateMealCost(dto.getMeals()));
+
+        return dto;
     }
     
 }
