@@ -20,9 +20,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,7 +33,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
 public class Booking {
 
     @Id
@@ -67,12 +66,17 @@ public class Booking {
     
     @Enumerated(EnumType.STRING)
     @Column(name="status", nullable = false, length = 20)
-    @Builder.Default
-    private BookingStatus status = BookingStatus.PENDING;
+    private BookingStatus status;
     
     @CreationTimestamp
     @Column(name = "created_at", nullable = false,updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "expired_at", nullable = false,updatable = false)
+    private LocalDateTime expiredAt;
+
+    @Column(name = "canceled_at")
+    private LocalDateTime canceledAt;
 
     @OneToMany(mappedBy = "booking")
     private List<LostFoundItem> lostFoundItems;
@@ -88,5 +92,10 @@ public class Booking {
 
     @Column(name = "accepted_at")
     private LocalDateTime acceptedAt;
+
+    @PrePersist
+    public void setExpireTime() {
+        this.expiredAt = LocalDateTime.now().plusHours(24);
+    }
 
 }

@@ -9,7 +9,9 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.threektechone.resorthub.common.exception.custom.BookingCancelForbiddenException;
 import com.threektechone.resorthub.common.exception.custom.DuplicateResourceException;
+import com.threektechone.resorthub.common.exception.custom.InvalidBookingStatusException;
 import com.threektechone.resorthub.common.exception.custom.InvalidEditRequestDataException;
 import com.threektechone.resorthub.common.exception.custom.InvalidOtpException;
 import com.threektechone.resorthub.common.exception.custom.InvalidRefreshTokenException;
@@ -27,8 +29,8 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
-    @ExceptionHandler(DisabledException.class)
-    public ResponseEntity<ApiResponse<Object>> handleForbidden(DisabledException ex) {
+    @ExceptionHandler({DisabledException.class,BookingCancelForbiddenException.class})
+    public ResponseEntity<ApiResponse<Object>> handleForbidden(Exception ex) {
         return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
     
@@ -37,7 +39,7 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler({InvalidOtpException.class,InvalidEditRequestDataException.class})
+    @ExceptionHandler({InvalidOtpException.class,InvalidEditRequestDataException.class,InvalidBookingStatusException.class})
     public ResponseEntity<ApiResponse<Object>> handleBadRequest(Exception ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }

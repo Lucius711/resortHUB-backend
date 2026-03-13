@@ -18,13 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.threektechone.resorthub.common.response.ApiResponse;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.EditRequestDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerBookingDetailResponseDTO;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerBookingListResponseDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerResortsResponseDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterMenusRequestDTO;
+import com.threektechone.resorthub.enums.BookingStatus;
 import com.threektechone.resorthub.enums.ResortStatus;
+import com.threektechone.resorthub.service.OwnerModule.OwnerBookingService;
 import com.threektechone.resorthub.service.OwnerModule.ResortService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +41,7 @@ import lombok.RequiredArgsConstructor;
 public class OwnerController {
 
     private final ResortService resortService;
+    private final OwnerBookingService ownerBookingService;
      
     @GetMapping("/resorts")
     public ResponseEntity<ApiResponse<Page<OwnerResortsResponseDTO>>> getAllOwnerResorst(
@@ -126,11 +131,28 @@ public class OwnerController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/bookings")
+    public ResponseEntity<ApiResponse<Page<OwnerBookingListResponseDTO>>> getOwnerBookings(@RequestParam(required =false) String searchkey, @RequestParam(required = false) BookingStatus status, @PageableDefault(size =5) Pageable pageable,Authentication authentication) {
+        String email = authentication.getName();
+
+        Page<OwnerBookingListResponseDTO> dtoList = ownerBookingService.getOwnerBookings(email, searchkey, status, pageable);
+
+        ApiResponse<Page<OwnerBookingListResponseDTO>> response = new ApiResponse<>(200,null,dtoList,LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/bookings/{id}")
+    public ResponseEntity<ApiResponse<OwnerBookingDetailResponseDTO>> getOwnerBookingDetail(@PathVariable int id) {
+        OwnerBookingDetailResponseDTO dto = ownerBookingService.getOwnerBookingDetail(id);
+
+        ApiResponse<OwnerBookingDetailResponseDTO> response = new ApiResponse<>(200,null,dto,LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
+    }
     
     
 
-    
 
-    
 
 }

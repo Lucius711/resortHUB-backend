@@ -8,8 +8,10 @@ import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingDetailRe
 import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingListResponseDTO;
 import com.threektechone.resorthub.enums.BookingStatus;
 
-public interface BookingService {
+public interface CustomerBookingService {
     void createBooking(BookingRequestDTO dto,String email,int resortId);
     Page<CustomerBookingListResponseDTO> getCustomerBookings(String email, String searchkey, BookingStatus status,Pageable pageable);
     CustomerBookingDetailResponseDTO getCustomerBookingDetail(int bookingId);
+    void cancelExpiredBookings();
+    void cancelBookingByCustomer(int bookingId,String customerMail);
 }

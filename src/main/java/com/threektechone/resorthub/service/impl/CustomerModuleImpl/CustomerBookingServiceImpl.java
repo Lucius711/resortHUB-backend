@@ -1,11 +1,14 @@
 package com.threektechone.resorthub.service.impl.CustomerModuleImpl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.threektechone.resorthub.common.exception.custom.BookingCancelForbiddenException;
+import com.threektechone.resorthub.common.exception.custom.InvalidBookingStatusException;
 import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.BookingRequestDTO;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingDetailResponseDTO;
@@ -21,20 +24,20 @@ import com.threektechone.resorthub.models.User;
 import com.threektechone.resorthub.repositories.BookingRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
-import com.threektechone.resorthub.service.CustomerModule.BookingMealService;
-import com.threektechone.resorthub.service.CustomerModule.BookingService;
+import com.threektechone.resorthub.service.CustomerModule.CustomerBookingMealService;
+import com.threektechone.resorthub.service.CustomerModule.CustomerBookingService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class BookingServiceImpl implements BookingService {
+public class CustomerBookingServiceImpl implements CustomerBookingService {
 
     private final ResortRepository resortRepository;
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
     private final BookingRepository bookingRepository;
-    private final BookingMealService bookingMealService;
+    private final CustomerBookingMealService bookingMealService;
     private final BookingPriceCalculator bookingPriceCalculator;
     private final BookingCodeGenerator bookingCodeGenerator;
 
@@ -78,6 +81,35 @@ public class BookingServiceImpl implements BookingService {
         dto.setMealPrice(bookingPriceCalculator.calculateMealCost(dto.getMeals()));
 
         return dto;
+    }
+
+    @Override
+    public void cancelExpiredBookings() {
+        List<Booking> expiredBookings = bookingRepository.findExpiredBookings(LocalDateTime.now());
+
+        expiredBookings.forEach(b -> b.setStatus(BookingStatus.CANCELED));
+
+        expiredBookings.forEach(b -> b.setCanceledAt(LocalDateTime.now()));
+
+        bookingRepository.saveAll(expiredBookings);
+    }
+
+    @Override
+    public void cancelBookingByCustomer(int bookingId, String customerMail) {
+        Booking booking = bookingRepository.findById(bookingId)
+        .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+
+        if (!booking.getCustomer().getEmail().equalsIgnoreCase(customerMail)) {
+            throw new BookingCancelForbiddenException("You are not have permission to cancel this booking!");
+        }
+
+        if (!booking.getStatus().equals(BookingStatus.PENDING)) {
+            throw new InvalidBookingStatusException("You can not cancel this booking because it is processed!");
+        }
+
+        booking.setStatus(BookingStatus.CANCELED);
+        booking.setCanceledAt(LocalDateTime.now());
+        bookingRepository.save(booking);
     }
     
 }

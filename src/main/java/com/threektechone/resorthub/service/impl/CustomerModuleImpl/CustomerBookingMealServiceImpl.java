@@ -9,13 +9,13 @@ import com.threektechone.resorthub.models.Booking;
 import com.threektechone.resorthub.models.BookingMeal;
 import com.threektechone.resorthub.models.ResortMenu;
 import com.threektechone.resorthub.repositories.ResortMenuRepository;
-import com.threektechone.resorthub.service.CustomerModule.BookingMealService;
+import com.threektechone.resorthub.service.CustomerModule.CustomerBookingMealService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class BookingMealServiceImpl implements BookingMealService{
+public class CustomerBookingMealServiceImpl implements CustomerBookingMealService{
 
     private final ResortMenuRepository resortMenuRepository;
 

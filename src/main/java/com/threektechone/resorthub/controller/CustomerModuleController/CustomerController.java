@@ -8,6 +8,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ import com.threektechone.resorthub.dto.CustomerModuleDTO.BookingRequestDTO;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingDetailResponseDTO;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingListResponseDTO;
 import com.threektechone.resorthub.enums.BookingStatus;
-import com.threektechone.resorthub.service.CustomerModule.BookingService;
+import com.threektechone.resorthub.service.CustomerModule.CustomerBookingService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomerController {
 
-    private final BookingService bookingService;
+    private final CustomerBookingService bookingService;
     
     @PostMapping("/resorts/{id}/booking")
     public ResponseEntity<ApiResponse<String>> createBooking(@RequestBody BookingRequestDTO dto, @PathVariable int id, Authentication authentication) {
@@ -60,6 +61,16 @@ public class CustomerController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/bookings/{id}/cancel")
+    public ResponseEntity<ApiResponse<String>> cancelBooking(@PathVariable int id,Authentication authentication) {
+        String email = authentication.getName();
+
+        bookingService.cancelBookingByCustomer(id, email);
+
+        ApiResponse<String> response = new ApiResponse<>(200,null,"Cancel booking successfully!",LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    } 
     
     
 }

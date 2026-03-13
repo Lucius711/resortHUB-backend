@@ -1,4 +1,7 @@
 package com.threektechone.resorthub.repositories;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,6 +22,29 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     AND (:status IS NULL OR b.status = :status)
     """)
     Page<Booking> getCustomerBookings(
+        @Param("email") String email,
+        @Param("searchkey") String searchkey,
+        @Param("status") BookingStatus status,
+        Pageable pageable
+    );
+
+    @Query("""
+        SELECT b FROM Booking b
+        WHERE b.status = 'PENDING'
+        AND b.expiredAt < :now
+    """)
+    List<Booking> findExpiredBookings(LocalDateTime now);
+
+    @Query("""
+    SELECT b FROM Booking b
+    WHERE b.status = 'PENDING'
+    AND b.resort.owner.email = :email
+    AND (:searchkey IS NULL OR 
+         LOWER(b.bookingCode) LIKE LOWER(CONCAT('%', :searchkey, '%')) 
+         OR LOWER(b.customer.fullName) LIKE LOWER(CONCAT('%', :searchkey, '%')))
+    AND (:status IS NULL OR b.status = :status)
+    """)
+    Page<Booking> getOwnerBookings(
         @Param("email") String email,
         @Param("searchkey") String searchkey,
         @Param("status") BookingStatus status,
