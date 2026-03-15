@@ -49,7 +49,11 @@ public interface  BookingMapper {
     @Mapping(target = "customerImage", source = "customer.image")
     @Mapping(target = "customerName", source = "customer.fullName")
     @Mapping(target = "paymentStatus", source = "payment.paymentStatus")
+    @Mapping(target = "bookingStatus", source = "status")
     @Mapping(target = "mealPrice", ignore= true)
+    @Mapping(target = "roomAvailable", ignore= true)
+    @Mapping(target = "canCheckIn", ignore= true)
+    @Mapping(target = "canCheckOut", ignore= true)
     OwnerBookingDetailResponseDTO tOwnerBookingDetailResponseDTO(Booking booking);
 
     default String getThumbnail(Booking booking) {

@@ -49,5 +49,13 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
         @Param("status") BookingStatus status,
         Pageable pageable
     );
+
+    @Query("""
+    SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END
+    FROM Booking b
+    WHERE b.resort.resortId = :resortId
+    AND b.status = 'CHECKED_IN'
+    """)
+    Boolean isRoomOccupied(@Param("resortId") int resortId);
     
 }

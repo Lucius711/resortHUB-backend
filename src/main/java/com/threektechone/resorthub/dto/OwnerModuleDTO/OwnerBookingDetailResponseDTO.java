@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.threektechone.resorthub.dto.CustomerModuleDTO.MealSelectionRequestDTO;
+import com.threektechone.resorthub.enums.BookingStatus;
 import com.threektechone.resorthub.enums.PaymentStatus;
 import com.threektechone.resorthub.enums.ResortType;
 
@@ -30,4 +31,8 @@ public class OwnerBookingDetailResponseDTO {
     private BigDecimal mealPrice;
     private BigDecimal totalPrice;
     private PaymentStatus paymentStatus;
+    private BookingStatus bookingStatus;
+    private Boolean roomAvailable;
+    private Boolean canCheckIn;
+    private Boolean canCheckOut;
 }

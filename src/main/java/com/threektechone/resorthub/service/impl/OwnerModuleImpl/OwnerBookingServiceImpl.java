@@ -39,9 +39,19 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
         Booking booking = bookingRepository.findById(bookingId)
         .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
 
+        Boolean occupied = bookingRepository.isRoomOccupied(booking.getResort().getResortId());
+
+        Boolean roomAvailable = !occupied;
+
+        Boolean canCheckIn =booking.getStatus() == BookingStatus.APPROVED && roomAvailable;
+        
+        Boolean canCheckOut =booking.getStatus() == BookingStatus.CHECKED_IN;
+
         OwnerBookingDetailResponseDTO dto = bookingMapper.tOwnerBookingDetailResponseDTO(booking);
         dto.setMealPrice(bookingPriceCalculator.calculateMealCost(dto.getMeals()));
-
+        dto.setRoomAvailable(roomAvailable);
+        dto.setCanCheckIn(canCheckIn);
+        dto.setCanCheckOut(canCheckOut);
         return dto;
     }
 
