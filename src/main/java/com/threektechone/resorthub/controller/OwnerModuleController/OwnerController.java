@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.threektechone.resorthub.common.response.ApiResponse;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.BookingRequestDecisionDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.EditRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerBookingDetailResponseDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerBookingListResponseDTO;
@@ -42,6 +43,7 @@ public class OwnerController {
 
     private final ResortService resortService;
     private final OwnerBookingService ownerBookingService;
+
      
     @GetMapping("/resorts")
     public ResponseEntity<ApiResponse<Page<OwnerResortsResponseDTO>>> getAllOwnerResorst(
@@ -150,6 +152,15 @@ public class OwnerController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/bookings/{id}/review")
+    public ResponseEntity<ApiResponse<String>> reviewBooking(@RequestBody BookingRequestDecisionDTO dto, @PathVariable int id) {
+        ownerBookingService.reviewBooking(dto, id);
+        
+        ApiResponse<String> response = new ApiResponse<>(200,null,"Review successfully!",LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
+    
     
     
 

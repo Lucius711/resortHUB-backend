@@ -4,10 +4,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.threektechone.resorthub.common.exception.custom.RequestAlreadyReviewedException;
 import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
+import com.threektechone.resorthub.dto.OwnerModuleDTO.BookingRequestDecisionDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerBookingDetailResponseDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerBookingListResponseDTO;
 import com.threektechone.resorthub.enums.BookingStatus;
+import com.threektechone.resorthub.enums.ReviewAction;
 import com.threektechone.resorthub.helper.BookingHelper.BookingPriceCalculator;
 import com.threektechone.resorthub.mapper.BookingMapper;
 import com.threektechone.resorthub.models.Booking;
@@ -40,6 +43,25 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
         dto.setMealPrice(bookingPriceCalculator.calculateMealCost(dto.getMeals()));
 
         return dto;
+    }
+
+    @Override
+    public void reviewBooking(BookingRequestDecisionDTO dto, int bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+        .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+           throw new RequestAlreadyReviewedException("Request already reviewed");
+        }
+
+        if (dto.getAction() == ReviewAction.APPROVE) {
+            booking.setStatus(BookingStatus.APPROVED);
+        }
+        else if (dto.getAction() == ReviewAction.REJECT) {
+            booking.setStatus(BookingStatus.REJECTED);
+            booking.setReason(dto.getReason());
+        }      
+        bookingRepository.save(booking);
     }
     
 }

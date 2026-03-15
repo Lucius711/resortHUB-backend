@@ -37,8 +37,7 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     @Query("""
     SELECT b FROM Booking b
-    WHERE b.status = 'PENDING'
-    AND b.resort.owner.email = :email
+    WHERE b.resort.owner.email = :email
     AND (:searchkey IS NULL OR 
          LOWER(b.bookingCode) LIKE LOWER(CONCAT('%', :searchkey, '%')) 
          OR LOWER(b.customer.fullName) LIKE LOWER(CONCAT('%', :searchkey, '%')))

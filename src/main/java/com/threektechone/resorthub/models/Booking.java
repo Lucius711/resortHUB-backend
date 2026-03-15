@@ -93,6 +93,9 @@ public class Booking {
     @Column(name = "accepted_at")
     private LocalDateTime acceptedAt;
 
+    @Column(name = "reason", length=255)
+    private String reason;
+
     @PrePersist
     public void setExpireTime() {
         this.expiredAt = LocalDateTime.now().plusHours(24);
