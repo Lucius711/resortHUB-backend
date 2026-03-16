@@ -1,16 +1,13 @@
 package com.threektechone.resorthub.helper.BookingHelper;
 
-import org.springframework.stereotype.Service;
+import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
 
-@Service
-@RequiredArgsConstructor
 public class BookingCodeGenerator {
-
+    
     //Generate booking code
-    public String generateBookingCode(){
-        return "BK" + System.currentTimeMillis();
+    public static String generateBookingCode(){
+        return "BK-" + UUID.randomUUID().toString();
     }
     
 }

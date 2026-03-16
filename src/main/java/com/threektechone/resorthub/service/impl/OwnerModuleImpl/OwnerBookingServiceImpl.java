@@ -11,10 +11,10 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerBookingDetailResponse
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerBookingListResponseDTO;
 import com.threektechone.resorthub.enums.BookingStatus;
 import com.threektechone.resorthub.enums.ReviewAction;
-import com.threektechone.resorthub.helper.BookingHelper.BookingPriceCalculator;
 import com.threektechone.resorthub.mapper.BookingMapper;
 import com.threektechone.resorthub.models.Booking;
 import com.threektechone.resorthub.repositories.BookingRepository;
+import com.threektechone.resorthub.service.CommonModule.BookingPriceCalculator;
 import com.threektechone.resorthub.service.OwnerModule.OwnerBookingService;
 
 import lombok.RequiredArgsConstructor;

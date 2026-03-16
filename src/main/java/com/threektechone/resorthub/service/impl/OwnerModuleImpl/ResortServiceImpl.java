@@ -20,7 +20,6 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterMenusRequestDTO;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.helper.ResortHelper.ResortCodeGenerator;
-import com.threektechone.resorthub.helper.ResortHelper.ResortEditDataBuilder;
 import com.threektechone.resorthub.mapper.EditRequestMapper;
 import com.threektechone.resorthub.mapper.ResortMapper;
 import com.threektechone.resorthub.mapper.ResortMenuMapper;
@@ -32,6 +31,7 @@ import com.threektechone.resorthub.models.User;
 import com.threektechone.resorthub.repositories.EditResortRequestRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
+import com.threektechone.resorthub.service.CommonModule.ResortEditDataBuilder;
 import com.threektechone.resorthub.service.OwnerModule.ResortRegistrationService;
 import com.threektechone.resorthub.service.OwnerModule.ResortService;
 
@@ -57,7 +57,6 @@ public class ResortServiceImpl implements ResortService {
 
     private final ResortRegistrationService resortRegistrationService;
 
-    private final ResortCodeGenerator resortCodeGenerator;
 
     private final ResortMenuMapper resortMenuMapper;
     
@@ -69,7 +68,7 @@ public class ResortServiceImpl implements ResortService {
         .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         Resort resort = new Resort();
-        resortRegistrationService.initNewRegistration(resort, owner, resortCodeGenerator.generateResortCode());
+        resortRegistrationService.initNewRegistration(resort, owner, ResortCodeGenerator.generateResortCode());
         resortRepository.save(resort);
         return resort.getResortId();
     }

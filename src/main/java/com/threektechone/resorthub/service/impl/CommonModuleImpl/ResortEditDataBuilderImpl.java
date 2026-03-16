@@ -1,4 +1,4 @@
-package com.threektechone.resorthub.helper.ResortHelper;
+package com.threektechone.resorthub.service.impl.CommonModuleImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,14 +10,13 @@ import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortAmenity;
 import com.threektechone.resorthub.models.ResortImage;
 import com.threektechone.resorthub.models.ResortMenu;
-
-import lombok.RequiredArgsConstructor;
+import com.threektechone.resorthub.service.CommonModule.ResortEditDataBuilder;
 
 @Service
-@RequiredArgsConstructor
-public class ResortEditDataBuilder {
-
+public class ResortEditDataBuilderImpl implements ResortEditDataBuilder{
+    
     //Get old data of resort
+    @Override
     public Map<String, Object> buildOldData(Resort resort, Map<String, Object> newData) {
         Map<String, Object> oldData = new HashMap<>();    
         for (String key : newData.keySet()) {
@@ -53,5 +52,5 @@ public class ResortEditDataBuilder {
         }
     }
     return oldData;
-}
+    }
 }

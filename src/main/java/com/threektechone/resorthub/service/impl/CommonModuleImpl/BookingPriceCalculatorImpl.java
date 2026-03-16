@@ -1,4 +1,4 @@
-package com.threektechone.resorthub.helper.BookingHelper;
+package com.threektechone.resorthub.service.impl.CommonModuleImpl;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
@@ -12,16 +12,19 @@ import com.threektechone.resorthub.dto.CustomerModuleDTO.MealSelectionRequestDTO
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortMenu;
 import com.threektechone.resorthub.repositories.ResortMenuRepository;
+import com.threektechone.resorthub.service.CommonModule.BookingPriceCalculator;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class BookingPriceCalculator {
+public class BookingPriceCalculatorImpl implements BookingPriceCalculator {
+
     private final ResortMenuRepository resortMenuRepository;
-
+    
+    //calculate total price of booking
+    @Override
     public BigDecimal calculateTotalPrice(Resort resort, BookingRequestDTO dto) {
-
         long nights = ChronoUnit.DAYS.between(
                 dto.getCheckInDate(),
                 dto.getCheckOutDate()
@@ -34,8 +37,10 @@ public class BookingPriceCalculator {
         return resortCost.add(mealCost);
     }
     
-    public BigDecimal calculateMealCost(List<MealSelectionRequestDTO> meals) {
 
+    //calculate meal cost of booking
+    @Override
+    public BigDecimal calculateMealCost(List<MealSelectionRequestDTO> meals) {
         BigDecimal mealCost = BigDecimal.ZERO;
 
         for (MealSelectionRequestDTO meal : meals) {
@@ -50,4 +55,5 @@ public class BookingPriceCalculator {
 
         return mealCost;
     }
+    
 }

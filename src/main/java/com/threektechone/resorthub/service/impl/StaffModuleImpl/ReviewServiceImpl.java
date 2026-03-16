@@ -22,7 +22,7 @@ import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseListDTO;
 import com.threektechone.resorthub.enums.RequestStatus;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.enums.ReviewAction;
-import com.threektechone.resorthub.helper.ResortHelper.ResortEditApplier;
+import com.threektechone.resorthub.service.CommonModule.ResortEditApplier;
 import com.threektechone.resorthub.mapper.EditRequestMapper;
 import com.threektechone.resorthub.mapper.ResortMapper;
 import com.threektechone.resorthub.models.EditResortRequest;

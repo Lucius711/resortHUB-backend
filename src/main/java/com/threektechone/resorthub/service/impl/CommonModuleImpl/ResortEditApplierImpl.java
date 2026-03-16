@@ -1,4 +1,4 @@
-package com.threektechone.resorthub.helper.ResortHelper;
+package com.threektechone.resorthub.service.impl.CommonModuleImpl;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -13,16 +13,21 @@ import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.repositories.ResortAmenityRepository;
 import com.threektechone.resorthub.repositories.ResortImageRepository;
 import com.threektechone.resorthub.repositories.ResortMenuRepository;
+import com.threektechone.resorthub.service.CommonModule.ResortEditApplier;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ResortEditApplier {
+public class ResortEditApplierImpl implements ResortEditApplier {
+
     private final ResortAmenityRepository resortAmenityRepository;
     private final ResortMenuRepository resortMenuRepository;
     private final ResortImageRepository resortImageRepository;
+    
 
+    //apply new data for resort
+    @Override
     public void applyChanges(Resort resort, Map<String, Object> newData) {
         for (String key : newData.keySet()) {
             EditResortField field = EditResortField.fromKey(key);
@@ -59,4 +64,5 @@ public class ResortEditApplier {
             }
         }
     }
+    
 }

@@ -15,7 +15,6 @@ import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingDetailRe
 import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingListResponseDTO;
 import com.threektechone.resorthub.enums.BookingStatus;
 import com.threektechone.resorthub.helper.BookingHelper.BookingCodeGenerator;
-import com.threektechone.resorthub.helper.BookingHelper.BookingPriceCalculator;
 import com.threektechone.resorthub.mapper.BookingMapper;
 import com.threektechone.resorthub.models.Booking;
 import com.threektechone.resorthub.models.BookingMeal;
@@ -24,6 +23,7 @@ import com.threektechone.resorthub.models.User;
 import com.threektechone.resorthub.repositories.BookingRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
+import com.threektechone.resorthub.service.CommonModule.BookingPriceCalculator;
 import com.threektechone.resorthub.service.CustomerModule.CustomerBookingMealService;
 import com.threektechone.resorthub.service.CustomerModule.CustomerBookingService;
 
@@ -39,7 +39,6 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
     private final BookingRepository bookingRepository;
     private final CustomerBookingMealService bookingMealService;
     private final BookingPriceCalculator bookingPriceCalculator;
-    private final BookingCodeGenerator bookingCodeGenerator;
 
     @Override
     public void createBooking(BookingRequestDTO dto,String email,int resortId) {
@@ -50,7 +49,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         Booking booking = bookingMapper.toBooking(dto);
-        booking.setBookingCode(bookingCodeGenerator.generateBookingCode());
+        booking.setBookingCode(BookingCodeGenerator.generateBookingCode());
         booking.setCustomer(customer);
         booking.setResort(resort);
         booking.setStatus(BookingStatus.PENDING);
