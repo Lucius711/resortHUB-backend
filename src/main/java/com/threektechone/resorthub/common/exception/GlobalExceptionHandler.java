@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.threektechone.resorthub.common.exception.custom.BookingCancelForbiddenException;
+import com.threektechone.resorthub.common.exception.custom.CancellationDeadlineException;
+import com.threektechone.resorthub.common.exception.custom.CapacityExceededException;
+import com.threektechone.resorthub.common.exception.custom.CheckInNotAllowedException;
+import com.threektechone.resorthub.common.exception.custom.CheckOutNotAllowedException;
 import com.threektechone.resorthub.common.exception.custom.DuplicateResourceException;
 import com.threektechone.resorthub.common.exception.custom.InvalidBookingStatusException;
 import com.threektechone.resorthub.common.exception.custom.InvalidEditRequestDataException;
@@ -39,13 +43,13 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler({InvalidOtpException.class,InvalidEditRequestDataException.class,InvalidBookingStatusException.class})
+    @ExceptionHandler({InvalidOtpException.class,InvalidEditRequestDataException.class,InvalidBookingStatusException.class,CancellationDeadlineException.class,CapacityExceededException.class})
     public ResponseEntity<ApiResponse<Object>> handleBadRequest(Exception ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler({DuplicateResourceException.class,InvalidResortStatusException.class,InvalidRegisterStepException.class
-        ,RequestAlreadyReviewedException.class
+        ,RequestAlreadyReviewedException.class,CheckInNotAllowedException.class,CheckOutNotAllowedException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleConflict(Exception ex) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());

@@ -15,4 +15,8 @@ public interface OwnerBookingService {
     OwnerBookingDetailResponseDTO getOwnerBookingDetail(int bookingId);
 
     void reviewBooking(BookingRequestDecisionDTO dto, int bookingId);
+
+    void checkIn(int bookingId);
+
+    void checkOut(int bookingId);
 }

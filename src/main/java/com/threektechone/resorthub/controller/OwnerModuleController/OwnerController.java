@@ -160,10 +160,22 @@ public class OwnerController {
         ApiResponse<String> response = new ApiResponse<>(200,null,"Review successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
-    
-    
-    
 
+    @PatchMapping("/bookings/{id}/check-in")
+    public ResponseEntity<ApiResponse<String>> checkInBooking(@PathVariable int id) {
+        ownerBookingService.checkIn(id);
 
+        ApiResponse<String> response = new ApiResponse<>(200,null,"Check-in successfuly!",LocalDateTime.now());
 
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/bookings/{id}/check-out")
+    public ResponseEntity<ApiResponse<String>> checkOutBooking(@PathVariable int id) {
+        ownerBookingService.checkOut(id);
+
+        ApiResponse<String> response = new ApiResponse<>(200,null,"Check-out successfuly!",LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
+    }
 }

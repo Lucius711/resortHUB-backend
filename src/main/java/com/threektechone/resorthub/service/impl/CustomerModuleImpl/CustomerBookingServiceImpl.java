@@ -7,8 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.threektechone.resorthub.common.exception.custom.BookingCancelForbiddenException;
-import com.threektechone.resorthub.common.exception.custom.InvalidBookingStatusException;
 import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.BookingRequestDTO;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingDetailResponseDTO;
@@ -20,6 +18,8 @@ import com.threektechone.resorthub.models.Booking;
 import com.threektechone.resorthub.models.BookingMeal;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.User;
+import com.threektechone.resorthub.policy.booking.CancellationPolicy;
+import com.threektechone.resorthub.policy.booking.CapacityPolicy;
 import com.threektechone.resorthub.repositories.BookingRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
@@ -39,6 +39,8 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
     private final BookingRepository bookingRepository;
     private final CustomerBookingMealService bookingMealService;
     private final BookingPriceCalculator bookingPriceCalculator;
+    private final CapacityPolicy capacityPolicy;
+    private final CancellationPolicy cancellationPolicy;
 
     @Override
     public void createBooking(BookingRequestDTO dto,String email,int resortId) {
@@ -47,6 +49,8 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
 
         User customer = userRepository.findByEmail(email)
         .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+
+        capacityPolicy.validateCapacity(dto.getNumberOfPerson(), resort.getMaxGuest());
 
         Booking booking = bookingMapper.toBooking(dto);
         booking.setBookingCode(BookingCodeGenerator.generateBookingCode());
@@ -98,13 +102,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         Booking booking = bookingRepository.findById(bookingId)
         .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
 
-        if (!booking.getCustomer().getEmail().equalsIgnoreCase(customerMail)) {
-            throw new BookingCancelForbiddenException("You are not have permission to cancel this booking!");
-        }
-
-        if (!booking.getStatus().equals(BookingStatus.PENDING)) {
-            throw new InvalidBookingStatusException("You can not cancel this booking because it is processed!");
-        }
+        cancellationPolicy.validateCancel(booking, customerMail);
 
         booking.setStatus(BookingStatus.CANCELED);
         booking.setCanceledAt(LocalDateTime.now());
