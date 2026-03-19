@@ -2,6 +2,7 @@ package com.threektechone.resorthub.service.OwnerModule;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.threektechone.resorthub.dto.OwnerModuleDTO.EditRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerResortsResponseDTO;
@@ -21,5 +22,6 @@ public interface ResortService {
     void updateAmenitiesResort(RegisterAmenitiesRequestDTO dto,int resortId);
     void updateImagesResort(RegisterImagesRequestDTO dto,int resortId);
     void updateMenusResort(RegisterMenusRequestDTO dto,int resortId);
-    void submitRegisterResort(int resortId);   
+    void submitRegisterResort(int resortId);
+    void signContract(int resortId,MultipartFile file,Boolean acceptedTerms);   
 }

@@ -2,16 +2,20 @@ package com.threektechone.resorthub.service.impl.OwnerModuleImpl;
 
 import org.springframework.stereotype.Service;
 
+import com.threektechone.resorthub.common.exception.custom.InvalidContractStatusException;
 import com.threektechone.resorthub.common.exception.custom.InvalidRegisterStepException;
 import com.threektechone.resorthub.common.exception.custom.InvalidResortStatusException;
+import com.threektechone.resorthub.enums.ContractStatus;
 import com.threektechone.resorthub.enums.ResortRegistrationStep;
 import com.threektechone.resorthub.enums.ResortStatus;
+import com.threektechone.resorthub.models.Contract;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.User;
 import com.threektechone.resorthub.service.OwnerModule.ResortRegistrationService;
 
 @Service
 public class ResortRegistrationServiceImpl implements ResortRegistrationService {
+
 
     @Override
     public void initNewRegistration(Resort resort, User owner, String resortCode) {
@@ -96,7 +100,29 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
     @Override
     public void submit(Resort resort) {
         resort.setStatus(ResortStatus.PENDING_REVIEW);
-        resort.setStep(ResortRegistrationStep.COMPLETED);
+        resort.setStep(ResortRegistrationStep.CONTRACT_SIGN);
+    }
+
+    @Override
+    public void ensureCanSignContract(Resort resort,Contract contract) {
+        if (contract.getStatus() != ContractStatus.PENDING) {
+            throw new InvalidContractStatusException("Staff must be send contract first!");
+        }
+
+        if(resort.getStatus() != ResortStatus.CONTRACT_PENDING){
+            throw new InvalidResortStatusException("Only contract pending resort can sign!");
+        }
+
+        if (resort.getStep().ordinal() != ResortRegistrationStep.CONTRACT_SIGN.ordinal()) {
+            throw new InvalidRegisterStepException("Please submit registration first!");
+        }
+    }
+
+    @Override
+    public void signContract(Contract contract,Resort resort) {
+        contract.setStatus(ContractStatus.ACTIVE);
+        resort.setStatus(ResortStatus.ACTIVE);  
+        resort.setStep(ResortRegistrationStep.COMPLETED);                            
     }
 
     

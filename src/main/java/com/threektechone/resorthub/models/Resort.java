@@ -113,10 +113,15 @@ public class Resort {
     @OneToMany(mappedBy = "resort")
     private List<Booking> bookings;
 
-    @OneToMany(mappedBy = "resort")
+    @OneToMany(mappedBy = "resort",cascade = CascadeType.PERSIST)
     private List<Contract> contracts;
 
     @OneToMany(mappedBy= "resort")
     private List<EditResortRequest> requests;
+
+    public void addContract(Contract contract) {
+        contracts.add(contract);
+        contract.setResort(this);
+    }
     
 }

@@ -16,6 +16,7 @@ import com.threektechone.resorthub.common.exception.custom.CheckInNotAllowedExce
 import com.threektechone.resorthub.common.exception.custom.CheckOutNotAllowedException;
 import com.threektechone.resorthub.common.exception.custom.DuplicateResourceException;
 import com.threektechone.resorthub.common.exception.custom.InvalidBookingStatusException;
+import com.threektechone.resorthub.common.exception.custom.InvalidContractStatusException;
 import com.threektechone.resorthub.common.exception.custom.InvalidEditRequestDataException;
 import com.threektechone.resorthub.common.exception.custom.InvalidOtpException;
 import com.threektechone.resorthub.common.exception.custom.InvalidRefreshTokenException;
@@ -23,12 +24,13 @@ import com.threektechone.resorthub.common.exception.custom.InvalidRegisterStepEx
 import com.threektechone.resorthub.common.exception.custom.InvalidResortStatusException;
 import com.threektechone.resorthub.common.exception.custom.RequestAlreadyReviewedException;
 import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
+import com.threektechone.resorthub.common.exception.custom.UnauthorizedException;
 import com.threektechone.resorthub.common.response.ApiResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({BadCredentialsException.class,InvalidRefreshTokenException.class})
+    @ExceptionHandler({BadCredentialsException.class,InvalidRefreshTokenException.class,UnauthorizedException.class})
     public ResponseEntity<ApiResponse<Object>> handleUnauthorized(Exception ex) {
         return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
@@ -49,7 +51,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({DuplicateResourceException.class,InvalidResortStatusException.class,InvalidRegisterStepException.class
-        ,RequestAlreadyReviewedException.class,CheckInNotAllowedException.class,CheckOutNotAllowedException.class
+        ,RequestAlreadyReviewedException.class,CheckInNotAllowedException.class,CheckOutNotAllowedException.class,InvalidContractStatusException.class
     })
     public ResponseEntity<ApiResponse<Object>> handleConflict(Exception ex) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());

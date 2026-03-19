@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.threektechone.resorthub.common.response.ApiResponse;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.BookingRequestDecisionDTO;
@@ -119,6 +120,15 @@ public class OwnerController {
         resortService.submitRegisterResort(id);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Submit successfully!",LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register-resort/{id}/sign-contract")
+    public ResponseEntity<ApiResponse<String>> signContract(@PathVariable int id,@RequestParam("file") MultipartFile file,@RequestParam Boolean acceptedTerms) {
+        resortService.signContract(id, file, acceptedTerms);
+        
+        ApiResponse<String> response = new ApiResponse<>(200,null,"Sign contract successfully!",LocalDateTime.now());
 
         return ResponseEntity.ok(response);
     }

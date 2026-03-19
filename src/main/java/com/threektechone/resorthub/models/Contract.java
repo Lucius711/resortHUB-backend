@@ -1,5 +1,7 @@
 package com.threektechone.resorthub.models;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import com.threektechone.resorthub.enums.ContractStatus;
 import com.threektechone.resorthub.enums.ContractType;
@@ -35,7 +37,7 @@ public class Contract {
     private int contractId;
 
     @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
+    @JoinColumn(name = "owner_id")
     private User owner;
 
     @ManyToOne
@@ -49,14 +51,24 @@ public class Contract {
     @Column(name = "contract_type", nullable = false, length = 30)
     private ContractType contractType;
 
-    @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
-
-    @Column(name = "end_date", nullable = false)
-    private LocalDate endDate;
+    @Column(name = "contract_file",length=255)
+    private String fileUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private ContractStatus status;
+    
+    @Column(name="signed_by_owner")
+    private Boolean signedByOwner;
+
+    @Column(name= "accepted_terms")
+    private Boolean acceptedTerms;
+    
+    @Column(name= "signed_at")
+    private LocalDateTime signedAt;
+
+    @CreationTimestamp
+    @Column(name= "created_at", nullable=false,updatable=false)
+    private LocalDateTime createdAt;
     
 }

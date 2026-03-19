@@ -7,28 +7,37 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.threektechone.resorthub.common.exception.custom.InvalidEditRequestDataException;
 import com.threektechone.resorthub.common.exception.custom.RequestAlreadyReviewedException;
 import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
+import com.threektechone.resorthub.common.exception.custom.UnauthorizedException;
 import com.threektechone.resorthub.dto.StaffModuleDTO.EditRequestDecisionDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseDetailDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.EditResponseListDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterRequestDecisionDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseDetailDTO;
 import com.threektechone.resorthub.dto.StaffModuleDTO.RegisterResponseListDTO;
+import com.threektechone.resorthub.enums.ContractStatus;
+import com.threektechone.resorthub.enums.ContractType;
 import com.threektechone.resorthub.enums.RequestStatus;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.enums.ReviewAction;
+import com.threektechone.resorthub.service.CommonModule.FileStorageService;
 import com.threektechone.resorthub.service.CommonModule.ResortEditApplier;
 import com.threektechone.resorthub.mapper.EditRequestMapper;
 import com.threektechone.resorthub.mapper.ResortMapper;
+import com.threektechone.resorthub.models.Contract;
 import com.threektechone.resorthub.models.EditResortRequest;
 import com.threektechone.resorthub.models.Resort;
+import com.threektechone.resorthub.models.User;
+import com.threektechone.resorthub.repositories.ContractRepository;
 import com.threektechone.resorthub.repositories.EditResortRequestRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
+import com.threektechone.resorthub.repositories.UserRepository;
 import com.threektechone.resorthub.service.StaffModule.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -42,6 +51,13 @@ public class ReviewServiceImpl implements ReviewService {
     private final EditRequestMapper requestMapper;
     private final ResortMapper resortMapper;
     private final ResortEditApplier resortEditApplier;
+    private final FileStorageService fileStorageService;
+    private final ContractRepository contractRepository;
+    private final UserRepository userRepository;
+
+    private boolean staffCanManage(String email, Resort resort) {
+        return resort.getStaff().getEmail().equals(email);
+    }
     
 
     //Get register resort list
@@ -73,7 +89,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         if (dto.getAction() == ReviewAction.APPROVE) {
-            resort.setStatus(ResortStatus.ACTIVE);
+            resort.setStatus(ResortStatus.APPROVED);
         }
         else if (dto.getAction() == ReviewAction.REJECT) {
             resort.setStatus(ResortStatus.REJECTED);
@@ -81,6 +97,34 @@ public class ReviewServiceImpl implements ReviewService {
         }      
         resortRepository.save(resort);
     }
+    
+    //send contract to the owner
+    @Override
+    public void sendContract(int resortId, MultipartFile file, String email,ContractType type) throws IOException {
+        String fileUrl = fileStorageService.storeFile(file,"contracts");
+
+        Resort resort = resortRepository.findById(resortId)
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found"));
+
+        User staff = userRepository.findByEmail(email)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+
+        if (!staffCanManage(email, resort)) throw new UnauthorizedException("You dont have permission!");
+
+        if (resort.getStatus() != ResortStatus.APPROVED)
+            throw new IllegalStateException("Resort must be APPROVED before sending contract");
+
+        Contract contract = new Contract();
+        contract.setResort(resort);
+        contract.setStaff(staff);
+        contract.setContractType(type);
+        contract.setFileUrl(fileUrl);
+        contract.setStatus(ContractStatus.PENDING);
+        contractRepository.save(contract);
+        resort.setStatus(ResortStatus.CONTRACT_PENDING);
+    }
+
+    
 
     //Get pending request list
     @Override
@@ -136,5 +180,6 @@ public class ReviewServiceImpl implements ReviewService {
         request.setNote(dto.getNote());
         requestRepository.save(request);
     }
+
   
 }

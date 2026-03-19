@@ -1,5 +1,6 @@
 package com.threektechone.resorthub.service.OwnerModule;
 
+import com.threektechone.resorthub.models.Contract;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.User;
 
@@ -17,4 +18,6 @@ public interface ResortRegistrationService {
     void moveToMenusStep(Resort resort);
     void ensureCanSubmit(Resort resort);
     void submit(Resort resort);
+    void ensureCanSignContract(Resort resort,Contract contract);
+    void signContract(Contract contract,Resort resort);
 }

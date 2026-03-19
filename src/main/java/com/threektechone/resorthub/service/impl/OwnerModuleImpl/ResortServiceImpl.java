@@ -1,11 +1,13 @@
 package com.threektechone.resorthub.service.impl.OwnerModuleImpl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,16 +20,19 @@ import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterBasicInfoRequestDT
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterImagesRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterMenusRequestDTO;
+import com.threektechone.resorthub.enums.ContractStatus;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.helper.ResortHelper.ResortCodeGenerator;
 import com.threektechone.resorthub.mapper.EditRequestMapper;
 import com.threektechone.resorthub.mapper.ResortMapper;
 import com.threektechone.resorthub.mapper.ResortMenuMapper;
+import com.threektechone.resorthub.models.Contract;
 import com.threektechone.resorthub.models.EditResortRequest;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortImage;
 import com.threektechone.resorthub.models.ResortMenu;
 import com.threektechone.resorthub.models.User;
+import com.threektechone.resorthub.repositories.ContractRepository;
 import com.threektechone.resorthub.repositories.EditResortRequestRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
@@ -59,6 +64,8 @@ public class ResortServiceImpl implements ResortService {
 
 
     private final ResortMenuMapper resortMenuMapper;
+
+    private final ContractRepository contractRepository;
     
     
     //Create resort registraton request 
@@ -158,6 +165,28 @@ public class ResortServiceImpl implements ResortService {
         resortRegistrationService.submit(resort);
         resortRepository.save(resort);
     }
+    
+
+    //sign contract
+    @Override
+    public void signContract(int resortId, MultipartFile file, Boolean acceptedTerms) {
+        Resort resort = resortRepository.findById(resortId)
+        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        Contract contract = resort.getContracts().stream()
+        .filter(c -> c.getStatus() == ContractStatus.PENDING)
+        .findFirst()
+        .orElseThrow(() -> new ResourceNotFoundException("No contract pending signature for this resort"));
+
+        resortRegistrationService.ensureCanSignContract(resort,contract);
+
+        contract.setSignedByOwner(true);
+        contract.setAcceptedTerms(true);
+        contract.setSignedAt(LocalDateTime.now());
+        contract.setStatus(ContractStatus.ACTIVE);
+        contractRepository.save(contract);
+     
+    }
 
     //Get all owner resorts
     @Override
@@ -195,5 +224,6 @@ public class ResortServiceImpl implements ResortService {
 
         editResortRequestRepository.save(request);
     }
+
   
 }

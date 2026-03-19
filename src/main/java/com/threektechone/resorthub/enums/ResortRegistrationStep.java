@@ -7,5 +7,6 @@ public enum ResortRegistrationStep {
     AMENITIES,
     IMAGES,
     MENUS,
+    CONTRACT_SIGN,
     COMPLETED
 }
