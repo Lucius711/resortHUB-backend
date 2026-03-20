@@ -62,86 +62,82 @@ public class ResortServiceImpl implements ResortService {
 
     private final ResortRegistrationService resortRegistrationService;
 
-
     private final ResortMenuMapper resortMenuMapper;
 
     private final ContractRepository contractRepository;
-    
-    
-    //Create resort registraton request 
+
+    // Create resort registraton request
     @Override
     public int createRegistrationResort(String email) {
         User owner = userRepository.findByEmail(email)
-        .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         Resort resort = new Resort();
         resortRegistrationService.initNewRegistration(resort, owner, ResortCodeGenerator.generateResortCode());
         resortRepository.save(resort);
         return resort.getResortId();
     }
-    
 
-    //Update resort basic-info
+    // Update resort basic-info
     @Override
-    public void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto,int resortId) {
+    public void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto, int resortId) {
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
-        
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
         resortRegistrationService.ensureCanUpdateBasicInfo(resort);
         resortMapper.updateResortBasicInfo(resort, dto);
         resortRegistrationService.moveToBasicInfoStep(resort);
 
         resortRepository.save(resort);
     }
-    
-    //Update capacity price resort
+
+    // Update capacity price resort
     @Override
     public void updateCapacityPriceResort(RegisterCapacityPricingRequestDTO dto, int resortId) {
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
-        
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
         resortRegistrationService.ensureCanUpdateCapacityPrice(resort);
         resortMapper.updateResortCapacityPrice(resort, dto);
         resortRegistrationService.moveToCapacityPriceStep(resort);
         resortRepository.save(resort);
     }
-    
-    //Update resort amenities
+
+    // Update resort amenities
     @Override
     public void updateAmenitiesResort(RegisterAmenitiesRequestDTO dto, int resortId) {
-        
+
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         resortRegistrationService.ensureCanUpdateAmenities(resort);
         resortMapper.updateResortAmenities(resort, dto);
         resortRegistrationService.moveToAmenitiesStep(resort);
         resortRepository.save(resort);
     }
-    
 
-    //Update resort images
+    // Update resort images
     @Override
     public void updateImagesResort(RegisterImagesRequestDTO dto, int resortId) {
 
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         List<ResortImage> images = resortMapper.mapImageIds(dto.getImageUrls());
-        
+
         resortRegistrationService.ensureCanUpdateImages(resort);
         images.forEach(img -> img.setResort(resort));
-        resort.getImages().clear();    
+        resort.getImages().clear();
         resort.getImages().addAll(images);
         resortRegistrationService.moveToImagesStep(resort);
         resortRepository.save(resort);
     }
-    
-    //Update resort menu
+
+    // Update resort menu
     @Override
     public void updateMenusResort(RegisterMenusRequestDTO dto, int resortId) {
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         List<ResortMenu> menus = resortMenuMapper.toResortMenuList(dto.getMenus());
 
@@ -149,61 +145,62 @@ public class ResortServiceImpl implements ResortService {
         for (ResortMenu menu : menus) {
             menu.setResort(resort);
         }
-        resort.getMenuItems().clear();   
+        resort.getMenuItems().clear();
         resort.getMenuItems().addAll(menus);
         resortRegistrationService.moveToMenusStep(resort);
         resortRepository.save(resort);
     }
-    
-    //Submit resort registration
+
+    // Submit resort registration
     @Override
     public void submitRegisterResort(int resortId) {
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         resortRegistrationService.ensureCanSubmit(resort);
         resortRegistrationService.submit(resort);
         resortRepository.save(resort);
     }
-    
 
-    //sign contract
+    // sign contract
     @Override
     public void signContract(int resortId, MultipartFile file, Boolean acceptedTerms) {
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         Contract contract = resort.getContracts().stream()
-        .filter(c -> c.getStatus() == ContractStatus.PENDING)
-        .findFirst()
-        .orElseThrow(() -> new ResourceNotFoundException("No contract pending signature for this resort"));
+                .filter(c -> c.getStatus() == ContractStatus.PENDING)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("No contract pending signature for this resort"));
 
-        resortRegistrationService.ensureCanSignContract(resort,contract);
+        resortRegistrationService.ensureCanSignContract(resort, contract);
 
         contract.setSignedByOwner(true);
         contract.setAcceptedTerms(true);
         contract.setSignedAt(LocalDateTime.now());
         contract.setStatus(ContractStatus.ACTIVE);
+        contract.setOwner(resort.getOwner());
+        resortRegistrationService.signContract(contract, resort);
         contractRepository.save(contract);
-     
     }
 
-    //Get all owner resorts
+    // Get all owner resorts
     @Override
-    public Page<OwnerResortsResponseDTO> getAllOwnerResorts(String email,String searchkey, ResortStatus status, Pageable pageable) {
-        Page<Resort> resortList = resortRepository.getOwnerResorts(email,searchkey, status, pageable);
-        
+    public Page<OwnerResortsResponseDTO> getAllOwnerResorts(String email, String searchkey, ResortStatus status,
+            Pageable pageable) {
+        Page<Resort> resortList = resortRepository.getOwnerResorts(email, searchkey, status, pageable);
+
         return resortList.map(resortMapper::toOwnerResortList);
     }
 
-    //Create edit resort request
+    // Create edit resort request
     @Override
     public void createEditRequest(EditRequestDTO dto, String email) {
         Resort resort = resortRepository.findById(dto.getResortId())
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         Map<String, Object> oldData = resortEditDataBuilder.buildOldData(resort, dto.getNewData());
 
@@ -225,5 +222,4 @@ public class ResortServiceImpl implements ResortService {
         editResortRequestRepository.save(request);
     }
 
-  
 }

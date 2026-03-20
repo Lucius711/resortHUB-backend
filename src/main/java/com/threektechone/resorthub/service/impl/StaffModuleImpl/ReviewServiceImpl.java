@@ -80,9 +80,12 @@ public class ReviewServiceImpl implements ReviewService {
     
     //Review register request from owner
     @Override
-    public void reviewRegisterRequest(RegisterRequestDecisionDTO dto,int resortId) {
+    public void reviewRegisterRequest(RegisterRequestDecisionDTO dto,int resortId,String email) {
         Resort resort = resortRepository.findById(resortId)
         .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        User staff = userRepository.findByEmail(email)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         if (resort.getStatus() != ResortStatus.PENDING_REVIEW) {
            throw new RequestAlreadyReviewedException("Request already reviewed");
@@ -94,7 +97,8 @@ public class ReviewServiceImpl implements ReviewService {
         else if (dto.getAction() == ReviewAction.REJECT) {
             resort.setStatus(ResortStatus.REJECTED);
             resort.setReason(dto.getReason());
-        }      
+        }
+        resort.setStaff(staff);      
         resortRepository.save(resort);
     }
     
@@ -120,8 +124,8 @@ public class ReviewServiceImpl implements ReviewService {
         contract.setContractType(type);
         contract.setFileUrl(fileUrl);
         contract.setStatus(ContractStatus.PENDING);
-        contractRepository.save(contract);
         resort.setStatus(ResortStatus.CONTRACT_PENDING);
+        contractRepository.save(contract);
     }
 
     

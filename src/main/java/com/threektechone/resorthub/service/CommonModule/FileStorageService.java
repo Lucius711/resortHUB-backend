@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class FileStorageService {
         Path dirPath = baseDir.resolve(folder);
         if (!Files.exists(dirPath)) Files.createDirectories(dirPath);
 
-        String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path targetPath = dirPath.resolve(filename);
         Files.write(targetPath, file.getBytes());
 

@@ -23,6 +23,6 @@ public interface ReviewService {
     EditResponseDetailDTO getRequestDetail(int requestId);
     Page<RegisterResponseListDTO> getAllRegisterResort(String searchkey,ResortStatus status,Pageable pageable);
     RegisterResponseDetailDTO getRegisterDetail(int resortId);
-    void reviewRegisterRequest(RegisterRequestDecisionDTO dto,int resortId);
+    void reviewRegisterRequest(RegisterRequestDecisionDTO dto,int resortId,String email);
     void sendContract(int resortId, MultipartFile file,String email,ContractType type) throws IOException;
 }
