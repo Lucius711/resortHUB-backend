@@ -12,11 +12,11 @@ import com.threektechone.resorthub.enums.BookingStatus;
 public interface OwnerBookingService {
     Page<OwnerBookingListResponseDTO> getOwnerBookings(String email,String searchkey,BookingStatus status,Pageable pageable);
 
-    OwnerBookingDetailResponseDTO getOwnerBookingDetail(int bookingId);
+    OwnerBookingDetailResponseDTO getOwnerBookingDetail(int bookingId, String ownerEmail);
 
-    void reviewBooking(BookingRequestDecisionDTO dto, int bookingId);
+    void reviewBooking(BookingRequestDecisionDTO dto, int bookingId, String ownerEmail);
 
-    void checkIn(int bookingId);
+    void checkIn(int bookingId, String ownerEmail);
 
-    void checkOut(int bookingId);
+    void checkOut(int bookingId, String ownerEmail);
 }

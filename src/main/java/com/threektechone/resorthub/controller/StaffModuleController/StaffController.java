@@ -96,9 +96,10 @@ public class StaffController {
     }
 
     @PostMapping("/edit-requests/{id}/review")
-    public ResponseEntity<ApiResponse<String>> reviewEditRequest(@PathVariable int id,@RequestBody EditRequestDecisionDTO dto) {
-        
-        reviewService.reviewEditRequest(dto,id);
+    public ResponseEntity<ApiResponse<String>> reviewEditRequest(@PathVariable int id,@RequestBody EditRequestDecisionDTO dto,Authentication authentication) {
+        String email = authentication.getName();
+
+        reviewService.reviewEditRequest(dto,id,email);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Review successfully!",LocalDateTime.now());
 

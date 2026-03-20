@@ -71,53 +71,59 @@ public class OwnerController {
     }
 
     @PatchMapping("/register-resort/{id}/basic-info")
-    public ResponseEntity<ApiResponse<String>> updateBasicInfoResort(@RequestBody RegisterBasicInfoRequestDTO dto,@PathVariable int id) {
+    public ResponseEntity<ApiResponse<String>> updateBasicInfoResort(@RequestBody RegisterBasicInfoRequestDTO dto,@PathVariable int id,Authentication authentication) {
+        String email = authentication.getName();
 
-        resortService.updateBasicInfoResort(dto, id);
+        resortService.updateBasicInfoResort(dto, id, email);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Update basic info successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/register-resort/{id}/capacity-price")
-    public ResponseEntity<ApiResponse<String>> updateCapacityPriceResort(@RequestBody RegisterCapacityPricingRequestDTO dto,@PathVariable int id) {
+    public ResponseEntity<ApiResponse<String>> updateCapacityPriceResort(@RequestBody RegisterCapacityPricingRequestDTO dto,@PathVariable int id,Authentication authentication) {
+        String email = authentication.getName();
 
-        resortService.updateCapacityPriceResort(dto, id);
+        resortService.updateCapacityPriceResort(dto, id, email);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Update capacity and price successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/register-resort/{id}/amenities")
-    public ResponseEntity<ApiResponse<String>> updateAmenitiesResort(@RequestBody RegisterAmenitiesRequestDTO dto,@PathVariable int id) {
+    public ResponseEntity<ApiResponse<String>> updateAmenitiesResort(@RequestBody RegisterAmenitiesRequestDTO dto,@PathVariable int id,Authentication authentication) {
+        String email = authentication.getName();
 
-        resortService.updateAmenitiesResort(dto, id);
+        resortService.updateAmenitiesResort(dto, id, email);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Update amenities successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/register-resort/{id}/images")
-    public ResponseEntity<ApiResponse<String>> updateImagesResort(@RequestBody RegisterImagesRequestDTO dto,@PathVariable int id) {
+    public ResponseEntity<ApiResponse<String>> updateImagesResort(@RequestBody RegisterImagesRequestDTO dto,@PathVariable int id,Authentication authentication) {
+        String email = authentication.getName();
 
-        resortService.updateImagesResort(dto, id);
+        resortService.updateImagesResort(dto, id, email);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Update images successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/register-resort/{id}/menus")
-    public ResponseEntity<ApiResponse<String>> updateMenusResort(@RequestBody RegisterMenusRequestDTO dto,@PathVariable int id) {
+    public ResponseEntity<ApiResponse<String>> updateMenusResort(@RequestBody RegisterMenusRequestDTO dto,@PathVariable int id,Authentication authentication) {
+        String email = authentication.getName();
 
-        resortService.updateMenusResort(dto, id);
+        resortService.updateMenusResort(dto, id, email);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Update menus successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register-resort/{id}/submit")
-    public ResponseEntity<ApiResponse<String>> submitRegisterResort(@PathVariable int id) {
-        resortService.submitRegisterResort(id);
+    public ResponseEntity<ApiResponse<String>> submitRegisterResort(@PathVariable int id,Authentication authentication) {
+        String email = authentication.getName();
+        resortService.submitRegisterResort(id, email);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Submit successfully!",LocalDateTime.now());
 
@@ -125,8 +131,9 @@ public class OwnerController {
     }
 
     @PostMapping("/register-resort/{id}/sign-contract")
-    public ResponseEntity<ApiResponse<String>> signContract(@PathVariable int id,@RequestParam("file") MultipartFile file,@RequestParam Boolean acceptedTerms) {
-        resortService.signContract(id, file, acceptedTerms);
+    public ResponseEntity<ApiResponse<String>> signContract(@PathVariable int id,@RequestParam("file") MultipartFile file,@RequestParam Boolean acceptedTerms,Authentication authentication) {
+        String email = authentication.getName();
+        resortService.signContract(id, file, acceptedTerms, email);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Sign contract successfully!",LocalDateTime.now());
 
@@ -155,8 +162,9 @@ public class OwnerController {
     }
 
     @GetMapping("/bookings/{id}")
-    public ResponseEntity<ApiResponse<OwnerBookingDetailResponseDTO>> getOwnerBookingDetail(@PathVariable int id) {
-        OwnerBookingDetailResponseDTO dto = ownerBookingService.getOwnerBookingDetail(id);
+    public ResponseEntity<ApiResponse<OwnerBookingDetailResponseDTO>> getOwnerBookingDetail(@PathVariable int id, Authentication authentication) {
+        String email = authentication.getName();
+        OwnerBookingDetailResponseDTO dto = ownerBookingService.getOwnerBookingDetail(id, email);
 
         ApiResponse<OwnerBookingDetailResponseDTO> response = new ApiResponse<>(200,null,dto,LocalDateTime.now());
 
@@ -164,16 +172,18 @@ public class OwnerController {
     }
 
     @PostMapping("/bookings/{id}/review")
-    public ResponseEntity<ApiResponse<String>> reviewBooking(@RequestBody BookingRequestDecisionDTO dto, @PathVariable int id) {
-        ownerBookingService.reviewBooking(dto, id);
+    public ResponseEntity<ApiResponse<String>> reviewBooking(@RequestBody BookingRequestDecisionDTO dto, @PathVariable int id, Authentication authentication) {
+        String email = authentication.getName();
+        ownerBookingService.reviewBooking(dto, id, email);
         
         ApiResponse<String> response = new ApiResponse<>(200,null,"Review successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/bookings/{id}/check-in")
-    public ResponseEntity<ApiResponse<String>> checkInBooking(@PathVariable int id) {
-        ownerBookingService.checkIn(id);
+    public ResponseEntity<ApiResponse<String>> checkInBooking(@PathVariable int id, Authentication authentication) {
+        String email = authentication.getName();
+        ownerBookingService.checkIn(id, email);
 
         ApiResponse<String> response = new ApiResponse<>(200,null,"Check-in successfuly!",LocalDateTime.now());
 
@@ -181,8 +191,9 @@ public class OwnerController {
     }
 
     @PatchMapping("/bookings/{id}/check-out")
-    public ResponseEntity<ApiResponse<String>> checkOutBooking(@PathVariable int id) {
-        ownerBookingService.checkOut(id);
+    public ResponseEntity<ApiResponse<String>> checkOutBooking(@PathVariable int id, Authentication authentication) {
+        String email = authentication.getName();
+        ownerBookingService.checkOut(id, email);
 
         ApiResponse<String> response = new ApiResponse<>(200,null,"Check-out successfuly!",LocalDateTime.now());
 

@@ -18,7 +18,7 @@ import com.threektechone.resorthub.enums.RequestStatus;
 import com.threektechone.resorthub.enums.ResortStatus;
 
 public interface ReviewService {
-    void reviewEditRequest(EditRequestDecisionDTO dto,int requestId);
+    void reviewEditRequest(EditRequestDecisionDTO dto,int requestId,String staffEmail);
     Page<EditResponseListDTO> getEditRequests(RequestStatus status,Pageable pageable);
     EditResponseDetailDTO getRequestDetail(int requestId);
     Page<RegisterResponseListDTO> getAllRegisterResort(String searchkey,ResortStatus status,Pageable pageable);

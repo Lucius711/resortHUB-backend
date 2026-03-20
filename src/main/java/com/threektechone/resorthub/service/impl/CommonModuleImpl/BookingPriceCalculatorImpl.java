@@ -16,6 +16,8 @@ import com.threektechone.resorthub.service.CommonModule.BookingPriceCalculator;
 
 import lombok.RequiredArgsConstructor;
 
+import com.threektechone.resorthub.common.exception.custom.InvalidBookingStatusException;
+
 @Service
 @RequiredArgsConstructor
 public class BookingPriceCalculatorImpl implements BookingPriceCalculator {
@@ -26,9 +28,13 @@ public class BookingPriceCalculatorImpl implements BookingPriceCalculator {
     @Override
     public BigDecimal calculateTotalPrice(Resort resort, BookingRequestDTO dto) {
         long nights = ChronoUnit.DAYS.between(
-                dto.getCheckInDate(),
-                dto.getCheckOutDate()
+                dto.getCheckInDate().toLocalDate(),
+                dto.getCheckOutDate().toLocalDate()
         );
+
+        if (nights < 1) {
+            throw new InvalidBookingStatusException("Booking duration must be at least 1 night");
+        }
 
         BigDecimal resortCost = resort.getPrice().multiply(BigDecimal.valueOf(nights));
 

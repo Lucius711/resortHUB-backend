@@ -151,9 +151,19 @@ public class ReviewServiceImpl implements ReviewService {
 
     //Handle Edit request
     @Override
-    public void reviewEditRequest(EditRequestDecisionDTO dto,int requestId) {
+    public void reviewEditRequest(EditRequestDecisionDTO dto,int requestId,String staffEmail) {
         EditResortRequest request = requestRepository.findById(requestId)
         .orElseThrow(() -> new ResourceNotFoundException("Request not found!"));
+
+        // Only pending requests can be reviewed, and only the assigned staff can decide.
+        if (request.getRequestStatus() != RequestStatus.PENDING) {
+            throw new RequestAlreadyReviewedException("Request already reviewed");
+        }
+
+        if (request.getApprovedBy() == null || request.getApprovedBy().getEmail() == null
+                || !request.getApprovedBy().getEmail().equalsIgnoreCase(staffEmail)) {
+            throw new UnauthorizedException("You dont have permission!");
+        }
 
         if (ReviewAction.APPROVE.equals(dto.getAction())) {
 

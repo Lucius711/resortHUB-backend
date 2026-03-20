@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.threektechone.resorthub.common.exception.custom.CheckInNotAllowedException;
 import com.threektechone.resorthub.common.exception.custom.CheckOutNotAllowedException;
+import com.threektechone.resorthub.common.exception.custom.UnauthorizedException;
 import com.threektechone.resorthub.common.exception.custom.RequestAlreadyReviewedException;
 import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.BookingRequestDecisionDTO;
@@ -35,6 +36,14 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
     private final CheckOutPolicy checkOutPolicy;
     private final BookingTimePolicy bookingTimePolicy;
 
+    private void ensureOwnerAccess(Booking booking, String ownerEmail) {
+        if (booking == null || booking.getResort() == null || booking.getResort().getOwner() == null
+                || booking.getResort().getOwner().getEmail() == null
+                || !booking.getResort().getOwner().getEmail().equalsIgnoreCase(ownerEmail)) {
+            throw new UnauthorizedException("You dont have permission!");
+        }
+    }
+
     private Boolean canCheckIn(Booking booking) {
         Boolean occupied = bookingRepository.isRoomOccupied(booking.getResort().getResortId());
 
@@ -59,9 +68,11 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
     }
 
     @Override
-    public OwnerBookingDetailResponseDTO getOwnerBookingDetail(int bookingId) {
+    public OwnerBookingDetailResponseDTO getOwnerBookingDetail(int bookingId, String ownerEmail) {
         Booking booking = bookingRepository.findById(bookingId)
         .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+
+        ensureOwnerAccess(booking, ownerEmail);
 
         Boolean occupied = bookingRepository.isRoomOccupied(booking.getResort().getResortId());
 
@@ -80,9 +91,11 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
     }
 
     @Override
-    public void reviewBooking(BookingRequestDecisionDTO dto, int bookingId) {
+    public void reviewBooking(BookingRequestDecisionDTO dto, int bookingId, String ownerEmail) {
         Booking booking = bookingRepository.findById(bookingId)
         .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+
+        ensureOwnerAccess(booking, ownerEmail);
 
         if (booking.getStatus() != BookingStatus.PENDING) {
            throw new RequestAlreadyReviewedException("Request already reviewed");
@@ -99,9 +112,11 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
     }
 
     @Override
-    public void checkIn(int bookingId) {
+    public void checkIn(int bookingId, String ownerEmail) {
         Booking booking = bookingRepository.findById(bookingId)
         .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+
+        ensureOwnerAccess(booking, ownerEmail);
 
         Boolean canCheckIn = canCheckIn(booking);
 
@@ -113,9 +128,11 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
     }
 
     @Override
-    public void checkOut(int bookingId) {
+    public void checkOut(int bookingId, String ownerEmail) {
         Booking booking = bookingRepository.findById(bookingId)
         .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+
+        ensureOwnerAccess(booking, ownerEmail);
 
         Boolean canCheckOut = canCheckOut(booking);
 

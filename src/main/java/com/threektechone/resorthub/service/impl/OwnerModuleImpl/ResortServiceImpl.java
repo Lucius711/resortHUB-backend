@@ -11,8 +11,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.threektechone.resorthub.common.exception.custom.InvalidContractStatusException;
 import com.threektechone.resorthub.common.exception.custom.InvalidEditRequestDataException;
+import com.threektechone.resorthub.common.exception.custom.InvalidResortStatusException;
 import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
+import com.threektechone.resorthub.common.exception.custom.UnauthorizedException;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.EditRequestDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.OwnerResortsResponseDTO;
 import com.threektechone.resorthub.dto.OwnerModuleDTO.RegisterAmenitiesRequestDTO;
@@ -66,6 +69,13 @@ public class ResortServiceImpl implements ResortService {
 
     private final ContractRepository contractRepository;
 
+    private void ensureOwnerAccess(Resort resort, String ownerEmail) {
+        if (resort == null || resort.getOwner() == null || resort.getOwner().getEmail() == null
+                || !resort.getOwner().getEmail().equalsIgnoreCase(ownerEmail)) {
+            throw new UnauthorizedException("You dont have permission!");
+        }
+    }
+
     // Create resort registraton request
     @Override
     public int createRegistrationResort(String email) {
@@ -80,9 +90,11 @@ public class ResortServiceImpl implements ResortService {
 
     // Update resort basic-info
     @Override
-    public void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto, int resortId) {
+    public void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto, int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        ensureOwnerAccess(resort, ownerEmail);
 
         resortRegistrationService.ensureCanUpdateBasicInfo(resort);
         resortMapper.updateResortBasicInfo(resort, dto);
@@ -93,9 +105,11 @@ public class ResortServiceImpl implements ResortService {
 
     // Update capacity price resort
     @Override
-    public void updateCapacityPriceResort(RegisterCapacityPricingRequestDTO dto, int resortId) {
+    public void updateCapacityPriceResort(RegisterCapacityPricingRequestDTO dto, int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        ensureOwnerAccess(resort, ownerEmail);
 
         resortRegistrationService.ensureCanUpdateCapacityPrice(resort);
         resortMapper.updateResortCapacityPrice(resort, dto);
@@ -105,10 +119,12 @@ public class ResortServiceImpl implements ResortService {
 
     // Update resort amenities
     @Override
-    public void updateAmenitiesResort(RegisterAmenitiesRequestDTO dto, int resortId) {
+    public void updateAmenitiesResort(RegisterAmenitiesRequestDTO dto, int resortId, String ownerEmail) {
 
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        ensureOwnerAccess(resort, ownerEmail);
 
         resortRegistrationService.ensureCanUpdateAmenities(resort);
         resortMapper.updateResortAmenities(resort, dto);
@@ -118,10 +134,12 @@ public class ResortServiceImpl implements ResortService {
 
     // Update resort images
     @Override
-    public void updateImagesResort(RegisterImagesRequestDTO dto, int resortId) {
+    public void updateImagesResort(RegisterImagesRequestDTO dto, int resortId, String ownerEmail) {
 
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        ensureOwnerAccess(resort, ownerEmail);
 
         List<ResortImage> images = resortMapper.mapImageIds(dto.getImageUrls());
 
@@ -135,9 +153,11 @@ public class ResortServiceImpl implements ResortService {
 
     // Update resort menu
     @Override
-    public void updateMenusResort(RegisterMenusRequestDTO dto, int resortId) {
+    public void updateMenusResort(RegisterMenusRequestDTO dto, int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        ensureOwnerAccess(resort, ownerEmail);
 
         List<ResortMenu> menus = resortMenuMapper.toResortMenuList(dto.getMenus());
 
@@ -153,9 +173,11 @@ public class ResortServiceImpl implements ResortService {
 
     // Submit resort registration
     @Override
-    public void submitRegisterResort(int resortId) {
+    public void submitRegisterResort(int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        ensureOwnerAccess(resort, ownerEmail);
 
         resortRegistrationService.ensureCanSubmit(resort);
         resortRegistrationService.submit(resort);
@@ -164,9 +186,15 @@ public class ResortServiceImpl implements ResortService {
 
     // sign contract
     @Override
-    public void signContract(int resortId, MultipartFile file, Boolean acceptedTerms) {
+    public void signContract(int resortId, MultipartFile file, Boolean acceptedTerms, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        ensureOwnerAccess(resort, ownerEmail);
+
+        if (acceptedTerms == null || !acceptedTerms) {
+            throw new InvalidContractStatusException("You must accept the terms to sign the contract");
+        }
 
         Contract contract = resort.getContracts().stream()
                 .filter(c -> c.getStatus() == ContractStatus.PENDING)
@@ -176,7 +204,7 @@ public class ResortServiceImpl implements ResortService {
         resortRegistrationService.ensureCanSignContract(resort, contract);
 
         contract.setSignedByOwner(true);
-        contract.setAcceptedTerms(true);
+        contract.setAcceptedTerms(acceptedTerms);
         contract.setSignedAt(LocalDateTime.now());
         contract.setStatus(ContractStatus.ACTIVE);
         contract.setOwner(resort.getOwner());
@@ -198,6 +226,16 @@ public class ResortServiceImpl implements ResortService {
     public void createEditRequest(EditRequestDTO dto, String email) {
         Resort resort = resortRepository.findById(dto.getResortId())
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        ensureOwnerAccess(resort, email);
+
+        if (resort.getStatus() != ResortStatus.ACTIVE) {
+            throw new InvalidResortStatusException("Only ACTIVE resorts can be edited");
+        }
+
+        if (resort.getStaff() == null) {
+            throw new InvalidResortStatusException("Staff must be assigned to edit this resort");
+        }
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found!"));

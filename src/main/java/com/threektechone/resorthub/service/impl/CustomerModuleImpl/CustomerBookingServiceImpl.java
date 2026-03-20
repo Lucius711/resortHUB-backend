@@ -18,6 +18,7 @@ import com.threektechone.resorthub.models.Booking;
 import com.threektechone.resorthub.models.BookingMeal;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.User;
+import com.threektechone.resorthub.common.exception.custom.InvalidBookingStatusException;
 import com.threektechone.resorthub.policy.booking.CancellationPolicy;
 import com.threektechone.resorthub.policy.booking.CapacityPolicy;
 import com.threektechone.resorthub.repositories.BookingRepository;
@@ -44,6 +45,34 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
 
     @Override
     public void createBooking(BookingRequestDTO dto,String email,int resortId) {
+        if (dto == null) {
+            throw new InvalidBookingStatusException("Booking request is required");
+        }
+        if (dto.getCheckInDate() == null || dto.getCheckOutDate() == null) {
+            throw new InvalidBookingStatusException("Check-in/check-out dates are required");
+        }
+        if (!dto.getCheckOutDate().isAfter(dto.getCheckInDate())) {
+            throw new InvalidBookingStatusException("Check-out date must be after check-in date");
+        }
+        if (dto.getNumberOfPerson() <= 0) {
+            throw new InvalidBookingStatusException("Number of person must be positive");
+        }
+        if (dto.getMeals() == null || dto.getMeals().isEmpty()) {
+            throw new InvalidBookingStatusException("Meals are required");
+        }
+
+        dto.getMeals().forEach(meal -> {
+            if (meal == null) {
+                throw new InvalidBookingStatusException("Meal is required");
+            }
+            if (meal.getMenuId() <= 0) {
+                throw new InvalidBookingStatusException("Invalid menu id");
+            }
+            if (meal.getQuantity() <= 0) {
+                throw new InvalidBookingStatusException("Invalid meal quantity");
+            }
+        });
+
         Resort resort = resortRepository.findById(resortId)
         .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 

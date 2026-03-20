@@ -24,8 +24,8 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/**").permitAll() // Allow unauthenticated access to public data
                 .requestMatchers("/api/auth/**").permitAll() // Allow unauthenticated access to authentication endpoints
+                .requestMatchers("/api/resorts/**").permitAll() // Allow unauthenticated access to public resort data
                 .requestMatchers("/api/admin/**").hasRole("ADMIN") // Restrict access to admin endpoints to users with ADMIN role
                 .requestMatchers("/api/owner/**").hasRole("OWNER") // Allow access to owner endpoints for users with OWNER role
                 .requestMatchers("/api/staff/**").hasRole("STAFF") // Allow access to staff endpoints for users with STAFF role

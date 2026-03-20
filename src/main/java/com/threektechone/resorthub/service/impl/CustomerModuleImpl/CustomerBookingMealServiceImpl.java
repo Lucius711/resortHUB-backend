@@ -26,6 +26,11 @@ public class CustomerBookingMealServiceImpl implements CustomerBookingMealServic
         ResortMenu menu = resortMenuRepository.findById(dto.getMenuId())
                 .orElseThrow(() -> new ResourceNotFoundException("Menu not found"));
 
+        // Prevent creating BookingMeal using menu from another resort.
+        if (booking == null || booking.getResort() == null || booking.getResort().getResortId() != menu.getResort().getResortId()) {
+            throw new ResourceNotFoundException("Menu not found for this resort");
+        }
+
         BookingMeal meal = bookingMealMapper.toBookingMeal(dto);
         meal.setResortMenu(menu);
         meal.setBooking(booking);

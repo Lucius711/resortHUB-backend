@@ -27,8 +27,8 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
 
     @Override
     public void ensureCanUpdateBasicInfo(Resort resort) {
-        if (resort.getStep().ordinal() < ResortRegistrationStep.START.ordinal()) {
-            throw new InvalidRegisterStepException("Please read the tutorial first!");
+        if (resort.getStatus() != ResortStatus.DRAFT) {
+            throw new InvalidResortStatusException("Only draft resort can update basic info");
         }
     }
 
@@ -39,7 +39,11 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
 
     @Override
     public void ensureCanUpdateCapacityPrice(Resort resort) {
-         if (resort.getStep().ordinal() != ResortRegistrationStep.BASIC_INFO.ordinal()) {
+        if (resort.getStatus() != ResortStatus.DRAFT) {
+            throw new InvalidResortStatusException("Only draft resort can update capacity-price");
+        }
+
+        if (resort.getStep().ordinal() < ResortRegistrationStep.BASIC_INFO.ordinal()) {
             throw new InvalidRegisterStepException("Please completed basic-info first!");
         }
     }
@@ -51,7 +55,11 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
 
     @Override
     public void ensureCanUpdateAmenities(Resort resort) {
-        if (resort.getStep().ordinal() != ResortRegistrationStep.CAPACITY_PRICE.ordinal()) {
+        if (resort.getStatus() != ResortStatus.DRAFT) {
+            throw new InvalidResortStatusException("Only draft resort can update amenities");
+        }
+
+        if (resort.getStep().ordinal() < ResortRegistrationStep.CAPACITY_PRICE.ordinal()) {
             throw new InvalidRegisterStepException("Please completed capacity-price first!");
         }
     }
@@ -63,7 +71,11 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
 
     @Override
     public void ensureCanUpdateImages(Resort resort) {
-        if (resort.getStep().ordinal() != ResortRegistrationStep.AMENITIES.ordinal()) {
+        if (resort.getStatus() != ResortStatus.DRAFT) {
+            throw new InvalidResortStatusException("Only draft resort can update images");
+        }
+
+        if (resort.getStep().ordinal() < ResortRegistrationStep.AMENITIES.ordinal()) {
             throw new InvalidRegisterStepException("Please completed amenities first!");
         }
     }
@@ -75,7 +87,11 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
 
      @Override
     public void ensureCanUpdateMenus(Resort resort) {
-        if (resort.getStep().ordinal() != ResortRegistrationStep.IMAGES.ordinal()) {
+        if (resort.getStatus() != ResortStatus.DRAFT) {
+            throw new InvalidResortStatusException("Only draft resort can update menus");
+        }
+
+        if (resort.getStep().ordinal() < ResortRegistrationStep.IMAGES.ordinal()) {
             throw new InvalidRegisterStepException("Please completed images first!");
         }
     }

@@ -2,12 +2,14 @@ package com.threektechone.resorthub.config.security;
 
 import java.io.IOException;
 
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.JwtException;
 import com.threektechone.resorthub.config.security.UserDetails.UserDetailsServiceImpl;
 import com.threektechone.resorthub.service.AuthModule.JwtService;
 
@@ -35,19 +37,24 @@ public class JwtAuthenciationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        String email = jwtService.extractEmail(token);
+        try {
+            String email = jwtService.extractEmail(token);
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            if (jwtService.isTokenValid(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (jwtService.isTokenValid(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
+        } catch (JwtException | IllegalArgumentException | AuthenticationException ex) {
+            // Invalid/expired JWT: do not authenticate; let Spring Security handle access control.
+            SecurityContextHolder.clearContext();
         }
         filterChain.doFilter(request, response);
         

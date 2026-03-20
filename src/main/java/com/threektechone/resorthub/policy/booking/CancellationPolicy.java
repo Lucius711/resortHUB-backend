@@ -18,11 +18,27 @@ public class CancellationPolicy {
             throw new BookingCancelForbiddenException("You are not have permission to cancel this booking!");
         }
 
-        if (booking.getStatus().equals(BookingStatus.CHECKED_IN) || booking.getStatus().equals(BookingStatus.COMPLETED)) {
+        if (booking.getStatus() == BookingStatus.CANCELED) {
+            throw new InvalidBookingStatusException("Booking is already canceled");
+        }
+
+        // Booking can't be canceled once it has progressed to/from stay.
+        if (booking.getStatus() == BookingStatus.CHECKED_IN || booking.getStatus() == BookingStatus.COMPLETED) {
             throw new InvalidBookingStatusException("Cannot cancel booking after check-in");
         }
 
-        if (booking.getStatus().equals(BookingStatus.APPROVED) && LocalDateTime.now().isAfter(booking.getCheckInDate().minusHours(24))) {
+        // If the owner rejected the reservation, the customer should not be able to cancel it.
+        if (booking.getStatus() == BookingStatus.REJECTED) {
+            throw new InvalidBookingStatusException("Cannot cancel a rejected booking");
+        }
+
+        // Only allow cancellation for statuses that still represent a pending approval / accepted booking.
+        if (booking.getStatus() != BookingStatus.PENDING && booking.getStatus() != BookingStatus.APPROVED) {
+            throw new InvalidBookingStatusException("Cannot cancel booking in current status");
+        }
+
+        if (booking.getStatus() == BookingStatus.APPROVED
+                && LocalDateTime.now().isAfter(booking.getCheckInDate().minusHours(24))) {
             throw new CancellationDeadlineException("Too late to cancel");
         }
     }
