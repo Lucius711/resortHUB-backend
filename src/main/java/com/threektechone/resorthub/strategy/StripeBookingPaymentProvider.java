@@ -27,6 +27,7 @@ public class StripeBookingPaymentProvider {
     private final StripePaymentProperties properties;
 
     @PostConstruct
+    @SuppressWarnings("unused")
     void initStripeKey() {
         if (properties.getSecretKey() != null && !properties.getSecretKey().isBlank()) {
             Stripe.apiKey = properties.getSecretKey().trim();

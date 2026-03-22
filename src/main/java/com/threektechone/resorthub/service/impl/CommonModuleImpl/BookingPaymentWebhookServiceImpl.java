@@ -2,9 +2,14 @@ package com.threektechone.resorthub.service.impl.CommonModuleImpl;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
+import com.stripe.model.EventDataObjectDeserializer;
+import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import com.threektechone.resorthub.common.exception.custom.InvalidPaymentException;
@@ -27,55 +32,53 @@ public class BookingPaymentWebhookServiceImpl implements BookingPaymentWebhookSe
 
     private final StripePaymentProperties stripePaymentProperties;
     private final PaymentRepository paymentRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional
     public void handleStripeWebhook(String payload, String signatureHeader) {
-        log.info("=== STRIPE WEBHOOK START ===");
-        log.info("Signature: {}", signatureHeader);
         if (stripePaymentProperties.getWebhookSecret() == null
                 || stripePaymentProperties.getWebhookSecret().isBlank()) {
             throw new InvalidPaymentException("Stripe webhook secret is not configured");
         }
 
-        Event event;
         try {
-            event = Webhook.constructEvent(payload, signatureHeader, stripePaymentProperties.getWebhookSecret().trim());
-            log.info("Event type: {}", event.getType());
+            Event event = Webhook.constructEvent(
+                    payload,
+                    signatureHeader,
+                    stripePaymentProperties.getWebhookSecret().trim());
+
+            String eventType = event.getType() != null ? event.getType().trim() : "";
+            if (!"checkout.session.completed".equals(eventType)) {
+                log.debug("Ignoring Stripe event type: {}", eventType);
+                return;
+            }
+
+            handleCheckoutSessionCompleted(event, payload);
         } catch (SignatureVerificationException e) {
+            log.error("Stripe signature verification failed: {}", e.getMessage());
             throw new InvalidPaymentException("Invalid Stripe signature");
         }
+    }
 
-        if (!"checkout.session.completed".equals(event.getType())) {
-            return;
-        }
-
-        Session eventSession = (Session) event.getDataObjectDeserializer()
-                .getObject()
-                .orElseThrow(() -> new InvalidPaymentException("Stripe webhook payload missing session"));
-
-        String sessionId = eventSession.getId();
+    /**
+     * Stripe Java SDK often returns an empty {@code getObject()} for webhook snapshots (API version / thin payloads).
+     * We resolve {@code cs_...} from the raw HTTP body or {@link com.stripe.model.Event.DataObjectDeserializer#getRawJson()},
+     * then load the full session via the API.
+     */
+    private void handleCheckoutSessionCompleted(Event event, String rawPayload) {
+        String sessionId = resolveCheckoutSessionId(event, rawPayload);
         if (sessionId == null || sessionId.isBlank()) {
-            throw new InvalidPaymentException("Stripe webhook missing checkout session id");
+            throw new InvalidPaymentException("Stripe webhook payload missing session");
         }
 
-        log.info("Event Session ID: {}", eventSession.getId());
-        log.info("Event Metadata (raw): {}", eventSession.getMetadata());
-
-        // Webhook payloads are often thin: metadata / amount_total may be missing on the embedded object.
-        // Always reload the session from the Stripe API so metadata and amounts match Checkout.
         Session session;
         try {
             session = Session.retrieve(sessionId);
         } catch (StripeException e) {
-            log.error("Stripe Session.retrieve failed sessionId={} : {}", sessionId, e.getMessage());
+            log.error("Stripe Session.retrieve failed sessionId={}: {}", sessionId, e.getMessage());
             throw new InvalidPaymentException("Failed to load Stripe session: " + e.getMessage());
         }
-
-        log.info("Retrieved Session ID: {}", session.getId());
-        log.info("Retrieved Metadata: {}", session.getMetadata());
-        log.info("Stripe Amount: {}", session.getAmountTotal());
-        log.info("Stripe Payment Status: {}", session.getPaymentStatus());
 
         String paymentIdStr = session.getMetadata() != null ? session.getMetadata().get("paymentId") : null;
 
@@ -106,15 +109,12 @@ public class BookingPaymentWebhookServiceImpl implements BookingPaymentWebhookSe
         long expectedAmount = StripeBookingPaymentProvider.toStripeVndUnitAmount(payment.getAmount());
         Long amountTotal = session.getAmountTotal();
         if (amountTotal == null) {
-            log.warn("Stripe session amount_total is null sessionId={}", sessionId);
             throw new InvalidPaymentException("Stripe session missing amount total");
         }
-        if (!expectedAmountEquals(amountTotal, expectedAmount)) {
+        if (!amountTotal.equals(expectedAmount)) {
             log.warn("Stripe amount mismatch sessionId={} stripeTotal={} expected={}", sessionId, amountTotal, expectedAmount);
             throw new InvalidPaymentException("Stripe amount mismatch");
         }
-        log.info("Compare amount → Stripe: {} | Expected(DB): {}",
-        amountTotal, expectedAmount);
 
         String txn = session.getPaymentIntent();
         if (txn == null || txn.isBlank()) {
@@ -123,11 +123,55 @@ public class BookingPaymentWebhookServiceImpl implements BookingPaymentWebhookSe
 
         payment.setTransactionCode(txn);
         payment.setPaymentStatus(PaymentStatus.SUCCESS);
-        log.info("Stripe payment marked SUCCESS paymentId={} sessionId={}", payment.getPaymentId(), sessionId);
         paymentRepository.save(payment);
+
+        log.info("Stripe payment marked SUCCESS paymentId={} sessionId={}", payment.getPaymentId(), sessionId);
     }
 
-    private boolean expectedAmountEquals(Long reported, long expected) {
-        return reported != null && reported == expected;
+    private String resolveCheckoutSessionId(Event event, String rawPayload) {
+        EventDataObjectDeserializer deserializer = event.getDataObjectDeserializer();
+
+        if (deserializer.getObject().isPresent()) {
+            StripeObject obj = deserializer.getObject().get();
+            if (obj instanceof Session eventSession) {
+                String id = eventSession.getId();
+                if (id != null && !id.isBlank()) {
+                    return id;
+                }
+            }
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(rawPayload);
+            JsonNode idNode = root.path("data").path("object").path("id");
+            if (idNode.isTextual()) {
+                String id = idNode.asText();
+                if (id.startsWith("cs_")) {
+                    log.debug("Resolved checkout session id from raw webhook JSON");
+                    return id;
+                }
+            }
+        } catch (JsonProcessingException e) {
+            log.warn("Could not parse session id from webhook body: {}", e.getMessage());
+        }
+
+        try {
+            String rawJson = deserializer.getRawJson();
+            if (rawJson != null && !rawJson.isBlank()) {
+                JsonNode node = objectMapper.readTree(rawJson);
+                if (node.has("id")) {
+                    String id = node.get("id").asText();
+                    if (id.startsWith("cs_")) {
+                        log.debug("Resolved checkout session id from EventDataObjectDeserializer raw JSON");
+                        return id;
+                    }
+                }
+            }
+        } catch (JsonProcessingException e) {
+            log.warn("Could not parse session id from deserializer raw JSON: {}", e.getMessage());
+        }
+
+        log.error("Stripe webhook: getObject() empty and could not parse session id from payload");
+        return null;
     }
 }
