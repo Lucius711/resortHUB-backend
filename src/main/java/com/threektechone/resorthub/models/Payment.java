@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.threektechone.resorthub.enums.PaymentGatewayProvider;
 import com.threektechone.resorthub.enums.PaymentStatus;
 
 import jakarta.persistence.Column;
@@ -54,6 +55,16 @@ public class Payment {
 
     @Column(name = "transaction_code", nullable = true, length = 100, unique = true)
     private String transactionCode;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gateway_provider", length = 20)
+    private PaymentGatewayProvider gatewayProvider;
+
+    @Column(name = "checkout_url", length = 2048)
+    private String checkoutUrl;
+
+    @Column(name = "gateway_reference", length = 255)
+    private String gatewayReference;
     
     @CreationTimestamp
     @Column(name = "created_at", nullable = false,updatable=false)

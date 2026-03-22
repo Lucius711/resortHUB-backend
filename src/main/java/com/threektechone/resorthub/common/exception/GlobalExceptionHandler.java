@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -19,6 +20,7 @@ import com.threektechone.resorthub.common.exception.custom.InvalidBookingStatusE
 import com.threektechone.resorthub.common.exception.custom.InvalidContractStatusException;
 import com.threektechone.resorthub.common.exception.custom.InvalidEditRequestDataException;
 import com.threektechone.resorthub.common.exception.custom.InvalidOtpException;
+import com.threektechone.resorthub.common.exception.custom.InvalidPaymentException;
 import com.threektechone.resorthub.common.exception.custom.InvalidRefreshTokenException;
 import com.threektechone.resorthub.common.exception.custom.InvalidRegisterStepException;
 import com.threektechone.resorthub.common.exception.custom.InvalidResortStatusException;
@@ -45,9 +47,18 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler({InvalidOtpException.class,InvalidEditRequestDataException.class,InvalidBookingStatusException.class,CancellationDeadlineException.class,CapacityExceededException.class})
+    @ExceptionHandler({InvalidOtpException.class,InvalidEditRequestDataException.class,InvalidBookingStatusException.class,CancellationDeadlineException.class,CapacityExceededException.class,InvalidPaymentException.class})
     public ResponseEntity<ApiResponse<Object>> handleBadRequest(Exception ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Object>> handleValidation(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .orElse("Validation error");
+        return buildResponse(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler({DuplicateResourceException.class,InvalidResortStatusException.class,InvalidRegisterStepException.class

@@ -16,13 +16,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.threektechone.resorthub.common.exception.custom.InvalidPaymentException;
 import com.threektechone.resorthub.common.response.ApiResponse;
+import com.threektechone.resorthub.dto.CustomerModuleDTO.BookingCreatedResponseDTO;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.BookingRequestDTO;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingDetailResponseDTO;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingListResponseDTO;
 import com.threektechone.resorthub.enums.BookingStatus;
+import com.threektechone.resorthub.service.CommonModule.BookingPaymentWebhookService;
 import com.threektechone.resorthub.service.CustomerModule.CustomerBookingService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
@@ -32,15 +37,27 @@ import lombok.RequiredArgsConstructor;
 public class CustomerController {
 
     private final CustomerBookingService bookingService;
+    private final BookingPaymentWebhookService webhookService;
     
     @PostMapping("/resorts/{id}/booking")
-    public ResponseEntity<ApiResponse<String>> createBooking(@RequestBody BookingRequestDTO dto, @PathVariable int id, Authentication authentication) {
-        
+    public ResponseEntity<ApiResponse<String>> createBooking(
+            @Valid @RequestBody BookingRequestDTO dto,
+            @PathVariable int id,
+            Authentication authentication) {
+
         String email = authentication.getName();
         bookingService.createBooking(dto, email, id);
 
-        ApiResponse<String> response = new ApiResponse<>(200,null,"Create booking successfully!",LocalDateTime.now());
+        ApiResponse<String> response = new ApiResponse<>(200, null, "Booking successfully!", LocalDateTime.now());
         return ResponseEntity.ok(response);
+    }
+
+    private static String resolveClientIp(HttpServletRequest request) {
+        String xff = request.getHeader("X-Forwarded-For");
+        if (xff != null && !xff.isBlank()) {
+            return xff.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 
     @GetMapping("/bookings")
@@ -70,7 +87,37 @@ public class CustomerController {
 
         ApiResponse<String> response = new ApiResponse<>(200,null,"Cancel booking successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
-    } 
+    }
+
+    @PostMapping("/bookings/{id}/payment")
+    public ResponseEntity<ApiResponse<BookingCreatedResponseDTO>> payBooking(
+            @PathVariable int id,
+            Authentication authentication,
+            HttpServletRequest request) {
+
+        String clientIp = resolveClientIp(request);
+        String email = authentication.getName();
+        BookingCreatedResponseDTO data = bookingService.payBooking(id, email, clientIp);
+
+        ApiResponse<BookingCreatedResponseDTO> response = new ApiResponse<>(200, null, data, LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
     
-    
+
+    @PostMapping("/payments/webhook/stripe")
+    public ResponseEntity<ApiResponse<String>> stripeWebhook(HttpServletRequest request,@RequestBody String payload) {
+
+        String sig = request.getHeader("Stripe-Signature");
+        ApiResponse<String> response;
+        try {
+            webhookService.handleStripeWebhook(payload, sig);
+            response = new ApiResponse<>(200, null, "Stripe webhook processed", LocalDateTime.now());
+            return ResponseEntity.ok(response);
+        }
+        catch (InvalidPaymentException e) {
+            response = new ApiResponse<>(400, null, "Stripe webhook rejected: " + e.getMessage(), LocalDateTime.now());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
 }

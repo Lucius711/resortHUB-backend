@@ -6,27 +6,35 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.threektechone.resorthub.common.exception.custom.InvalidBookingStatusException;
 import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
+import com.threektechone.resorthub.common.exception.custom.UnauthorizedException;
+import com.threektechone.resorthub.dto.CustomerModuleDTO.BookingCreatedResponseDTO;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.BookingRequestDTO;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingDetailResponseDTO;
 import com.threektechone.resorthub.dto.CustomerModuleDTO.CustomerBookingListResponseDTO;
 import com.threektechone.resorthub.enums.BookingStatus;
+import com.threektechone.resorthub.enums.PaymentGatewayProvider;
+import com.threektechone.resorthub.enums.PaymentStatus;
 import com.threektechone.resorthub.helper.BookingHelper.BookingCodeGenerator;
 import com.threektechone.resorthub.mapper.BookingMapper;
 import com.threektechone.resorthub.models.Booking;
 import com.threektechone.resorthub.models.BookingMeal;
+import com.threektechone.resorthub.models.Payment;
 import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.User;
-import com.threektechone.resorthub.common.exception.custom.InvalidBookingStatusException;
 import com.threektechone.resorthub.policy.booking.CancellationPolicy;
 import com.threektechone.resorthub.policy.booking.CapacityPolicy;
 import com.threektechone.resorthub.repositories.BookingRepository;
+import com.threektechone.resorthub.repositories.PaymentRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
 import com.threektechone.resorthub.service.CommonModule.BookingPriceCalculator;
 import com.threektechone.resorthub.service.CustomerModule.CustomerBookingMealService;
 import com.threektechone.resorthub.service.CustomerModule.CustomerBookingService;
+import com.threektechone.resorthub.strategy.StripeBookingPaymentProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,9 +50,12 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
     private final BookingPriceCalculator bookingPriceCalculator;
     private final CapacityPolicy capacityPolicy;
     private final CancellationPolicy cancellationPolicy;
+    private final PaymentRepository paymentRepository;
+    private final StripeBookingPaymentProvider stripeBookingPaymentProvider;
 
     @Override
-    public void createBooking(BookingRequestDTO dto,String email,int resortId) {
+    @Transactional
+    public void createBooking(BookingRequestDTO dto, String email, int resortId) {
         if (dto == null) {
             throw new InvalidBookingStatusException("Booking request is required");
         }
@@ -136,6 +147,60 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         booking.setStatus(BookingStatus.CANCELED);
         booking.setCanceledAt(LocalDateTime.now());
         bookingRepository.save(booking);
+    }
+    
+    @Override
+    @Transactional
+    public BookingCreatedResponseDTO payBooking(int bookingId, String customerEmail, String clientIp) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+
+        if (!booking.getCustomer().getEmail().equalsIgnoreCase(customerEmail)) {
+            throw new UnauthorizedException("You dont have permission!");
+        }
+        if (booking.getStatus() != BookingStatus.APPROVED) {
+            throw new InvalidBookingStatusException("Payment is only available after the owner approves the booking");
+        }
+
+        Payment payment = booking.getPayment();
+        if (payment != null && payment.getPaymentStatus() == PaymentStatus.SUCCESS) {
+            throw new InvalidBookingStatusException("Booking is already paid");
+        }
+
+        if (payment == null) {
+            payment = Payment.builder()
+                    .booking(booking)
+                    .amount(booking.getTotalPrice())
+                    .paymentMethod("GATEWAY_PENDING")
+                    .paymentStatus(PaymentStatus.PENDING)
+                    .build();
+            paymentRepository.save(payment);
+            paymentRepository.flush();
+        } else {
+            payment.setAmount(booking.getTotalPrice());
+            payment.setPaymentMethod("GATEWAY_PENDING");
+            payment.setPaymentStatus(PaymentStatus.PENDING);
+            paymentRepository.save(payment);
+            paymentRepository.flush();
+        }
+
+        // Ensure DB row is marked Stripe before Checkout completes (webhook validates provider).
+        payment.setGatewayProvider(PaymentGatewayProvider.STRIPE);
+
+        String paymentUrl = stripeBookingPaymentProvider.createCheckoutUrl(payment, booking, clientIp);
+        paymentRepository.save(payment);
+
+        booking.setPayment(payment);
+        bookingRepository.save(booking);
+
+        return BookingCreatedResponseDTO.builder()
+                .bookingId(booking.getBookingId())
+                .bookingCode(booking.getBookingCode())
+                .totalAmount(booking.getTotalPrice())
+                .paymentProvider(PaymentGatewayProvider.STRIPE)
+                .paymentStatus(payment.getPaymentStatus())
+                .paymentUrl(paymentUrl)
+                .build();
     }
     
 }
