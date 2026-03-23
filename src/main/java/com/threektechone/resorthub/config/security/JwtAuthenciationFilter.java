@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.threektechone.resorthub.config.security.UserDetails.UserDetailsServiceImpl;
-import com.threektechone.resorthub.service.AuthModule.JwtService;
+import com.threektechone.resorthub.service.auth.JwtService;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

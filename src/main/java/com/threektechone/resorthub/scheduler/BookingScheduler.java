@@ -3,7 +3,7 @@ package com.threektechone.resorthub.scheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.threektechone.resorthub.service.CustomerModule.CustomerBookingService;
+import com.threektechone.resorthub.service.customer.CustomerBookingService;
 
 import lombok.RequiredArgsConstructor;
 
