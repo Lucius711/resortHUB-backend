@@ -24,17 +24,19 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // Allow unauthenticated access to authentication endpoints
-                .requestMatchers("/api/customer/payments/webhook/**").permitAll() // Stripe server callbacks
-                .requestMatchers("/api/resorts/**").permitAll() // Allow unauthenticated access to public resort data
-                .requestMatchers("/api/admin/**").hasRole("ADMIN") // Restrict access to admin endpoints to users with ADMIN role
-                .requestMatchers("/api/owner/**").hasRole("OWNER") // Allow access to owner endpoints for users with OWNER role
-                .requestMatchers("/api/staff/**").hasRole("STAFF") // Allow access to staff endpoints for users with STAFF role
-                .requestMatchers("/api/customer/**").hasRole("CUSTOMER") // Allow access to customer endpoints for users with CUSTOMER role
-                .anyRequest().authenticated() // Require authentication for all other endpoints
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/customer/payments/webhook/**").permitAll()
+                .requestMatchers("/api/resorts/**").permitAll()
+                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers("/", "/chat-test.html", "/static/**", "/webjars/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/owner/**").hasRole("OWNER")
+                .requestMatchers("/api/staff/**").hasRole("STAFF")
+                .requestMatchers("/api/customer/**").hasRole("CUSTOMER") 
+                .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Use stateless sessions (JWT)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         

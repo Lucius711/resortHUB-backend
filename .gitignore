@@ -38,3 +38,6 @@ src/main/resources/application.properties
 # Ignore uploaded images
 /uploads/
 /uploads/** 
+
+# Ignore local-only frontend test page
+src/main/resources/static/chat-test.html
