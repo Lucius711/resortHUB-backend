@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.threektechone.resorthub.enums.BookingStatus;
+import com.threektechone.resorthub.enums.PaymentStatus;
 import com.threektechone.resorthub.models.Booking;
 
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
@@ -57,5 +58,9 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     AND b.status = 'CHECKED_IN'
     """)
     Boolean isRoomOccupied(@Param("resortId") int resortId);
+
+    Boolean existsByResortIdAndStatusIn(int resortId, List<BookingStatus> statuses);
+
+    Boolean existsByResortIdAndPaymentStatusIn(int resortId, List<PaymentStatus> statuses);
     
 }

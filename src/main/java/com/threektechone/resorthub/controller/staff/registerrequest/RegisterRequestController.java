@@ -28,7 +28,7 @@ public class RegisterRequestController {
     private final ReviewService reviewService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<RegisterResponseListDTO>>> getAll(
+    public ResponseEntity<ApiResponse<Page<RegisterResponseListDTO>>> getAllRegisterRequests(
         @RequestParam(required=false) String searchkey,
         @RequestParam(required=false) ResortStatus status,
         @PageableDefault(size=5) Pageable pageable
@@ -39,10 +39,10 @@ public class RegisterRequestController {
         return ResponseEntity.ok(new ApiResponse<>(200,null,dtoList,LocalDateTime.now()));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<RegisterResponseDetailDTO>> getDetail(@PathVariable int id) {
+    @GetMapping("/{requestId}")
+    public ResponseEntity<ApiResponse<RegisterResponseDetailDTO>> getRegisterRequestDetail(@PathVariable int requestId) {
         return ResponseEntity.ok(
-            new ApiResponse<>(200,null,reviewService.getRegisterDetail(id),LocalDateTime.now())
+            new ApiResponse<>(200,null,reviewService.getRegisterDetail(requestId),LocalDateTime.now())
         );
     }
 }

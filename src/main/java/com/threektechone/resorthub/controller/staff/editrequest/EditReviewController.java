@@ -23,13 +23,13 @@ public class EditReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping("/{id}/review")
-    public ResponseEntity<ApiResponse<String>> review(
-        @PathVariable int id,
+    @PostMapping("/{requestId}/review")
+    public ResponseEntity<ApiResponse<String>> reviewEditRequest(
+        @PathVariable int requestId,
         @RequestBody EditRequestDecisionDTO dto,
         Authentication authentication
     ) {
-        reviewService.reviewEditRequest(dto, id, authentication.getName());
+        reviewService.reviewEditRequest(dto, requestId, authentication.getName());
 
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,"Review successfully!",LocalDateTime.now())

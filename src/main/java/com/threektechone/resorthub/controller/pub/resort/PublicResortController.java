@@ -37,10 +37,10 @@ public class PublicResortController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/resorts/{id}")
-    public ResponseEntity<ApiResponse<PublicResortResponseDetailDTO>> getResortDetails(@PathVariable int id) {
+    @GetMapping("/resorts/{resortId}")
+    public ResponseEntity<ApiResponse<PublicResortResponseDetailDTO>> getResortDetails(@PathVariable int resortId) {
         
-        PublicResortResponseDetailDTO dto = resortService.getResortDetail(id);
+        PublicResortResponseDetailDTO dto = resortService.getResortDetail(resortId);
 
         ApiResponse<PublicResortResponseDetailDTO> response = new ApiResponse<>(200,null,dto,LocalDateTime.now());
         return ResponseEntity.ok(response);

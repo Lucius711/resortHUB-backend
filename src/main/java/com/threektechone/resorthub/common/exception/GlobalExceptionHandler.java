@@ -10,6 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.threektechone.resorthub.common.exception.custom.ActiveBookingExistsException;
+import com.threektechone.resorthub.common.exception.custom.ActiveUnfinishedPaymentException;
 import com.threektechone.resorthub.common.exception.custom.BookingCancelForbiddenException;
 import com.threektechone.resorthub.common.exception.custom.CancellationDeadlineException;
 import com.threektechone.resorthub.common.exception.custom.CapacityExceededException;
@@ -47,7 +49,8 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler({InvalidOtpException.class,InvalidEditRequestDataException.class,InvalidBookingStatusException.class,CancellationDeadlineException.class,CapacityExceededException.class,InvalidPaymentException.class})
+    @ExceptionHandler({InvalidOtpException.class,InvalidEditRequestDataException.class,InvalidBookingStatusException.class,CancellationDeadlineException.class,CapacityExceededException.class,InvalidPaymentException.class,
+        ActiveBookingExistsException.class,ActiveUnfinishedPaymentException.class})
     public ResponseEntity<ApiResponse<Object>> handleBadRequest(Exception ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }

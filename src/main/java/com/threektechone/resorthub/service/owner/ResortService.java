@@ -5,7 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.threektechone.resorthub.dto.owner.EditRequestDTO;
-import com.threektechone.resorthub.dto.owner.OwnerResortsResponseDTO;
+import com.threektechone.resorthub.dto.owner.OwnerResortsDetailResponseDTO;
+import com.threektechone.resorthub.dto.owner.OwnerResortsListResponseDTO;
 import com.threektechone.resorthub.dto.owner.RegisterAmenitiesRequestDTO;
 import com.threektechone.resorthub.dto.owner.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.owner.RegisterCapacityPricingRequestDTO;
@@ -14,7 +15,9 @@ import com.threektechone.resorthub.dto.owner.RegisterMenusRequestDTO;
 import com.threektechone.resorthub.enums.ResortStatus;
 
 public interface ResortService {
-    Page<OwnerResortsResponseDTO> getAllOwnerResorts(String email,String searchkey,ResortStatus status,Pageable pageable);
+    Page<OwnerResortsListResponseDTO> getAllOwnerResorts(String email,String searchkey,ResortStatus status,Pageable pageable);
+    OwnerResortsDetailResponseDTO getOwnerResortsDetail(int resortId,String ownerEmail);
+    void inactiveResort(int resortId,String ownerEmail);
     void createEditRequest(EditRequestDTO dto,String email);
     int createRegistrationResort(String email);
     void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto,int resortId,String ownerEmail);

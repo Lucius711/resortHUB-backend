@@ -11,19 +11,24 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.threektechone.resorthub.common.exception.custom.ActiveBookingExistsException;
+import com.threektechone.resorthub.common.exception.custom.ActiveUnfinishedPaymentException;
 import com.threektechone.resorthub.common.exception.custom.InvalidContractStatusException;
 import com.threektechone.resorthub.common.exception.custom.InvalidEditRequestDataException;
 import com.threektechone.resorthub.common.exception.custom.InvalidResortStatusException;
 import com.threektechone.resorthub.common.exception.custom.ResourceNotFoundException;
 import com.threektechone.resorthub.common.exception.custom.UnauthorizedException;
 import com.threektechone.resorthub.dto.owner.EditRequestDTO;
-import com.threektechone.resorthub.dto.owner.OwnerResortsResponseDTO;
+import com.threektechone.resorthub.dto.owner.OwnerResortsDetailResponseDTO;
+import com.threektechone.resorthub.dto.owner.OwnerResortsListResponseDTO;
 import com.threektechone.resorthub.dto.owner.RegisterAmenitiesRequestDTO;
 import com.threektechone.resorthub.dto.owner.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.owner.RegisterCapacityPricingRequestDTO;
 import com.threektechone.resorthub.dto.owner.RegisterImagesRequestDTO;
 import com.threektechone.resorthub.dto.owner.RegisterMenusRequestDTO;
+import com.threektechone.resorthub.enums.BookingStatus;
 import com.threektechone.resorthub.enums.ContractStatus;
+import com.threektechone.resorthub.enums.PaymentStatus;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.helper.resort.ResortCodeGenerator;
 import com.threektechone.resorthub.mapper.editrequest.EditRequestMapper;
@@ -35,6 +40,7 @@ import com.threektechone.resorthub.models.Resort;
 import com.threektechone.resorthub.models.ResortImage;
 import com.threektechone.resorthub.models.ResortMenu;
 import com.threektechone.resorthub.models.User;
+import com.threektechone.resorthub.repositories.BookingRepository;
 import com.threektechone.resorthub.repositories.ContractRepository;
 import com.threektechone.resorthub.repositories.EditResortRequestRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
@@ -68,6 +74,8 @@ public class ResortServiceImpl implements ResortService {
     private final ResortMenuMapper resortMenuMapper;
 
     private final ContractRepository contractRepository;
+
+    private final BookingRepository bookingRepository;
 
     private void ensureOwnerAccess(Resort resort, String ownerEmail) {
         if (resort == null || resort.getOwner() == null || resort.getOwner().getEmail() == null
@@ -214,11 +222,57 @@ public class ResortServiceImpl implements ResortService {
 
     // Get all owner resorts
     @Override
-    public Page<OwnerResortsResponseDTO> getAllOwnerResorts(String email, String searchkey, ResortStatus status,
+    public Page<OwnerResortsListResponseDTO> getAllOwnerResorts(String email, String searchkey, ResortStatus status,
             Pageable pageable) {
         Page<Resort> resortList = resortRepository.getOwnerResorts(email, searchkey, status, pageable);
 
         return resortList.map(resortMapper::toOwnerResortList);
+    }
+    
+    //Get owner resorts detail
+    @Override
+    public OwnerResortsDetailResponseDTO getOwnerResortsDetail(int resortId, String ownerEmail) {
+        Resort resort = resortRepository.findById(resortId)
+        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        OwnerResortsDetailResponseDTO dto = resortMapper.toOwnerResortsDetail(resort);
+        return dto;
+    }
+    
+    //Inactive resort
+    @Override
+    public void inactiveResort(int resortId, String ownerEmail) {
+        Resort resort = resortRepository.findById(resortId)
+        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        if (!resort.getOwner().getEmail().equals(ownerEmail)) {
+            throw new UnauthorizedException("You are not the owner of this resort!");
+        }
+        boolean hasActiveBooking = bookingRepository.existsByResortIdAndStatusIn(
+            resortId,
+            List.of(
+                BookingStatus.PENDING,
+                BookingStatus.APPROVED,
+                BookingStatus.CHECKED_IN
+            )
+        );
+        if (hasActiveBooking) {
+            throw new ActiveBookingExistsException("Resort cannot be deactivated while there are active bookings.");
+        }
+
+        boolean hasUnfinishedPayment  = bookingRepository.existsByResortIdAndPaymentStatusIn(
+            resortId,
+            List.of(
+                PaymentStatus.PENDING
+            )
+        );
+
+        if (hasUnfinishedPayment) {
+            throw new ActiveUnfinishedPaymentException("Resort cannot be deactivated while there are unfinished payment.");
+        }
+
+        resort.setStatus(ResortStatus.INACTIVE);
+        resortRepository.save(resort);
     }
 
     // Create edit resort request

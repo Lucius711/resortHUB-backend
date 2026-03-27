@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class OwnerResortsResponseDTO {
+public class OwnerResortsListResponseDTO {
     private int resortId;
     private String resortName;
     private String approvedByName;

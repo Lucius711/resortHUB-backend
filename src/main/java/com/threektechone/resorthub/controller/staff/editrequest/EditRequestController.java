@@ -28,7 +28,7 @@ public class EditRequestController {
     private final ReviewService reviewService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<EditResponseListDTO>>> getAll(
+    public ResponseEntity<ApiResponse<Page<EditResponseListDTO>>> getAllEditRequest(
         @RequestParam(required=false) RequestStatus status,
         @PageableDefault(size=5) Pageable pageable
     ) {
@@ -39,11 +39,11 @@ public class EditRequestController {
         );
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<EditResponseDetailDTO>> getDetail(@PathVariable int id) {
+    @GetMapping("/{requestId}")
+    public ResponseEntity<ApiResponse<EditResponseDetailDTO>> getEditRequestDetail(@PathVariable int requestId) {
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,
-                reviewService.getRequestDetail(id),
+                reviewService.getRequestDetail(requestId),
                 LocalDateTime.now())
         );
     }

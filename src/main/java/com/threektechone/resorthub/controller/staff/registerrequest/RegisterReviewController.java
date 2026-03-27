@@ -28,28 +28,28 @@ public class RegisterReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping("/{id}/review")
+    @PostMapping("/{requestId}/review")
     public ResponseEntity<ApiResponse<String>> review(
-        @PathVariable int id,
+        @PathVariable int requestId,
         @RequestBody RegisterRequestDecisionDTO dto,
         Authentication authentication
     ) {
-        reviewService.reviewRegisterRequest(dto, id, authentication.getName());
+        reviewService.reviewRegisterRequest(dto, requestId, authentication.getName());
 
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,"Review successfully!",LocalDateTime.now())
         );
     }
 
-    @PostMapping("/{id}/send-contract")
+    @PostMapping("/{requestId}/send-contract")
     public ResponseEntity<ApiResponse<String>> sendContract(
-        @PathVariable int id,
+        @PathVariable int requestId,
         @RequestParam("file") MultipartFile file,
         Authentication authentication,
         ContractType type
     ) throws IOException {
 
-        reviewService.sendContract(id, file, authentication.getName(), type);
+        reviewService.sendContract(requestId, file, authentication.getName(), type);
 
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,"Send contract successfully!",LocalDateTime.now())

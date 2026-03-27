@@ -52,31 +52,31 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateUser(@PathVariable int id, @RequestBody UserDetailRequestDTO dto) {
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateUser(@PathVariable int userId, @RequestBody UserDetailRequestDTO dto) {
         
-        ApiResponse<UserDetailResponseDTO> response =new ApiResponse<>(200, null, userService.updateUser(id, dto), LocalDateTime.now());
+        ApiResponse<UserDetailResponseDTO> response =new ApiResponse<>(200, null, userService.updateUser(userId, dto), LocalDateTime.now());
 
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
-        userService.deleteUser(id);
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable int userId) {
+        userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/users/{id}/role")
-    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateRole(@PathVariable int id, @RequestBody UpdateRoleRequestDTO dto) {
+    @PatchMapping("/users/{userId}/role")
+    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateRole(@PathVariable int userId, @RequestBody UpdateRoleRequestDTO dto) {
         
-        ApiResponse<UserDetailResponseDTO> response =new ApiResponse<>(200, null, userService.updateRole(id, dto), LocalDateTime.now());
+        ApiResponse<UserDetailResponseDTO> response =new ApiResponse<>(200, null, userService.updateRole(userId, dto), LocalDateTime.now());
 
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/users/{id}/status")
-    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateStatus(@PathVariable int id, @RequestBody UpdateStatusRequestDTO dto) {
-        ApiResponse<UserDetailResponseDTO> response =new ApiResponse<>(200, null, userService.updateStatus(id, dto), LocalDateTime.now());
+    @PatchMapping("/users/{userId}/status")
+    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateStatus(@PathVariable int userId, @RequestBody UpdateStatusRequestDTO dto) {
+        ApiResponse<UserDetailResponseDTO> response =new ApiResponse<>(200, null, userService.updateStatus(userId, dto), LocalDateTime.now());
     
         return ResponseEntity.ok(response);
     }

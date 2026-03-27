@@ -23,7 +23,7 @@ public class OwnerEditRequestController {
     private final ResortService resortService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> create(
+    public ResponseEntity<ApiResponse<String>> createEditRequest(
         @RequestBody EditRequestDTO dto,
         Authentication authentication
     ) {

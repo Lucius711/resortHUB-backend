@@ -32,99 +32,99 @@ public class ResortRegistrationController {
     private final ResortService resortService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Integer>> create(Authentication authentication) {
+    public ResponseEntity<ApiResponse<Integer>> createRegistrationResort(Authentication authentication) {
         int id = resortService.createRegistrationResort(authentication.getName());
 
         return ResponseEntity.status(201)
             .body(new ApiResponse<>(201,null,id,LocalDateTime.now()));
     }
 
-    @PatchMapping("/{id}/basic-info")
-    public ResponseEntity<ApiResponse<String>> basicInfo(
+    @PatchMapping("/{resortId}/basic-info")
+    public ResponseEntity<ApiResponse<String>> updateBasicInfo(
         @RequestBody RegisterBasicInfoRequestDTO dto,
-        @PathVariable int id,
+        @PathVariable int resortId,
         Authentication auth
     ) {
-        resortService.updateBasicInfoResort(dto, id, auth.getName());
+        resortService.updateBasicInfoResort(dto, resortId, auth.getName());
 
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,"Update basic info successfully!",LocalDateTime.now())
         );
     }
 
-    @PatchMapping("/{id}/capacity-price")
-    public ResponseEntity<ApiResponse<String>> capacityPrice(
+    @PatchMapping("/{resortId}/capacity-price")
+    public ResponseEntity<ApiResponse<String>> updateCapacityPrice(
         @RequestBody RegisterCapacityPricingRequestDTO dto,
-        @PathVariable int id,
+        @PathVariable int resortId,
         Authentication auth
     ) {
-        resortService.updateCapacityPriceResort(dto, id, auth.getName());
+        resortService.updateCapacityPriceResort(dto, resortId, auth.getName());
 
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,"Update capacity and price successfully!",LocalDateTime.now())
         );
     }
 
-    @PatchMapping("/{id}/amenities")
-    public ResponseEntity<ApiResponse<String>> amenities(
+    @PatchMapping("/{resortId}/amenities")
+    public ResponseEntity<ApiResponse<String>> updateAmenities(
         @RequestBody RegisterAmenitiesRequestDTO dto,
-        @PathVariable int id,
+        @PathVariable int resortId,
         Authentication auth
     ) {
-        resortService.updateAmenitiesResort(dto, id, auth.getName());
+        resortService.updateAmenitiesResort(dto, resortId, auth.getName());
 
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,"Update amenities successfully!",LocalDateTime.now())
         );
     }
 
-    @PatchMapping("/{id}/images")
-    public ResponseEntity<ApiResponse<String>> images(
+    @PatchMapping("/{resortId}/images")
+    public ResponseEntity<ApiResponse<String>> updateImages(
         @RequestBody RegisterImagesRequestDTO dto,
-        @PathVariable int id,
+        @PathVariable int resortId,
         Authentication auth
     ) {
-        resortService.updateImagesResort(dto, id, auth.getName());
+        resortService.updateImagesResort(dto, resortId, auth.getName());
 
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,"Update images successfully!",LocalDateTime.now())
         );
     }
 
-    @PatchMapping("/{id}/menus")
-    public ResponseEntity<ApiResponse<String>> menus(
+    @PatchMapping("/{resortId}/menus")
+    public ResponseEntity<ApiResponse<String>> updateMenus(
         @RequestBody RegisterMenusRequestDTO dto,
-        @PathVariable int id,
+        @PathVariable int resortId,
         Authentication auth
     ) {
-        resortService.updateMenusResort(dto, id, auth.getName());
+        resortService.updateMenusResort(dto, resortId, auth.getName());
 
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,"Update menus successfully!",LocalDateTime.now())
         );
     }
 
-    @PostMapping("/{id}/submit")
+    @PostMapping("/{resortId}/submit")
     public ResponseEntity<ApiResponse<String>> submit(
-        @PathVariable int id,
+        @PathVariable int resortId,
         Authentication auth
     ) {
-        resortService.submitRegisterResort(id, auth.getName());
+        resortService.submitRegisterResort(resortId, auth.getName());
 
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,"Submit successfully!",LocalDateTime.now())
         );
     }
 
-    @PostMapping("/{id}/sign-contract")
+    @PatchMapping("/{resortId}/sign-contract")
     public ResponseEntity<ApiResponse<String>> signContract(
-        @PathVariable int id,
+        @PathVariable int resortId,
         @RequestParam("file") MultipartFile file,
         @RequestParam Boolean acceptedTerms,
         Authentication auth
     ) throws IOException {
 
-        resortService.signContract(id, file, acceptedTerms, auth.getName());
+        resortService.signContract(resortId, file, acceptedTerms, auth.getName());
 
         return ResponseEntity.ok(
             new ApiResponse<>(200,null,"Sign contract successfully!",LocalDateTime.now())

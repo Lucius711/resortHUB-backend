@@ -9,7 +9,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.threektechone.resorthub.dto.owner.OwnerResortsResponseDTO;
+import com.threektechone.resorthub.dto.owner.OwnerResortsDetailResponseDTO;
+import com.threektechone.resorthub.dto.owner.OwnerResortsListResponseDTO;
 import com.threektechone.resorthub.dto.owner.RegisterAmenitiesRequestDTO;
 import com.threektechone.resorthub.dto.owner.RegisterBasicInfoRequestDTO;
 import com.threektechone.resorthub.dto.owner.RegisterCapacityPricingRequestDTO;
@@ -33,25 +34,27 @@ public interface ResortMapper {
     @Mapping(target = "resortStatus", source = "resort.status")
     @Mapping(target = "approvedByName", source = "resort.staff.fullName")
     @Mapping(target = "approvedByPhone", source = "resort.staff.phone")
-    @Mapping(target = "city", source = "city")
-    @Mapping(target = "district", source = "district")
-    @Mapping(target = "address", source = "address")
-    @Mapping(target = "createdAt", source = "createdAt")
-    OwnerResortsResponseDTO toOwnerResortList(Resort resort);
+    OwnerResortsListResponseDTO toOwnerResortList(Resort resort);
     
     @Mapping(target = "resortId", source = "resortId")
-    @Mapping(target = "resortCode", source = "resortCode")
+    @Mapping(target = "resortName", source = "resort.name")
+    @Mapping(target = "resortStatus", source = "resort.status")
+    @Mapping(target = "approvedByName", source = "resort.staff.fullName")
+    @Mapping(target = "approvedByPhone", source = "resort.staff.phone")
+    @Mapping(target = "amenityIds", source = "amenities")
+    @Mapping(target = "imageIds", source = "images")
+    @Mapping(target = "menuIds", source = "menuItems")
+    @Mapping(target = "reviewIds", source = "reviews")
+    OwnerResortsDetailResponseDTO toOwnerResortsDetail(Resort resort);
+    
+    
     @Mapping(target = "resortName", source = "name")
     @Mapping(target = "resortStatus", source = "status")
     @Mapping(target = "ownerName", source = "resort.owner.fullName")
     @Mapping(target = "ownerPhone", source = "resort.owner.phone")
     RegisterResponseListDTO toRegisterResponseListDTO(Resort resort);
     
-    @Mapping(target = "resortId", source = "resortId")
     @Mapping(target = "resortName", source = "name")
-    @Mapping(target = "district", source = "district")
-    @Mapping(target = "city", source = "city")
-    @Mapping(target = "type", source = "type")
     @Mapping(target = "thumbnail", expression = "java(getThumbnail(resort))")
     @Mapping(target = "maxGuest", source = "maxGuest")
     @Mapping(target = "price", source = "price")
@@ -59,48 +62,25 @@ public interface ResortMapper {
     PublicResortResponseListDTO toPublicResortResponseListDTO(Resort resort);
     
 
-    @Mapping(target = "resortId", source = "resortId")
     @Mapping(target = "resortName", source = "name")
-    @Mapping(target = "district", source = "district")
-    @Mapping(target = "city", source = "city")
-    @Mapping(target = "address", source = "address")
-    @Mapping(target = "type", source = "type")
-    @Mapping(target = "description", source = "description")
-    @Mapping(target = "maxGuest", source = "maxGuest")
-    @Mapping(target = "price", source = "price")
-    @Mapping(target = "averageRating", source = "averageRating")
     @Mapping(target = "amenityIds", source = "amenities")
     @Mapping(target = "imageIds", source = "images")
     @Mapping(target = "menuIds", source = "menuItems")
     @Mapping(target = "reviewIds", source = "reviews")
     PublicResortResponseDetailDTO toPublicResortResponseDetailDTO(Resort resort);
     
-    @Mapping(target = "resortId", source = "resortId")
     @Mapping(target = "resortCode", source = "resortCode")
     @Mapping(target = "ownerName", source = "owner.fullName")
     @Mapping(target = "resortName", source = "name")
-    @Mapping(target = "description", source = "description")
-    @Mapping(target = "type", source = "type")
-    @Mapping(target = "city", source = "city")
-    @Mapping(target = "district", source = "address")
-    @Mapping(target = "maxGuest", source = "maxGuest")
-    @Mapping(target = "price", source = "price")
     @Mapping(target = "amenityIds", source = "amenities")
     @Mapping(target = "imageIds", source = "images")
     RegisterResponseDetailDTO toRegisterResponseDetailDTO(Resort resort);
     
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "name", source = "resortName")
-    @Mapping(target = "description", source = "description")
-    @Mapping(target = "type", source = "type")
-    @Mapping(target = "city", source = "city")
-    @Mapping(target = "district", source = "district")
-    @Mapping(target = "address", source = "address")
     void updateResortBasicInfo(@MappingTarget Resort resort, RegisterBasicInfoRequestDTO dto);
     
     @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "maxGuest", source = "maxGuest")
-    @Mapping(target = "price", source = "price")
     void updateResortCapacityPrice(@MappingTarget Resort resort, RegisterCapacityPricingRequestDTO dto);
     
     @BeanMapping(ignoreByDefault = true)

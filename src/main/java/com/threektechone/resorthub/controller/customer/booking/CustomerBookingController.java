@@ -39,14 +39,14 @@ public class CustomerBookingController {
     private final CustomerBookingService bookingService;
     private final BookingPaymentWebhookService webhookService;
     
-    @PostMapping("/resorts/{id}/booking")
+    @PostMapping("/resorts/{resortId}/booking")
     public ResponseEntity<ApiResponse<String>> createBooking(
             @Valid @RequestBody BookingRequestDTO dto,
-            @PathVariable int id,
+            @PathVariable int resortId,
             Authentication authentication) {
 
         String email = authentication.getName();
-        bookingService.createBooking(dto, email, id);
+        bookingService.createBooking(dto, email, resortId);
 
         ApiResponse<String> response = new ApiResponse<>(200, null, "Booking successfully!", LocalDateTime.now());
         return ResponseEntity.ok(response);
@@ -70,34 +70,34 @@ public class CustomerBookingController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/bookings/{id}")
-    public ResponseEntity<ApiResponse<CustomerBookingDetailResponseDTO>> getCustomerBookingDetail(@PathVariable int id) {
-        CustomerBookingDetailResponseDTO dto = bookingService.getCustomerBookingDetail(id);
+    @GetMapping("/bookings/{bookingId}")
+    public ResponseEntity<ApiResponse<CustomerBookingDetailResponseDTO>> getCustomerBookingDetail(@PathVariable int bookingId) {
+        CustomerBookingDetailResponseDTO dto = bookingService.getCustomerBookingDetail(bookingId);
 
         ApiResponse<CustomerBookingDetailResponseDTO> response = new ApiResponse<>(200,null,dto,LocalDateTime.now());
 
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/bookings/{id}/cancel")
-    public ResponseEntity<ApiResponse<String>> cancelBooking(@PathVariable int id,Authentication authentication) {
+    @PatchMapping("/bookings/{bookingId}/cancel")
+    public ResponseEntity<ApiResponse<String>> cancelBooking(@PathVariable int bookingId,Authentication authentication) {
         String email = authentication.getName();
 
-        bookingService.cancelBookingByCustomer(id, email);
+        bookingService.cancelBookingByCustomer(bookingId, email);
 
         ApiResponse<String> response = new ApiResponse<>(200,null,"Cancel booking successfully!",LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/bookings/{id}/payment")
+    @PostMapping("/bookings/{bookingId}/payment")
     public ResponseEntity<ApiResponse<BookingCreatedResponseDTO>> payBooking(
-            @PathVariable int id,
+            @PathVariable int bookingId,
             Authentication authentication,
             HttpServletRequest request) {
 
         String clientIp = resolveClientIp(request);
         String email = authentication.getName();
-        BookingCreatedResponseDTO data = bookingService.payBooking(id, email, clientIp);
+        BookingCreatedResponseDTO data = bookingService.payBooking(bookingId, email, clientIp);
 
         ApiResponse<BookingCreatedResponseDTO> response = new ApiResponse<>(200, null, data, LocalDateTime.now());
         return ResponseEntity.ok(response);
