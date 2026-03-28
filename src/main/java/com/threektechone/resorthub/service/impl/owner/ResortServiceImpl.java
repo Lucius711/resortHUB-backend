@@ -84,6 +84,11 @@ public class ResortServiceImpl implements ResortService {
         }
     }
 
+    private Boolean isRegistrationCompleted(Resort resort) {
+        return resort.getCompletedSteps() >= resort.getTotalSteps();
+    }
+
+
     // Create resort registraton request
     @Override
     public int createRegistrationResort(String email) {
@@ -245,10 +250,14 @@ public class ResortServiceImpl implements ResortService {
         Resort resort = resortRepository.findById(resortId)
         .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
+        if (!isRegistrationCompleted(resort)) {
+            throw new InvalidResortStatusException("Resort must complete all registration steps before changing status");
+        }
+
         if (!resort.getOwner().getEmail().equals(ownerEmail)) {
             throw new UnauthorizedException("You are not the owner of this resort!");
         }
-        boolean hasActiveBooking = bookingRepository.existsByResortIdAndStatusIn(
+        boolean hasActiveBooking = bookingRepository.existsActiveBooking(
             resortId,
             List.of(
                 BookingStatus.PENDING,
@@ -260,7 +269,7 @@ public class ResortServiceImpl implements ResortService {
             throw new ActiveBookingExistsException("Resort cannot be deactivated while there are active bookings.");
         }
 
-        boolean hasUnfinishedPayment  = bookingRepository.existsByResortIdAndPaymentStatusIn(
+        boolean hasUnfinishedPayment  = bookingRepository.existsUnfinishedPayment(
             resortId,
             List.of(
                 PaymentStatus.PENDING
@@ -271,7 +280,34 @@ public class ResortServiceImpl implements ResortService {
             throw new ActiveUnfinishedPaymentException("Resort cannot be deactivated while there are unfinished payment.");
         }
 
+        if (resort.getStatus() == ResortStatus.INACTIVE) {
+            throw new InvalidResortStatusException("Resort is already inactive");
+        }
+
+
         resort.setStatus(ResortStatus.INACTIVE);
+        resortRepository.save(resort);
+    }
+
+    //Active resort
+    @Override
+    public void activeResort(int resortId, String ownerEmail) {
+        Resort resort = resortRepository.findById(resortId)
+        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+
+        if (!isRegistrationCompleted(resort)) {
+            throw new InvalidResortStatusException("Resort must complete all registration steps before changing status");
+        }
+
+        if (!resort.getOwner().getEmail().equals(ownerEmail)) {
+            throw new UnauthorizedException("You are not the owner of this resort!");
+        }
+
+        if (resort.getStatus() == ResortStatus.ACTIVE) {
+            throw new InvalidResortStatusException("Resort is already active");
+        }
+
+        resort.setStatus(ResortStatus.ACTIVE);
         resortRepository.save(resort);
     }
 

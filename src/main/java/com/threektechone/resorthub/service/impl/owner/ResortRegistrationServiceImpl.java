@@ -23,6 +23,8 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
         resort.setResortCode(resortCode);
         resort.setStep(ResortRegistrationStep.START);
         resort.setOwner(owner);
+        resort.setCompletedSteps(0);
+        resort.setTotalSteps(7);
     }
 
     @Override
@@ -35,6 +37,7 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
     @Override
     public void moveToBasicInfoStep(Resort resort) {
         resort.setStep(ResortRegistrationStep.BASIC_INFO);
+        markStepCompleted(resort, 1);
     }
 
     @Override
@@ -51,6 +54,7 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
     @Override
     public void moveToCapacityPriceStep(Resort resort) {
         resort.setStep(ResortRegistrationStep.CAPACITY_PRICE);
+        markStepCompleted(resort, 2);
     }
 
     @Override
@@ -67,6 +71,7 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
     @Override
     public void moveToAmenitiesStep(Resort resort) {
         resort.setStep(ResortRegistrationStep.AMENITIES);
+        markStepCompleted(resort, 3);
     }
 
     @Override
@@ -83,6 +88,7 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
     @Override
     public void moveToImagesStep(Resort resort) {
         resort.setStep(ResortRegistrationStep.IMAGES);
+        markStepCompleted(resort, 4);
     }
 
      @Override
@@ -99,6 +105,7 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
     @Override
     public void moveToMenusStep(Resort resort) {
         resort.setStep(ResortRegistrationStep.MENUS);
+        markStepCompleted(resort, 5);
     }
 
 
@@ -117,6 +124,7 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
     public void submit(Resort resort) {
         resort.setStatus(ResortStatus.PENDING_REVIEW);
         resort.setStep(ResortRegistrationStep.CONTRACT_SIGN);
+        markStepCompleted(resort, 6);
     }
 
     @Override
@@ -138,7 +146,15 @@ public class ResortRegistrationServiceImpl implements ResortRegistrationService 
     public void signContract(Contract contract,Resort resort) {
         contract.setStatus(ContractStatus.ACTIVE);
         resort.setStatus(ResortStatus.ACTIVE);  
-        resort.setStep(ResortRegistrationStep.COMPLETED);                            
+        resort.setStep(ResortRegistrationStep.COMPLETED);
+        markStepCompleted(resort, 7);                            
+    }
+
+    @Override
+    public void markStepCompleted(Resort resort, int step) {
+        if (resort.getCompletedSteps() < step) {
+             resort.setCompletedSteps(step);
+        }
     }
 
     

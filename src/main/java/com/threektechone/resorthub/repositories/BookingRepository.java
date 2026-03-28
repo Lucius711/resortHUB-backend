@@ -59,8 +59,26 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     """)
     Boolean isRoomOccupied(@Param("resortId") int resortId);
 
-    Boolean existsByResortIdAndStatusIn(int resortId, List<BookingStatus> statuses);
+    @Query("""
+    SELECT COUNT(b) > 0
+    FROM Booking b
+    WHERE b.resort.resortId = :resortId
+    AND b.status IN :statuses
+    """)
+    boolean existsActiveBooking(
+    @Param("resortId") int resortId,
+    @Param("statuses") List<BookingStatus> statuses
+    );
 
-    Boolean existsByResortIdAndPaymentStatusIn(int resortId, List<PaymentStatus> statuses);
-    
+    @Query("""
+    SELECT COUNT(b) > 0
+    FROM Booking b
+    WHERE b.resort.resortId = :resortId
+    AND b.payment.paymentStatus IN :statuses
+    """)
+    boolean existsUnfinishedPayment(
+        @Param("resortId") int resortId,
+        @Param("statuses") List<PaymentStatus> statuses
+    );
+
 }

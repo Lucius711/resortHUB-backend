@@ -18,6 +18,7 @@ public interface ResortService {
     Page<OwnerResortsListResponseDTO> getAllOwnerResorts(String email,String searchkey,ResortStatus status,Pageable pageable);
     OwnerResortsDetailResponseDTO getOwnerResortsDetail(int resortId,String ownerEmail);
     void inactiveResort(int resortId,String ownerEmail);
+    void activeResort(int resortId,String ownerEmail);
     void createEditRequest(EditRequestDTO dto,String email);
     int createRegistrationResort(String email);
     void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto,int resortId,String ownerEmail);

@@ -8,6 +8,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,7 +58,27 @@ public class OwnerResortController {
             return ResponseEntity.ok(response);
     }
 
-    
+    @PatchMapping("/{resortId}/inactive")
+    public ResponseEntity<ApiResponse<String>> inactiveResort(
+        @PathVariable int resortId,
+        Authentication authentication) {
+        
+            String email = authentication.getName();
+            resortService.inactiveResort(resortId, email);
+            ApiResponse<String> response = new ApiResponse<>(200,"Resort inactivated successfully!",null,LocalDateTime.now());
 
-    
+            return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{resortId}/active")
+    public ResponseEntity<ApiResponse<String>> activeResort(
+        @PathVariable int resortId,
+        Authentication authentication) {
+        
+            String email = authentication.getName();
+            resortService.activeResort(resortId, email);
+            ApiResponse<String> response = new ApiResponse<>(200,"Resort activated successfully!",null,LocalDateTime.now());
+
+            return ResponseEntity.ok(response);
+   }
 }

@@ -23,5 +23,6 @@ public class OwnerResortsListResponseDTO {
     private String district;
     private String address;
     private LocalDateTime createdAt;
-    
+    private int completedSteps;
+    private int totalSteps;
 }

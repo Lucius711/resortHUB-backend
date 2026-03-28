@@ -20,4 +20,5 @@ public interface ResortRegistrationService {
     void submit(Resort resort);
     void ensureCanSignContract(Resort resort,Contract contract);
     void signContract(Contract contract,Resort resort);
+    void markStepCompleted(Resort resort, int step);
 }

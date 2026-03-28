@@ -119,9 +119,17 @@ public class Resort {
     @OneToMany(mappedBy= "resort")
     private List<EditResortRequest> requests;
 
+    @Column(name="completed_steps")
+    private int completedSteps;
+
+    @Column(name="total_steps")
+    private int totalSteps;
+
     public void addContract(Contract contract) {
         contracts.add(contract);
         contract.setResort(this);
     }
+
+    
     
 }
