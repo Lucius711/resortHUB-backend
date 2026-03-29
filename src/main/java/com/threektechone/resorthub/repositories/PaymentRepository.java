@@ -20,4 +20,39 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Payment p WHERE p.paymentId = :id")
     Optional<Payment> lockById(@Param("id") int id);
+
+    @Query("""
+    SELECT COALESCE(SUM(p.amount), 0)
+    FROM Payment p
+    JOIN p.booking b
+    JOIN b.resort r
+    WHERE r.owner.email = :ownerEmail
+      AND p.paymentStatus = 'PAID'
+    """)
+    double getTotalRevenue(@Param("ownerEmail") String ownerEmail);
+
+
+    @Query("""
+    SELECT COALESCE(SUM(p.amount), 0)
+    FROM Payment p
+    JOIN p.booking b
+    JOIN b.resort r
+    WHERE r.owner.email = :ownerEmail
+      AND p.paymentStatus = 'PAID'
+      AND MONTH(p.createdAt) = MONTH(CURRENT_DATE)
+      AND YEAR(p.createdAt) = YEAR(CURRENT_DATE)
+    """)
+    double getRevenueThisMonth(@Param("ownerEmail") String ownerEmail);
+
+    @Query("""
+    SELECT COALESCE(SUM(p.amount), 0)
+    FROM Payment p
+    JOIN p.booking b
+    JOIN b.resort r
+    WHERE r.owner.email = :ownerEmail
+      AND p.paymentStatus = 'PAID'
+      AND MONTH(p.createdAt) = MONTH(CURRENT_DATE) - 1
+      AND YEAR(p.createdAt) = YEAR(CURRENT_DATE)
+    """)
+    double getRevenueLastMonth(@Param("ownerEmail") String ownerEmail);
 }

@@ -81,4 +81,22 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
         @Param("statuses") List<PaymentStatus> statuses
     );
 
+    @Query("""
+    SELECT COUNT(b)
+    FROM Booking b
+    JOIN b.resort r
+    WHERE r.owner.email = :ownerEmail
+    """)
+    int getTotalBookings(@Param("ownerEmail") String ownerEmail);
+
+    @Query("""
+    SELECT COUNT(b)
+    FROM Booking b
+    JOIN b.resort r
+    WHERE r.owner.email = :ownerEmail
+      AND MONTH(b.createdAt) = MONTH(CURRENT_DATE)
+      AND YEAR(b.createdAt) = YEAR(CURRENT_DATE)
+    """)
+   int getBookingThisMonth(@Param("ownerEmail") String ownerEmail);
+
 }

@@ -65,4 +65,19 @@ public interface ResortRepository extends JpaRepository<Resort, Integer> {
         Pageable pageable
     );
 
+    @Query("""
+    SELECT COUNT(r)
+    FROM Resort r
+    WHERE r.owner.email = :ownerEmail
+    """)
+    int getTotalResorts(@Param("ownerEmail") String ownerEmail);
+
+    @Query("""
+    SELECT COUNT(r)
+    FROM Resort r
+    WHERE r.owner.email = :ownerEmail
+      AND r.status = 'ACTIVE'
+    """)
+    int getActiveResorts(@Param("ownerEmail") String ownerEmail);
+
 }
