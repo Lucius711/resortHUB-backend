@@ -14,5 +14,5 @@ import lombok.Setter;
 @Setter
 public class OwnerRevenueChartDTO {
     private LocalDate date;
-    private Double revenue;
+    private double revenue;
 }

@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import com.threektechone.resorthub.enums.BookingStatus;
 import com.threektechone.resorthub.enums.PaymentStatus;
 import com.threektechone.resorthub.models.Booking;
+import com.threektechone.resorthub.repositories.projection.OwnerBookingChartProjection;
 
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
@@ -99,4 +100,21 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     """)
    int getBookingThisMonth(@Param("ownerEmail") String ownerEmail);
 
+
+   @Query("""
+    SELECT 
+        CAST(b.createdAt AS date) AS date,
+        COUNT(b) AS totalBookings
+    FROM Booking b
+    WHERE b.resort.owner.email = :ownerEmail
+      AND b.status IN ('APPROVED', 'COMPLETED')
+      AND b.createdAt BETWEEN :fromDate AND :toDate
+    GROUP BY CAST(b.createdAt AS date)
+    ORDER BY CAST(b.createdAt AS date)
+    """)
+    List<OwnerBookingChartProjection> getBookingChart(
+        String ownerEmail,
+        LocalDateTime fromDate,
+        LocalDateTime toDate
+    );
 }

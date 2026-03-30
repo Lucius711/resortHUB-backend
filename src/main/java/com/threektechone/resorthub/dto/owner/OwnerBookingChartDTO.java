@@ -13,6 +13,6 @@ import lombok.Setter;
 @Setter
 public class OwnerBookingChartDTO {
     private LocalDate date;
-    private Integer totalBookings;
+    private int totalBookings;
     
 }

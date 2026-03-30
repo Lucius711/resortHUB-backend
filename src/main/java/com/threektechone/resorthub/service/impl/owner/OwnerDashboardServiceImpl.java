@@ -1,8 +1,14 @@
 package com.threektechone.resorthub.service.impl.owner;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
+import com.threektechone.resorthub.dto.owner.OwnerBookingChartDTO;
 import com.threektechone.resorthub.dto.owner.OwnerOverviewResponseDTO;
+import com.threektechone.resorthub.dto.owner.OwnerRevenueChartDTO;
+import com.threektechone.resorthub.mapper.chart.ChartMapper;
 import com.threektechone.resorthub.repositories.BookingRepository;
 import com.threektechone.resorthub.repositories.PaymentRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
@@ -19,6 +25,7 @@ public class OwnerDashboardServiceImpl implements OwnerDashboardService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final ResortReviewRepository resortReviewRepository;
+    private final ChartMapper chartMapper;
 
     @Override
     public OwnerOverviewResponseDTO getOwnerOverview(String ownerEmail) {
@@ -49,6 +56,34 @@ public class OwnerDashboardServiceImpl implements OwnerDashboardService {
             bookingThisMonth, 
             totalResorts, 
             activeResorts);
+    }
+
+    @Override
+    public List<OwnerRevenueChartDTO> getOwnerRevenueChart(String ownerEmail) {
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.minusDays(29);
+        List<OwnerRevenueChartDTO> chartData = paymentRepository.getRevenueChart(ownerEmail, 
+            startDate.atStartOfDay(), 
+            today.plusDays(1).atStartOfDay())
+            .stream()
+            .map(chartMapper::toOwnerRevenueChartDTO)
+            .toList();
+        
+        return chartData;
+    }
+
+    @Override
+    public List<OwnerBookingChartDTO> getOwnerBookingChart(String ownerEmail) {
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.minusDays(29);
+        List<OwnerBookingChartDTO> chartData = bookingRepository.getBookingChart(ownerEmail, 
+            startDate.atStartOfDay(), 
+            today.plusDays(1).atStartOfDay())
+            .stream()
+            .map(chartMapper::toOwnerBookingChartDTO)
+            .toList();
+        
+        return chartData;
     }
     
 }
