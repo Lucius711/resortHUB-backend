@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import com.threektechone.resorthub.enums.ResortStatus;
 import com.threektechone.resorthub.enums.ResortType;
 import com.threektechone.resorthub.models.Resort;
+import com.threektechone.resorthub.repositories.projection.ResortStatusCountProjection;
 
 
 
@@ -79,5 +80,16 @@ public interface ResortRepository extends JpaRepository<Resort, Integer> {
       AND r.status = 'ACTIVE'
     """)
     int getActiveResorts(@Param("ownerEmail") String ownerEmail);
+
+    @Query("SELECT COUNT(r) FROM Resort r WHERE r.status = :status AND r.staff.email = :staffEmail")
+    int countByStatusAndStaffEmail(@Param("status") ResortStatus status, @Param("staffEmail") String staffEmail);
+
+    @Query("SELECT r.status as status, COUNT(r) as count " +
+           "FROM Resort r " +
+           "WHERE r.staff.email = :staffEmail " +
+           "GROUP BY r.status")
+    List<ResortStatusCountProjection> countResortsGroupByStatus(@Param("staffEmail") String staffEmail);
+
+
 
 }

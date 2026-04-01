@@ -97,7 +97,7 @@ for (String[] d : data) {
 }
  User owner = userRepository.findById(8)
                 .orElseThrow();
-      User staff = userRepository.findById(2).orElseThrow();
+      User staff = userRepository.findById(4).orElseThrow();
 // 2. Tạo các Amenity (Lưu riêng lẻ trước)
     ResortAmenity wifi = ResortAmenity.builder().name(AmenityName.WIFI).build();
     ResortAmenity pool = ResortAmenity.builder().name(AmenityName.POOL).build();
