@@ -22,7 +22,6 @@ public class StaffDashboardController {
     
     private final StaffDashboardService staffDashboardService;
 
-    
     @GetMapping
     public ResponseEntity<ApiResponse<StaffDashboardDTO>> getStaffDashboard(Authentication authentication) {
         String email = authentication.getName();

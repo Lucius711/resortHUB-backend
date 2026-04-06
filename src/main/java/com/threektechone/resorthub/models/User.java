@@ -66,8 +66,7 @@ public class User {
     
     @Enumerated(EnumType.STRING)
     @Column(name="status", nullable = false, length = 20)
-    @Builder.Default
-    private UserStatus status = UserStatus.ACTIVE;
+    private UserStatus status;
 
     @Column(nullable = false)
     @Builder.Default
