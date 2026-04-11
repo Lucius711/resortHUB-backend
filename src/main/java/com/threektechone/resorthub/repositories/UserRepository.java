@@ -20,6 +20,10 @@ import com.threektechone.resorthub.repositories.projection.UserRoleCountProjecti
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
+
+    Boolean existsByEmail(String email);
+
+    Boolean existsByPhone(String phone);
     
     @Query("""
     SELECT u FROM User u
