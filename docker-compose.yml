@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  backend:
+    build: .
+    container_name: resorthub-backend
+    ports:
+      - "3000:3000" # Spring Boot mặc định 8080
+    env_file:
+      - .env
+    environment:
+      DB_URL: jdbc:sqlserver://sqlserver:1433;databaseName=resortHUBData;encrypt=false;trustServerCertificate=true
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      sqlserver-init:
+        condition: service_completed_successfully
+    restart: always
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: resorthub-sqlserver
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P $$MSSQL_SA_PASSWORD -Q 'SELECT 1' || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: resorthub-sqlserver-init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: resortHUBData
+    restart: "no"
+    command: >
+      /bin/bash -c " /opt/mssql-tools18/bin/sqlcmd -C -S sqlserver -U sa -P $$DB_PASSWORD -Q \"IF DB_ID(N'resortHUBData') IS NULL CREATE DATABASE [resortHUBData];\" "
+
+volumes:
+  sqlserver_data:

@@ -34,6 +34,8 @@ build/
 
 # Spring Boot config
 src/main/resources/application.properties
+.env
+.env.*
 
 # Ignore uploaded images
 /uploads/

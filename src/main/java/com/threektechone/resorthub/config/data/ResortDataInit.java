@@ -158,7 +158,7 @@ public class ResortDataInit implements CommandLineRunner {
     return ResortMenu.builder()
             .name(name)
             .price(price)
-            .category(category) // 🔥 QUAN TRỌNG
+            .category(category) 
             .resort(resort)
             .build();
 }
