@@ -82,7 +82,7 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
         
         Boolean canCheckOut =canCheckOut(booking);
 
-        OwnerBookingDetailResponseDTO dto = bookingMapper.tOwnerBookingDetailResponseDTO(booking);
+        OwnerBookingDetailResponseDTO dto = bookingMapper.toOwnerBookingDetailResponseDTO(booking);
         dto.setMealPrice(bookingPriceCalculator.calculateMealCost(dto.getMeals()));
         dto.setRoomAvailable(roomAvailable);
         dto.setCanCheckIn(canCheckIn);

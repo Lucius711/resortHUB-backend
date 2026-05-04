@@ -35,6 +35,7 @@ public interface  BookingMapper {
     @Mapping(target = "ownerName", source = "resort.owner.fullName")
     @Mapping(target = "paymentStatus", source = "payment.paymentStatus")
     @Mapping(target = "mealPrice", ignore= true)
+    @Mapping(target = "meals", ignore = true)
     CustomerBookingDetailResponseDTO toCustomerBookingDetailResponseDTO(Booking booking);
     
 
@@ -51,10 +52,11 @@ public interface  BookingMapper {
     @Mapping(target = "paymentStatus", source = "payment.paymentStatus")
     @Mapping(target = "bookingStatus", source = "status")
     @Mapping(target = "mealPrice", ignore= true)
+    @Mapping(target = "meals", ignore = true)
     @Mapping(target = "roomAvailable", ignore= true)
     @Mapping(target = "canCheckIn", ignore= true)
     @Mapping(target = "canCheckOut", ignore= true)
-    OwnerBookingDetailResponseDTO tOwnerBookingDetailResponseDTO(Booking booking);
+    OwnerBookingDetailResponseDTO toOwnerBookingDetailResponseDTO(Booking booking);
 
     default String getThumbnail(Booking booking) {
         if (booking.getResort().getImages() == null || booking.getResort().getImages().isEmpty()) {
