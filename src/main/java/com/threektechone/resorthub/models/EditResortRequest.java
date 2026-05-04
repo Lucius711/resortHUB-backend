@@ -40,10 +40,10 @@ public class EditResortRequest {
     @JoinColumn(name="resort_id",nullable=false)
     private Resort resort;
 
-    @Column(name="old_data",columnDefinition="NVARCHAR(MAX)",nullable=false)
+    @Column(name="old_data",columnDefinition="TEXT",nullable=false)
     private String oldData;
 
-    @Column(name="new_data",columnDefinition="NVARCHAR(MAX)",nullable=false)
+    @Column(name="new_data",columnDefinition="TEXT",nullable=false)
     private String newData;
 
     @Enumerated(EnumType.STRING)
@@ -65,6 +65,6 @@ public class EditResortRequest {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name="note",columnDefinition="NVARCHAR(MAX)",nullable=true)
+    @Column(name="note",columnDefinition="TEXT",nullable=true)
     private String note;
 }
