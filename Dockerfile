@@ -1,9 +1,16 @@
+FROM maven:3.9-eclipse-temurin-21 AS build
+
+WORKDIR /app
+COPY . .
+
+RUN mvn clean package -DskipTests
+
 FROM eclipse-temurin:21-jre-jammy
 
-WORKDIR /resortHUB-backend-0.0.1-SNAPSHOT
+WORKDIR /app
 
-COPY target/*.jar resortHUB-backend-0.0.1-SNAPSHOT.jar
+COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 3000
+EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","resortHUB-backend-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
