@@ -33,7 +33,6 @@ build/
 .vscode/
 
 # Spring Boot config
-src/main/resources/application.properties
 .env
 .env.*
 
