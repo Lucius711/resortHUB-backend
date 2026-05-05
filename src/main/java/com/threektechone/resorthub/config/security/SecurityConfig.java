@@ -26,7 +26,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/customer/payments/webhook/**").permitAll()
-                .requestMatchers("/api/resorts/**").permitAll()
+                .requestMatchers("/api/resorts**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/", "/chat-test.html", "/static/**", "/webjars/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
