@@ -19,7 +19,8 @@ public interface ResortRepository extends JpaRepository<Resort, Integer> {
    @Query("""
     SELECT r FROM Resort r
     WHERE r.owner.email = :email 
-    AND (:searchkey IS NULL OR 
+    AND (
+         :searchkey IS NULL OR :searchkey = '' OR
          LOWER(r.resortCode) LIKE LOWER(CONCAT('%', :searchkey, '%')) 
          OR LOWER(r.name) LIKE LOWER(CONCAT('%', :searchkey, '%')))
     AND (:status IS NULL OR r.status = :status)
@@ -37,7 +38,8 @@ public interface ResortRepository extends JpaRepository<Resort, Integer> {
     SELECT r FROM Resort r
     WHERE r.status <> 'DRAFT'
     AND r.step = 'CONTRACT_SIGN' 
-    AND (:searchkey IS NULL OR 
+    AND (
+         :searchkey IS NULL OR :searchkey = '' OR
          LOWER(r.resortCode) LIKE LOWER(CONCAT('%', :searchkey, '%')) 
          OR LOWER(r.name) LIKE LOWER(CONCAT('%', :searchkey, '%'))
          OR LOWER(r.owner.fullName) LIKE LOWER(CONCAT('%', :searchkey, '%')))
@@ -49,22 +51,24 @@ public interface ResortRepository extends JpaRepository<Resort, Integer> {
         Pageable pageable
     );
 
-    @Query("""
-    SELECT r FROM Resort r
-    WHERE r.status = 'ACTIVE'
-    AND (:searchkey IS NULL OR 
-        LOWER(r.name) LIKE LOWER(CONCAT('%', :searchkey, '%'))
-        OR LOWER(r.district) LIKE LOWER(CONCAT('%', :searchkey, '%'))
-        OR LOWER(r.city) LIKE LOWER(CONCAT('%', :searchkey, '%')))
-    AND (:city IS NULL OR r.city = :city)
-    AND (:type IS NULL OR r.type = :type)
-    """)
-    Page<Resort> getPublicResorts(
-        @Param("searchkey") String searchkey,
-        @Param("city") String city,
-        @Param("type") ResortType type,
-        Pageable pageable
-    );
+  @Query("""
+SELECT r FROM Resort r
+WHERE r.status = 'ACTIVE'
+AND (
+    :searchkey IS NULL OR :searchkey = '' OR
+    LOWER(r.name) LIKE LOWER(CONCAT('%', :searchkey, '%')) OR
+    LOWER(r.district) LIKE LOWER(CONCAT('%', :searchkey, '%')) OR
+    LOWER(r.city) LIKE LOWER(CONCAT('%', :searchkey, '%'))
+)
+AND (:city IS NULL OR r.city = :city)
+AND (:type IS NULL OR r.type = :type)
+""")
+Page<Resort> getPublicResorts(
+    @Param("searchkey") String searchkey,
+    @Param("city") String city,
+    @Param("type") ResortType type,
+    Pageable pageable
+);
 
     @Query("""
     SELECT COUNT(r)

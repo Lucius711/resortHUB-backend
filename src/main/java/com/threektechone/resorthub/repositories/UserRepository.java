@@ -29,7 +29,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     SELECT u FROM User u
     JOIN u.role r
     WHERE 
-        (:search IS NULL OR 
+        (:search IS NULL OR :search = '' OR
          LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')) 
          OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')))
     AND (:gender IS NULL OR u.gender = :gender)

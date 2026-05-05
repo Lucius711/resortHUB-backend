@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/customer/payments/webhook/**").permitAll()
-                .requestMatchers("/api/resorts", "/api/resorts/**").permitAll()
+                .requestMatchers("/api/resorts/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/", "/chat-test.html", "/static/**", "/webjars/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
