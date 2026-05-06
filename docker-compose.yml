@@ -53,15 +53,6 @@ services:
       - redis_data:/data
     command: redis-server --appendonly yes
 
-  k6:
-    image: grafana/k6
-    container_name: k6
-    depends_on:
-      - backend
-    volumes:
-      - ./k6:/scripts
-    command: run /scripts/test.js
-
 volumes:
   postgres_data:
   redis_data:
