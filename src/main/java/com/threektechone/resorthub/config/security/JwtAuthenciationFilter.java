@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.threektechone.resorthub.config.security.UserDetails.UserDetailsServiceImpl;
+import com.threektechone.resorthub.service.auth.JwtBlacklistService;
 import com.threektechone.resorthub.service.auth.JwtService;
 
 import io.jsonwebtoken.JwtException;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenciationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final JwtBlacklistService jwtBlacklistService;
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -44,6 +46,13 @@ public class JwtAuthenciationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
         try {
+            String jti = jwtService.extractJti(token);
+            if (jwtBlacklistService.isBlacklisted(jti)) {
+                SecurityContextHolder.clearContext();
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             String email = jwtService.extractEmail(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {

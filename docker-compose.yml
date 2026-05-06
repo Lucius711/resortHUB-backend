@@ -5,16 +5,23 @@ services:
     build: .
     container_name: resorthub-backend
     ports:
-      - "3000:3000" # Spring Boot mặc định 8080
+      - "3000:3000"
     env_file:
       - .env
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/resort_hub_data
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_started
     restart: always
 
   postgres:
@@ -36,5 +43,25 @@ services:
       retries: 10
       start_period: 30s
 
+  redis:
+    image: redis:7-alpine
+    container_name: resorthub-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  k6:
+    image: grafana/k6
+    container_name: k6
+    depends_on:
+      - backend
+    volumes:
+      - ./k6:/scripts
+    command: run /scripts/test.js
+
 volumes:
   postgres_data:
+  redis_data:

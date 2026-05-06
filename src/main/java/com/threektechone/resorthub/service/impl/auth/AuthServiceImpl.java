@@ -30,6 +30,7 @@ import com.threektechone.resorthub.repositories.RefreshTokenRepository;
 import com.threektechone.resorthub.repositories.RoleRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
 import com.threektechone.resorthub.service.auth.AuthService;
+import com.threektechone.resorthub.service.auth.JwtBlacklistService;
 import com.threektechone.resorthub.service.auth.JwtService;
 import com.threektechone.resorthub.service.mail.MailService;
 
@@ -59,6 +60,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserDetailsServiceImpl userDetailService;
 
     private final JwtProperties jwtProperties;
+    
+    private final JwtBlacklistService jwtBlacklistService;
     
 
     //generate OTP 
@@ -169,6 +172,11 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponseDTO refreshToken(RefreshTokenRequestDTO request) {
         String token = request.getRefreshToken();
 
+        String refreshJti = jwtService.extractJti(token);
+        if (jwtBlacklistService.isBlacklisted(refreshJti)) {
+            throw new InvalidRefreshTokenException("Token revoked");
+        }
+
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
         .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
 
@@ -201,6 +209,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(RefreshTokenRequestDTO request) {
          String token = request.getRefreshToken();
+
+    String refreshJti = jwtService.extractJti(token);
+    jwtBlacklistService.blacklistJti(
+        refreshJti,
+        jwtService.extractExpiration(token).toInstant()
+    );
 
     RefreshToken refreshToken = refreshTokenRepository
             .findByToken(token)

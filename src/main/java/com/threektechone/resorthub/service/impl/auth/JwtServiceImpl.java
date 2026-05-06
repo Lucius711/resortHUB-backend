@@ -1,6 +1,7 @@
 package com.threektechone.resorthub.service.impl.auth;
 
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -32,6 +33,7 @@ public class JwtServiceImpl implements JwtService {
     public String generateAccessToken(UserDetails userDetails) {
         // Implementation for generating JWT token based on user details
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(userDetails.getUsername())
                 .claim("roles", userDetails.getAuthorities())
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -45,6 +47,7 @@ public class JwtServiceImpl implements JwtService {
     public String generateRefreshToken(UserDetails userDetails) {
         // Implementation for generating refresh JWT token based on user details
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(userDetails.getUsername())
                 .claim("roles", userDetails.getAuthorities())
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -58,6 +61,11 @@ public class JwtServiceImpl implements JwtService {
     public String extractEmail(String token) {
         // Implementation for extracting email from JWT token
         return extractAllClaims(token).getSubject(); // Placeholder return statement
+    }
+
+    @Override
+    public String extractJti(String token) {
+        return extractAllClaims(token).getId();
     }
     
 
