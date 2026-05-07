@@ -1,5 +1,7 @@
 package com.threektechone.resorthub.service.impl.owner;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,6 @@ import com.threektechone.resorthub.service.common.BookingPriceCalculator;
 import com.threektechone.resorthub.service.owner.OwnerBookingService;
 
 import lombok.RequiredArgsConstructor;
-
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
 
         Boolean checkInTimeValid = bookingTimePolicy.isCheckInTimeValid(booking);
 
-        return checkInPolicy.canCheckIn(booking, roomAvailable,checkInTimeValid);
+        return checkInPolicy.canCheckIn(booking, roomAvailable, checkInTimeValid);
     }
 
     private Boolean canCheckOut(Booking booking) {
@@ -61,16 +62,18 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
     }
 
     @Override
-    public Page<OwnerBookingListResponseDTO> getOwnerBookings(String email, String searchkey, BookingStatus status, Pageable pageable) {
+    public Page<OwnerBookingListResponseDTO> getOwnerBookings(String email, String searchkey, BookingStatus status,
+            Pageable pageable) {
         Page<Booking> bookingList = bookingRepository.getOwnerBookings(email, searchkey, status, pageable);
 
         return bookingList.map(bookingMapper::toOwnerBookingListResponseDTO);
     }
 
     @Override
+    @Cacheable(cacheNames = "owner-booking-detail", key = "#bookingId + '-' + #ownerEmail", unless = "#result == null")
     public OwnerBookingDetailResponseDTO getOwnerBookingDetail(int bookingId, String ownerEmail) {
         Booking booking = bookingRepository.findById(bookingId)
-        .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
 
         ensureOwnerAccess(booking, ownerEmail);
 
@@ -79,8 +82,8 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
         Boolean roomAvailable = !occupied;
 
         Boolean canCheckIn = canCheckIn(booking);
-        
-        Boolean canCheckOut =canCheckOut(booking);
+
+        Boolean canCheckOut = canCheckOut(booking);
 
         OwnerBookingDetailResponseDTO dto = bookingMapper.toOwnerBookingDetailResponseDTO(booking);
         dto.setMealPrice(bookingPriceCalculator.calculateMealCost(dto.getMeals()));
@@ -91,30 +94,31 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "owner-booking-detail", key = "#bookingId + '-' + #ownerEmail")
     public void reviewBooking(BookingRequestDecisionDTO dto, int bookingId, String ownerEmail) {
         Booking booking = bookingRepository.findById(bookingId)
-        .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
 
         ensureOwnerAccess(booking, ownerEmail);
 
         if (booking.getStatus() != BookingStatus.PENDING) {
-           throw new RequestAlreadyReviewedException("Request already reviewed");
+            throw new RequestAlreadyReviewedException("Request already reviewed");
         }
 
         if (dto.getAction() == ReviewAction.APPROVE) {
             booking.setStatus(BookingStatus.APPROVED);
-        }
-        else if (dto.getAction() == ReviewAction.REJECT) {
+        } else if (dto.getAction() == ReviewAction.REJECT) {
             booking.setStatus(BookingStatus.REJECTED);
             booking.setReason(dto.getReason());
-        }      
+        }
         bookingRepository.save(booking);
     }
 
     @Override
+    @CacheEvict(cacheNames = "owner-booking-detail", key = "#bookingId + '-' + #ownerEmail")
     public void checkIn(int bookingId, String ownerEmail) {
         Booking booking = bookingRepository.findById(bookingId)
-        .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
 
         ensureOwnerAccess(booking, ownerEmail);
 
@@ -130,7 +134,7 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
     @Override
     public void checkOut(int bookingId, String ownerEmail) {
         Booking booking = bookingRepository.findById(bookingId)
-        .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
 
         ensureOwnerAccess(booking, ownerEmail);
 
@@ -143,6 +147,4 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
         bookingRepository.save(booking);
     }
 
-
-    
 }

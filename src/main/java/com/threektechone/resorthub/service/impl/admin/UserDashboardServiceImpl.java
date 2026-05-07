@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.threektechone.resorthub.dto.admin.ActiveUserDTO;
@@ -30,12 +31,13 @@ public class UserDashboardServiceImpl implements UserDashboardService {
     private final ChartMapper chartMapper;
 
     @Override
+    @Cacheable(cacheNames = "admin-user-dashboard", key = "'dashboard'", unless = "#result == null")
     public UserDashboardDto getDashboard() {
         LocalDate today = LocalDate.now();
 
         LocalDateTime startToday = today.atStartOfDay();
         LocalDateTime endToday = today.plusDays(1).atStartOfDay();
-        
+
         LocalDateTime startYesterday = today.minusDays(1).atStartOfDay();
         LocalDateTime endYesterday = today.atStartOfDay();
 
@@ -47,8 +49,8 @@ public class UserDashboardServiceImpl implements UserDashboardService {
         int yesterdayCount = userRepository.countUsersByCreatedAtBetween(startYesterday, endYesterday);
 
         double percentage = yesterdayCount == 0 ? 100
-        : (todayCount - yesterdayCount) * 100.0 / yesterdayCount;
-        PeriodDTO dailyPeriod = new PeriodDTO(todayCount, yesterdayCount,percentage);
+                : (todayCount - yesterdayCount) * 100.0 / yesterdayCount;
+        PeriodDTO dailyPeriod = new PeriodDTO(todayCount, yesterdayCount, percentage);
         GrowthDTO growth = new GrowthDTO(dailyPeriod);
 
         int dailyActive = userRepository.countActiveUsers(UserStatus.ACTIVE, startToday, endToday);
@@ -66,7 +68,7 @@ public class UserDashboardServiceImpl implements UserDashboardService {
         List<UserChartProjection> chartData = userRepository.getUserChart(start7Days);
         List<UserChartDTO> chart = chartMapper.toUserChartDTOList(chartData);
 
-        return new UserDashboardDto(total,growth,active,byRole,newVsReturning,chart);
+        return new UserDashboardDto(total, growth, active, byRole, newVsReturning, chart);
     }
-    
+
 }

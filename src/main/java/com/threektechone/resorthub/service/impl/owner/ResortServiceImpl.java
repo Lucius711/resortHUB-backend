@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -88,7 +90,6 @@ public class ResortServiceImpl implements ResortService {
         return resort.getCompletedSteps() >= resort.getTotalSteps();
     }
 
-
     // Create resort registraton request
     @Override
     public int createRegistrationResort(String email) {
@@ -103,6 +104,7 @@ public class ResortServiceImpl implements ResortService {
 
     // Update resort basic-info
     @Override
+    @CacheEvict(cacheNames = "owner-resort-detail", key = "#resortId + '-' + #ownerEmail")
     public void updateBasicInfoResort(RegisterBasicInfoRequestDTO dto, int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
@@ -118,6 +120,7 @@ public class ResortServiceImpl implements ResortService {
 
     // Update capacity price resort
     @Override
+    @CacheEvict(cacheNames = "owner-resort-detail", key = "#resortId + '-' + #ownerEmail")
     public void updateCapacityPriceResort(RegisterCapacityPricingRequestDTO dto, int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
@@ -132,6 +135,7 @@ public class ResortServiceImpl implements ResortService {
 
     // Update resort amenities
     @Override
+    @CacheEvict(cacheNames = "owner-resort-detail", key = "#resortId + '-' + #ownerEmail")
     public void updateAmenitiesResort(RegisterAmenitiesRequestDTO dto, int resortId, String ownerEmail) {
 
         Resort resort = resortRepository.findById(resortId)
@@ -147,6 +151,7 @@ public class ResortServiceImpl implements ResortService {
 
     // Update resort images
     @Override
+    @CacheEvict(cacheNames = "owner-resort-detail", key = "#resortId + '-' + #ownerEmail")
     public void updateImagesResort(RegisterImagesRequestDTO dto, int resortId, String ownerEmail) {
 
         Resort resort = resortRepository.findById(resortId)
@@ -166,6 +171,7 @@ public class ResortServiceImpl implements ResortService {
 
     // Update resort menu
     @Override
+    @CacheEvict(cacheNames = "owner-resort-detail", key = "#resortId + '-' + #ownerEmail")
     public void updateMenusResort(RegisterMenusRequestDTO dto, int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
@@ -186,6 +192,7 @@ public class ResortServiceImpl implements ResortService {
 
     // Submit resort registration
     @Override
+    @CacheEvict(cacheNames = "owner-resort-detail", key = "#resortId + '-' + #ownerEmail")
     public void submitRegisterResort(int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
@@ -199,6 +206,7 @@ public class ResortServiceImpl implements ResortService {
 
     // sign contract
     @Override
+    @CacheEvict(cacheNames = "owner-resort-detail", key = "#resortId + '-' + #ownerEmail")
     public void signContract(int resortId, MultipartFile file, Boolean acceptedTerms, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
@@ -233,70 +241,71 @@ public class ResortServiceImpl implements ResortService {
 
         return resortList.map(resortMapper::toOwnerResortList);
     }
-    
-    //Get owner resorts detail
+
+    // Get owner resorts detail
     @Override
+    @Cacheable(cacheNames = "owner-resort-detail", key = "#resortId + '-' + #ownerEmail", unless = "#result == null")
     public OwnerResortsDetailResponseDTO getOwnerResortsDetail(int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         OwnerResortsDetailResponseDTO dto = resortMapper.toOwnerResortsDetail(resort);
         return dto;
     }
-    
-    //Inactive resort
+
+    // Inactive resort
     @Override
+    @CacheEvict(cacheNames = "owner-resort-detail", key = "#resortId + '-' + #ownerEmail")
     public void inactiveResort(int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         if (!isRegistrationCompleted(resort)) {
-            throw new InvalidResortStatusException("Resort must complete all registration steps before changing status");
+            throw new InvalidResortStatusException(
+                    "Resort must complete all registration steps before changing status");
         }
 
         if (!resort.getOwner().getEmail().equals(ownerEmail)) {
             throw new UnauthorizedException("You are not the owner of this resort!");
         }
         boolean hasActiveBooking = bookingRepository.existsActiveBooking(
-            resortId,
-            List.of(
-                BookingStatus.PENDING,
-                BookingStatus.APPROVED,
-                BookingStatus.CHECKED_IN
-            )
-        );
+                resortId,
+                List.of(
+                        BookingStatus.PENDING,
+                        BookingStatus.APPROVED,
+                        BookingStatus.CHECKED_IN));
         if (hasActiveBooking) {
             throw new ActiveBookingExistsException("Resort cannot be deactivated while there are active bookings.");
         }
 
-        boolean hasUnfinishedPayment  = bookingRepository.existsUnfinishedPayment(
-            resortId,
-            List.of(
-                PaymentStatus.PENDING
-            )
-        );
+        boolean hasUnfinishedPayment = bookingRepository.existsUnfinishedPayment(
+                resortId,
+                List.of(
+                        PaymentStatus.PENDING));
 
         if (hasUnfinishedPayment) {
-            throw new ActiveUnfinishedPaymentException("Resort cannot be deactivated while there are unfinished payment.");
+            throw new ActiveUnfinishedPaymentException(
+                    "Resort cannot be deactivated while there are unfinished payment.");
         }
 
         if (resort.getStatus() == ResortStatus.INACTIVE) {
             throw new InvalidResortStatusException("Resort is already inactive");
         }
 
-
         resort.setStatus(ResortStatus.INACTIVE);
         resortRepository.save(resort);
     }
 
-    //Active resort
+    // Active resort
     @Override
+    @CacheEvict(cacheNames = "owner-resort-detail", key = "#resortId + '-' + #ownerEmail")
     public void activeResort(int resortId, String ownerEmail) {
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         if (!isRegistrationCompleted(resort)) {
-            throw new InvalidResortStatusException("Resort must complete all registration steps before changing status");
+            throw new InvalidResortStatusException(
+                    "Resort must complete all registration steps before changing status");
         }
 
         if (!resort.getOwner().getEmail().equals(ownerEmail)) {

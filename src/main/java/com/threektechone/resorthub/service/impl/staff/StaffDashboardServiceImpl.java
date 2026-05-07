@@ -2,6 +2,7 @@ package com.threektechone.resorthub.service.impl.staff;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.threektechone.resorthub.dto.staff.ResortStatusChartDTO;
@@ -21,6 +22,11 @@ public class StaffDashboardServiceImpl implements StaffDashboardService {
     private final ChartMapper chartMapper;
 
     @Override
+    @Cacheable(
+        cacheNames = "staff-dashboard",
+        key = "#staffEmail",
+        unless = "#result == null"
+    )
     public StaffDashboardDTO getStaffDashboard(String staffEmail) {
         StaffDashboardDTO dto = new StaffDashboardDTO();
 

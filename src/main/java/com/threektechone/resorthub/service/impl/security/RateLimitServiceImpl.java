@@ -21,7 +21,7 @@ public class RateLimitServiceImpl implements RateLimitService {
     private final DefaultRedisScript<Long> rateLimitScript = createRateLimitScript();
 
     @Override
-public boolean allow(String key, int limit, int windowSeconds) {
+    public boolean allow(String key, int limit, int windowSeconds) {
     String redisKey = "rl:" + key;
 
     long start = System.currentTimeMillis();

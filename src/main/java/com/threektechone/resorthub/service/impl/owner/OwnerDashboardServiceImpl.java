@@ -3,6 +3,7 @@ package com.threektechone.resorthub.service.impl.owner;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.threektechone.resorthub.dto.owner.OwnerBookingChartDTO;
@@ -28,6 +29,7 @@ public class OwnerDashboardServiceImpl implements OwnerDashboardService {
     private final ChartMapper chartMapper;
 
     @Override
+    @Cacheable(cacheNames = "owner-dashboard-overview", key = "#ownerEmail", unless = "#result == null")
     public OwnerOverviewResponseDTO getOwnerOverview(String ownerEmail) {
         double totalRevenue = paymentRepository.getTotalRevenue(ownerEmail);
         double revenueThisMonth = paymentRepository.getRevenueThisMonth(ownerEmail);
@@ -46,44 +48,46 @@ public class OwnerDashboardServiceImpl implements OwnerDashboardService {
         int activeResorts = resortRepository.getActiveResorts(ownerEmail);
 
         return new OwnerOverviewResponseDTO(
-            totalRevenue, 
-            revenueThisMonth, 
-            revenueLastMonth, 
-            growthRate, 
-            averageRating, 
-            totalReviews, 
-            totalBookings, 
-            bookingThisMonth, 
-            totalResorts, 
-            activeResorts);
+                totalRevenue,
+                revenueThisMonth,
+                revenueLastMonth,
+                growthRate,
+                averageRating,
+                totalReviews,
+                totalBookings,
+                bookingThisMonth,
+                totalResorts,
+                activeResorts);
     }
 
     @Override
+    @Cacheable(cacheNames = "owner-revenue-chart", key = "#ownerEmail", unless = "#result == null || #result.isEmpty()")
     public List<OwnerRevenueChartDTO> getOwnerRevenueChart(String ownerEmail) {
         LocalDate today = LocalDate.now();
         LocalDate startDate = today.minusDays(29);
-        List<OwnerRevenueChartDTO> chartData = paymentRepository.getRevenueChart(ownerEmail, 
-            startDate.atStartOfDay(), 
-            today.plusDays(1).atStartOfDay())
-            .stream()
-            .map(chartMapper::toOwnerRevenueChartDTO)
-            .toList();
-        
+        List<OwnerRevenueChartDTO> chartData = paymentRepository.getRevenueChart(ownerEmail,
+                startDate.atStartOfDay(),
+                today.plusDays(1).atStartOfDay())
+                .stream()
+                .map(chartMapper::toOwnerRevenueChartDTO)
+                .toList();
+
         return chartData;
     }
 
     @Override
+    @Cacheable(cacheNames = "owner-booking-chart", key = "#ownerEmail", unless = "#result == null || #result.isEmpty()")
     public List<OwnerBookingChartDTO> getOwnerBookingChart(String ownerEmail) {
         LocalDate today = LocalDate.now();
         LocalDate startDate = today.minusDays(29);
-        List<OwnerBookingChartDTO> chartData = bookingRepository.getBookingChart(ownerEmail, 
-            startDate.atStartOfDay(), 
-            today.plusDays(1).atStartOfDay())
-            .stream()
-            .map(chartMapper::toOwnerBookingChartDTO)
-            .toList();
-        
+        List<OwnerBookingChartDTO> chartData = bookingRepository.getBookingChart(ownerEmail,
+                startDate.atStartOfDay(),
+                today.plusDays(1).atStartOfDay())
+                .stream()
+                .map(chartMapper::toOwnerBookingChartDTO)
+                .toList();
+
         return chartData;
     }
-    
+
 }

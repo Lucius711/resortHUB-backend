@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -58,62 +61,71 @@ public class ReviewServiceImpl implements ReviewService {
     private boolean staffCanManage(String email, Resort resort) {
         return resort.getStaff().getEmail().equals(email);
     }
-    
 
-    //Get register resort list
+    // Get register resort list
     @Override
-    public Page<RegisterResponseListDTO> getAllRegisterResort(String searchkey, ResortStatus status, Pageable pageable) {
+    public Page<RegisterResponseListDTO> getAllRegisterResort(String searchkey, ResortStatus status,
+            Pageable pageable) {
         Page<Resort> registerList = resortRepository.getRegisterResorts(searchkey, status, pageable);
 
         return registerList.map(resortMapper::toRegisterResponseListDTO);
     }
-    
-    //Get register resort detail
+
+    // Get register resort detail
     @Override
+    @Cacheable(cacheNames = "register-resort-detail", key = "#resortId", unless = "#result == null")
     public RegisterResponseDetailDTO getRegisterDetail(int resortId) {
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         RegisterResponseDetailDTO dto = resortMapper.toRegisterResponseDetailDTO(resort);
         return dto;
     }
-    
-    //Review register request from owner
+
+    // Review register request from owner
     @Override
-    public void reviewRegisterRequest(RegisterRequestDecisionDTO dto,int resortId,String email) {
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "register-resort-detail", key = "#resortId"),
+            @CacheEvict(cacheNames = "staff-dashboard", key = "#email")
+    })
+    public void reviewRegisterRequest(RegisterRequestDecisionDTO dto, int resortId, String email) {
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         User staff = userRepository.findByEmail(email)
-        .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         if (resort.getStatus() != ResortStatus.PENDING_REVIEW) {
-           throw new RequestAlreadyReviewedException("Request already reviewed");
+            throw new RequestAlreadyReviewedException("Request already reviewed");
         }
 
         if (dto.getAction() == ReviewAction.APPROVE) {
             resort.setStatus(ResortStatus.APPROVED);
-        }
-        else if (dto.getAction() == ReviewAction.REJECT) {
+        } else if (dto.getAction() == ReviewAction.REJECT) {
             resort.setStatus(ResortStatus.REJECTED);
             resort.setReason(dto.getReason());
         }
-        resort.setStaff(staff);      
+        resort.setStaff(staff);
         resortRepository.save(resort);
     }
-    
-    //send contract to the owner
+
+    // send contract to the owner
     @Override
-    public void sendContract(int resortId, MultipartFile file, String email,ContractType type) throws IOException {
-        String fileUrl = fileStorageService.storeFile(file,"contracts");
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "register-resort-detail", key = "#resortId"),
+            @CacheEvict(cacheNames = "staff-dashboard", key = "#email")
+    })
+    public void sendContract(int resortId, MultipartFile file, String email, ContractType type) throws IOException {
+        String fileUrl = fileStorageService.storeFile(file, "contracts");
 
         Resort resort = resortRepository.findById(resortId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resort not found"));
 
         User staff = userRepository.findByEmail(email)
-        .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if (!staffCanManage(email, resort)) throw new UnauthorizedException("You dont have permission!");
+        if (!staffCanManage(email, resort))
+            throw new UnauthorizedException("You dont have permission!");
 
         if (resort.getStatus() != ResortStatus.APPROVED)
             throw new IllegalStateException("Resort must be APPROVED before sending contract");
@@ -128,34 +140,38 @@ public class ReviewServiceImpl implements ReviewService {
         contractRepository.save(contract);
     }
 
-    
-
-    //Get pending request list
+    // Get pending request list
     @Override
-    public Page<EditResponseListDTO> getEditRequests(RequestStatus status,Pageable pageable) {
+    public Page<EditResponseListDTO> getEditRequests(RequestStatus status, Pageable pageable) {
         Page<EditResortRequest> requestList = requestRepository.getEditRequests(status, pageable);
 
         return requestList.map(requestMapper::toEditResponseListDTO);
     }
-    
-    //View edit request detail
+
+    // View edit request detail
     @Override
+    @Cacheable(cacheNames = "edit-request-detail", key = "#requestId", unless = "#result == null")
     public EditResponseDetailDTO getRequestDetail(int requestId) {
         EditResortRequest request = requestRepository.findById(requestId)
-        .orElseThrow(() -> new ResourceNotFoundException("Request not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found!"));
 
         EditResponseDetailDTO dto = requestMapper.toEditResponseDetailDTO(request);
         return dto;
     }
-    
 
-    //Handle Edit request
+    // Handle Edit request
     @Override
-    public void reviewEditRequest(EditRequestDecisionDTO dto,int requestId,String staffEmail) {
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "edit-request-detail", key = "#requestId"),
+            @CacheEvict(cacheNames = "register-resort-detail", key = "#request.resort.id"),
+            @CacheEvict(cacheNames = "staff-dashboard", key = "#staffEmail")
+    })
+    public void reviewEditRequest(EditRequestDecisionDTO dto, int requestId, String staffEmail) {
         EditResortRequest request = requestRepository.findById(requestId)
-        .orElseThrow(() -> new ResourceNotFoundException("Request not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found!"));
 
-        // Only pending requests can be reviewed, and only the assigned staff can decide.
+        // Only pending requests can be reviewed, and only the assigned staff can
+        // decide.
         if (request.getRequestStatus() != RequestStatus.PENDING) {
             throw new RequestAlreadyReviewedException("Request already reviewed");
         }
@@ -172,28 +188,25 @@ public class ReviewServiceImpl implements ReviewService {
             Map<String, Object> newData;
             try {
                 newData = objectMapper.readValue(
-                    request.getNewData(),
-                    new TypeReference<Map<String, Object>>() {}
-                );
+                        request.getNewData(),
+                        new TypeReference<Map<String, Object>>() {
+                        });
             } catch (IOException e) {
-                throw new InvalidEditRequestDataException("Failed to parse edit request data",e);
+                throw new InvalidEditRequestDataException("Failed to parse edit request data", e);
             }
-            
-            //Handle update
+
+            // Handle update
             resortEditApplier.applyChanges(resort, newData);
 
-            
             resortRepository.save(resort);
             request.setUpdatedAt(LocalDateTime.now());
             request.setRequestStatus(RequestStatus.APPROVED);
-        }
-        else {
+        } else {
             request.setRequestStatus(RequestStatus.REJECTED);
-           
+
         }
         request.setNote(dto.getNote());
         requestRepository.save(request);
     }
 
-  
 }

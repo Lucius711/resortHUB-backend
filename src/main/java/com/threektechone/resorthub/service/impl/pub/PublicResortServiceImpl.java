@@ -1,5 +1,6 @@
 package com.threektechone.resorthub.service.impl.pub;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,12 @@ public class PublicResortServiceImpl implements PublicResortService {
     }
 
     @Override
+    @Cacheable(
+        cacheNames = "public-resort-detail",
+        key = "#resortId",
+        unless = "#result == null"
+    )
+
     public PublicResortResponseDetailDTO getResortDetail(int resortId) {
         Resort resort = resortRepository.findById(resortId)
         .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));

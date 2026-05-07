@@ -3,6 +3,8 @@ package com.threektechone.resorthub.service.impl.customer;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -85,10 +87,10 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         });
 
         Resort resort = resortRepository.findById(resortId)
-        .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resort not found!"));
 
         User customer = userRepository.findByEmail(email)
-        .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         capacityPolicy.validateCapacity(dto.getNumberOfPerson(), resort.getMaxGuest());
 
@@ -99,26 +101,28 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         booking.setStatus(BookingStatus.PENDING);
 
         List<BookingMeal> meals = dto.getMeals()
-            .stream()
-            .map(meal -> bookingMealService.mapToBookingMeal(meal, booking))
-            .toList();
-        
+                .stream()
+                .map(meal -> bookingMealService.mapToBookingMeal(meal, booking))
+                .toList();
+
         booking.setMeals(meals);
         booking.setTotalPrice(bookingPriceCalculator.calculateTotalPrice(resort, dto));
         bookingRepository.save(booking);
     }
 
     @Override
-    public Page<CustomerBookingListResponseDTO> getCustomerBookings(String email, String searchkey, BookingStatus status, Pageable pageable) {
+    public Page<CustomerBookingListResponseDTO> getCustomerBookings(String email, String searchkey,
+            BookingStatus status, Pageable pageable) {
         Page<Booking> bookingList = bookingRepository.getCustomerBookings(email, searchkey, status, pageable);
 
         return bookingList.map(bookingMapper::toCustomerBookingListResponseDTO);
     }
 
     @Override
+    @Cacheable(cacheNames = "customer-booking-detail", key = "#bookingId", unless = "#result == null")
     public CustomerBookingDetailResponseDTO getCustomerBookingDetail(int bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
-        .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
 
         CustomerBookingDetailResponseDTO dto = bookingMapper.toCustomerBookingDetailResponseDTO(booking);
         dto.setMealPrice(bookingPriceCalculator.calculateMealCost(dto.getMeals()));
@@ -127,6 +131,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "customer-booking-detail", allEntries = true)
     public void cancelExpiredBookings() {
         List<Booking> expiredBookings = bookingRepository.findExpiredBookings(LocalDateTime.now());
 
@@ -138,9 +143,10 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "customer-booking-detail", key = "#bookingId")
     public void cancelBookingByCustomer(int bookingId, String customerMail) {
         Booking booking = bookingRepository.findById(bookingId)
-        .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));
 
         cancellationPolicy.validateCancel(booking, customerMail);
 
@@ -148,8 +154,9 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         booking.setCanceledAt(LocalDateTime.now());
         bookingRepository.save(booking);
     }
-    
+
     @Override
+    @CacheEvict(cacheNames = "customer-booking-detail", key = "#bookingId")
     @Transactional
     public BookingCreatedResponseDTO payBooking(int bookingId, String customerEmail, String clientIp) {
         Booking booking = bookingRepository.findById(bookingId)
@@ -201,5 +208,5 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                 .paymentUrl(paymentUrl)
                 .build();
     }
-    
+
 }
