@@ -27,7 +27,6 @@ import com.threektechone.resorthub.repositories.ResortAmenityRepository;
 import com.threektechone.resorthub.repositories.ResortRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -39,40 +38,39 @@ public class ResortDataInit implements CommandLineRunner {
     private final UserRepository userRepository;
     private final ResortAmenityRepository amenityRepository;
 
-    private Faker faker;
-
-    @PostConstruct
-    public void init() {
-        faker = new Faker();
-    }
+    private final Faker faker = new Faker();
+    private final Random random = new Random();
 
     @Transactional
     @Override
     public void run(String... args) {
 
-        if (resortRepository.count() > 0)
+        if (resortRepository.count() > 0) {
+            System.out.println("⚠ Resorts already exist -> skip");
             return;
+        }
 
-        List<User> owners = userRepository.findAll()
-                .stream()
-                .filter(u -> u.getRole().getRoleName() == RoleName.OWNER)
+        List<User> owners = userRepository.findAll().stream()
+                .filter(u -> u.getRole() != null
+                        && RoleName.OWNER.equals(u.getRole().getRoleName()))
                 .toList();
 
-        List<User> staffs = userRepository.findAll()
-                .stream()
-                .filter(u -> u.getRole().getRoleName() == RoleName.STAFF)
+        List<User> staffs = userRepository.findAll().stream()
+                .filter(u -> u.getRole() != null
+                        && RoleName.STAFF.equals(u.getRole().getRoleName()))
                 .toList();
 
         List<ResortAmenity> amenities = amenityRepository.findAll();
 
-        if (owners.isEmpty() || amenities.isEmpty())
+        if (owners.isEmpty() || amenities.isEmpty()) {
+            System.out.println("❌ Missing OWNER or amenities");
             return;
+        }
 
         for (int i = 0; i < 10; i++) {
 
-            User owner = owners.get(faker.random().nextInt(owners.size()));
-            User staff = staffs.isEmpty() ? null : staffs.get(faker.random().nextInt(staffs.size()));
-            Random random = new Random();
+            User owner = owners.get(random.nextInt(owners.size()));
+            User staff = staffs.isEmpty() ? null : staffs.get(random.nextInt(staffs.size()));
 
             Set<ResortAmenity> randomAmenities = random.ints(0, amenities.size())
                     .distinct()
@@ -100,18 +98,17 @@ public class ResortDataInit implements CommandLineRunner {
                     .amenities(randomAmenities)
                     .build();
 
-            // 🔥 Images
+            // 🔥 IMPORTANT: attach child entities
             List<ResortImage> images = List.of(
                     ResortImage.builder()
                             .imageUrl("https://source.unsplash.com/400x300/?resort&sig=" + faker.number().digits(3))
                             .resort(resort)
                             .build(),
                     ResortImage.builder()
-                            .imageUrl("https://source.unsplash.com/400x300/?hotel&sig=" + faker.number().digits(3))
+                            .imageUrl("https://source.unsplash.com/400x300/?villa&sig=" + faker.number().digits(3))
                             .resort(resort)
                             .build());
 
-            // 🔥 Menu
             List<ResortMenu> menus = List.of(
                     createMenu(resort, MenuCategory.MAIN),
                     createMenu(resort, MenuCategory.DRINK),
