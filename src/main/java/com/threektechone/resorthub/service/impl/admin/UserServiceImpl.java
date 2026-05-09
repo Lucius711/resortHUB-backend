@@ -17,10 +17,14 @@ import com.threektechone.resorthub.dto.admin.UserListResponseDTO;
 import com.threektechone.resorthub.enums.RoleName;
 import com.threektechone.resorthub.enums.UserStatus;
 import com.threektechone.resorthub.mapper.user.UserMapper;
+import com.threektechone.resorthub.models.Province;
 import com.threektechone.resorthub.models.Role;
 import com.threektechone.resorthub.models.User;
+import com.threektechone.resorthub.models.Ward;
+import com.threektechone.resorthub.repositories.ProvinceRepository;
 import com.threektechone.resorthub.repositories.RoleRepository;
 import com.threektechone.resorthub.repositories.UserRepository;
+import com.threektechone.resorthub.repositories.WardRepository;
 import com.threektechone.resorthub.service.admin.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,61 +35,72 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final ProvinceRepository provinceRepository;
+
+    private final WardRepository wardRepository;
+
     private final UserMapper userMapper;
 
     private final RoleRepository roleRepository;
 
     private final PasswordEncoder passwordEncoder;
-    
 
-    //getAllusers with search,gender,roleName and page
+    // getAllusers with search,gender,roleName and page
     @Override
-    public Page<UserListResponseDTO> getAllUsers(String search,Boolean gender,RoleName roleName,UserStatus status,Pageable pageable) {
+    public Page<UserListResponseDTO> getAllUsers(String search, Boolean gender, RoleName roleName, UserStatus status,
+            Pageable pageable) {
 
-        Page<User> userList = userRepository.getUserListWithSearchAndFilterAndPagination(search, gender, roleName,status, pageable);
-        
+        Page<User> userList = userRepository.getUserListWithSearchAndFilterAndPagination(search, gender, roleName,
+                status, pageable);
+
         return userList.map(userMapper::toUserListDTO);
     }
-    
 
-    //Update information about user
+    // Update information about user
     @Override
-    public UserDetailResponseDTO updateUser(int id,UserDetailRequestDTO dto) {
+    public UserDetailResponseDTO updateUser(int id, UserDetailRequestDTO dto) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        
 
         user.setFullName(dto.getFullName());
         user.setGender(dto.getGender());
         user.setPhone(dto.getPhone());
         user.setDob(dto.getDob());
-        user.setCity(dto.getCity());
+        Province province = provinceRepository.findById(dto.getProvinceId())
+                .orElseThrow(() -> new ResourceNotFoundException("Province not found"));
+
+        user.setProvince(province);
+
+        Ward ward = wardRepository.findById(dto.getWardId())
+                .orElseThrow(() -> new ResourceNotFoundException("Ward not found"));
+
+        user.setWard(ward);
 
         userRepository.save(user);
 
         return userMapper.toUserDetailResponseDTO(user);
     }
-    
-    //Update role of a user
+
+    // Update role of a user
     @Override
     public UserDetailResponseDTO updateRole(int id, UpdateRoleRequestDTO dto) {
         User user = userRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Role role = roleRepository.findByRoleName(dto.getRoleName())
-        .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
         user.setRole(role);
 
         userRepository.save(user);
-        
+
         return userMapper.toUserDetailResponseDTO(user);
     }
-    
-    //Update status of user
+
+    // Update status of user
     @Override
     public UserDetailResponseDTO updateStatus(int id, UpdateStatusRequestDTO dto) {
         User user = userRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setStatus(dto.getStatus());
 
@@ -94,19 +109,23 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDetailResponseDTO(user);
     }
 
-    //Delete User with anonymize user details
+    // Delete User with anonymize user details
     @Override
     public void deleteUser(int id) {
+
         User user = userRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setFullName("Deleted User");
         user.setEmail("deleted_" + user.getUserId() + "@system.local");
-        user.setDob(LocalDate.of(1900,1,1));
+        user.setDob(LocalDate.of(1900, 1, 1));
         user.setPhone("0000000000");
-        user.setCity("N/A");
+        user.setProvince(null);
+        user.setWard(null);
+
         user.setStatus(UserStatus.INACTIVE);
         user.setIsDeleted(true);
+
         user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
 
         userRepository.save(user);

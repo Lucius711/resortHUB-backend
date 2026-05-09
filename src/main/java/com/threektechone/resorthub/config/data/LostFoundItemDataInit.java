@@ -19,7 +19,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(9)
+@Order(11)
 @RequiredArgsConstructor
 public class LostFoundItemDataInit implements CommandLineRunner {
 

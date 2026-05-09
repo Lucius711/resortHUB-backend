@@ -15,17 +15,18 @@ import com.threektechone.resorthub.repositories.ResortAmenityRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(2) // sau Role/User
+@Order(5) // sau Role/User
 @RequiredArgsConstructor
 public class ResortAmenityDataInit implements CommandLineRunner {
 
     private final ResortAmenityRepository amenityRepository;
-    
+
     @Transactional
     @Override
     public void run(String... args) {
 
-        if (amenityRepository.count() > 0) return;
+        if (amenityRepository.count() > 0)
+            return;
 
         List<ResortAmenity> amenities = Arrays.stream(AmenityName.values())
                 .map(name -> ResortAmenity.builder()

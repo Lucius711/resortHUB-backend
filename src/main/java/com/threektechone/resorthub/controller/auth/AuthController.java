@@ -1,7 +1,10 @@
 package com.threektechone.resorthub.controller.auth;
+
 import java.time.LocalDateTime;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +14,7 @@ import com.threektechone.resorthub.common.response.ApiResponse;
 import com.threektechone.resorthub.dto.auth.AuthRequestDTO;
 import com.threektechone.resorthub.dto.auth.AuthResponseDTO;
 import com.threektechone.resorthub.dto.auth.RefreshTokenRequestDTO;
+import com.threektechone.resorthub.dto.auth.UserAccountDTO;
 import com.threektechone.resorthub.dto.auth.VerifyOTPRequestDTO;
 import com.threektechone.resorthub.service.auth.AuthService;
 
@@ -20,14 +24,15 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    
+
     private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<String>> register(@RequestBody AuthRequestDTO authRequestDTO) {
         authService.register(authRequestDTO);
 
-        ApiResponse<String> response =new ApiResponse<>(201, null, "User registered successfully", LocalDateTime.now());
+        ApiResponse<String> response = new ApiResponse<>(201, null, "User registered successfully",
+                LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
@@ -43,24 +48,44 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> verifyOtp(@RequestBody VerifyOTPRequestDTO request) {
         authService.verifyOTP(request);
 
-        ApiResponse<String> response =new ApiResponse<>(201, null, "Verify OTP successful. Account created!", LocalDateTime.now());
+        ApiResponse<String> response = new ApiResponse<>(201, null, "Verify OTP successful. Account created!",
+                LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<ApiResponse<String>> resendOtp(Authentication authentication) {
+        String email = authentication.getName();
+
+        authService.resendOTP(email);
+
+        ApiResponse<String> response = new ApiResponse<>(200, null, "Resend OTP successfully!", LocalDateTime.now());
+
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh-token")
     public ResponseEntity<ApiResponse<AuthResponseDTO>> refreshToken(@RequestBody RefreshTokenRequestDTO request) {
 
-        ApiResponse<AuthResponseDTO> response = new ApiResponse<>(200,null,authService.refreshToken(request),LocalDateTime.now());
+        ApiResponse<AuthResponseDTO> response = new ApiResponse<>(200, null, authService.refreshToken(request),
+                LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout(@RequestBody RefreshTokenRequestDTO request) {
         authService.logout(request);
-        
-        ApiResponse<String> response =new ApiResponse<>(201, null, "Logout successfully!", LocalDateTime.now());
+
+        ApiResponse<String> response = new ApiResponse<>(201, null, "Logout successfully!", LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
-    
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserAccountDTO>> getMe(Authentication authentication) {
+        String email = authentication.getName();
+        UserAccountDTO user = authService.getMe(email);
+        ApiResponse<UserAccountDTO> response = new ApiResponse<>(200, null, user, LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
 
 }

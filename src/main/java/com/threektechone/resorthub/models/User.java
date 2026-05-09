@@ -39,7 +39,10 @@ public class User {
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
-    
+
+    @Column(name = "user_code", unique = true, nullable = false)
+    private String userCode;
+
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
@@ -49,23 +52,28 @@ public class User {
     @Column(name = "gender", nullable = false)
     private Boolean gender;
 
-    @Column(name ="dob", nullable = false)
+    @Column(name = "dob", nullable = false)
     private LocalDate dob;
 
-    @Column(name="image",nullable=true)
+    @Column(name = "image", nullable = true)
     private String image;
 
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 
-    @Column(name = "phone", nullable = false, length = 20,unique = true)
+    @Column(name = "phone", nullable = false, length = 20, unique = true)
     private String phone;
 
-    @Column(name="city", length = 50,nullable = false)
-    private String city;
-    
+    @ManyToOne
+    @JoinColumn(name = "province_id", nullable = false)
+    private Province province;
+
+    @ManyToOne
+    @JoinColumn(name = "ward_id", nullable = false)
+    private Ward ward;
+
     @Enumerated(EnumType.STRING)
-    @Column(name="status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, length = 20)
     private UserStatus status;
 
     @Column(nullable = false)
@@ -75,9 +83,9 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
-    
+
     @CreationTimestamp
-    @Column(name = "created_at",nullable = false,updatable=false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "owner")
@@ -101,7 +109,7 @@ public class User {
     @OneToMany(mappedBy = "receiver")
     private List<ChatMessage> receivedMessages;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RefreshToken> refreshTokens;
 
     @OneToMany(mappedBy = "user")

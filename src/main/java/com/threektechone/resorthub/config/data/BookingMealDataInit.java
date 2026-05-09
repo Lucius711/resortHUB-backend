@@ -19,7 +19,7 @@ import com.threektechone.resorthub.repositories.BookingRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(5)
+@Order(8)
 @RequiredArgsConstructor
 public class BookingMealDataInit implements CommandLineRunner {
 

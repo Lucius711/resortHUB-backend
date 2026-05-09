@@ -22,7 +22,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(8)
+@Order(9)
 @RequiredArgsConstructor
 public class EditResortRequestDataInit implements CommandLineRunner {
 

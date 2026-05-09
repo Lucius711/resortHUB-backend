@@ -12,5 +12,4 @@ import lombok.Setter;
 public class VerifyOTPRequestDTO {
     private String email;
     private String otpCode;
-
 }

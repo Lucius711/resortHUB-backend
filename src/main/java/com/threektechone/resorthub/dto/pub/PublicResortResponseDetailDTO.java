@@ -20,7 +20,9 @@ public class PublicResortResponseDetailDTO {
     private String district;
     private String city;
     private String address;
-    private ResortType type; 
+    private BigDecimal lattitude;
+    private BigDecimal longitude;
+    private ResortType type;
     private String description;
     private int maxGuest;
     private BigDecimal averageRating;

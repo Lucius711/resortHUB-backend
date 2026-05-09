@@ -23,7 +23,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(7)
+@Order(10)
 @RequiredArgsConstructor
 public class ContractDataInit implements CommandLineRunner {
 

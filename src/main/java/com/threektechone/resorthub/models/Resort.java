@@ -52,7 +52,7 @@ public class Resort {
     private User owner;
 
     @ManyToOne
-    @JoinColumn(name="staff_id",nullable=true)
+    @JoinColumn(name = "staff_id", nullable = true)
     private User staff;
 
     @Column(name = "name", nullable = true, length = 150)
@@ -63,15 +63,21 @@ public class Resort {
 
     @Column(name = "type", nullable = true, length = 255)
     private ResortType type;
-    
+
     @Column(name = "city", length = 255)
     private String city;
-    
+
     @Column(name = "district", length = 255)
     private String district;
 
     @Column(name = "address", length = 255)
     private String address;
+
+    @Column(name = "latitude", precision = 10, scale = 7)
+    private BigDecimal latitude;
+
+    @Column(name = "longitude", precision = 10, scale = 7)
+    private BigDecimal longitude;
 
     @Column(name = "max_guests")
     private int maxGuest;
@@ -79,14 +85,14 @@ public class Resort {
     @Column(name = "rating", precision = 2, scale = 1)
     private BigDecimal averageRating;
 
-    @Column(name = "reason",length=255,nullable=true)
+    @Column(name = "reason", length = 255, nullable = true)
     private String reason;
 
     @OneToMany(mappedBy = "resort")
     private List<ResortReview> reviews;
 
     @ManyToMany
-    @JoinTable(name = "resort_amenity_map",joinColumns = @JoinColumn(name = "resort_id"),inverseJoinColumns = @JoinColumn(name = "amenity_id"))
+    @JoinTable(name = "resort_amenity_map", joinColumns = @JoinColumn(name = "resort_id"), inverseJoinColumns = @JoinColumn(name = "amenity_id"))
     private Set<ResortAmenity> amenities;
 
     @OneToMany(mappedBy = "resort", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -95,9 +101,9 @@ public class Resort {
     @Column(name = "price", precision = 12, scale = 2)
     private BigDecimal price;
 
-    @OneToMany(mappedBy = "resort",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "resort", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ResortImage> images;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private ResortStatus status;
@@ -105,24 +111,24 @@ public class Resort {
     @Enumerated(EnumType.STRING)
     @Column(name = "register_step", nullable = false, length = 20)
     private ResortRegistrationStep step;
-    
+
     @CreationTimestamp
-    @Column(name = "created_at",updatable=false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "resort")
     private List<Booking> bookings;
 
-    @OneToMany(mappedBy = "resort",cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "resort", cascade = CascadeType.PERSIST)
     private List<Contract> contracts;
 
-    @OneToMany(mappedBy= "resort")
+    @OneToMany(mappedBy = "resort")
     private List<EditResortRequest> requests;
 
-    @Column(name="completed_steps")
+    @Column(name = "completed_steps")
     private int completedSteps;
 
-    @Column(name="total_steps")
+    @Column(name = "total_steps")
     private int totalSteps;
 
     public void addContract(Contract contract) {
@@ -130,6 +136,4 @@ public class Resort {
         contract.setResort(this);
     }
 
-    
-    
 }

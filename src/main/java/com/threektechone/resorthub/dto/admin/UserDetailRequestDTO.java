@@ -16,6 +16,7 @@ public class UserDetailRequestDTO {
     private Boolean gender;
     private LocalDate dob;
     private String phone;
-    private String city;
-    
+    private int provinceId;
+    private int wardId;
+
 }

@@ -16,12 +16,14 @@ import lombok.Setter;
 @Setter
 public class UserDetailResponseDTO {
     private int userId;
+    private String userCode;
     private String fullName;
     private String email;
     private Boolean gender;
     private LocalDate dob;
     private String phone;
-    private String city;
+    private int provinceId;
+    private int wardId;
     private UserStatus status;
     private RoleName roleName;
 

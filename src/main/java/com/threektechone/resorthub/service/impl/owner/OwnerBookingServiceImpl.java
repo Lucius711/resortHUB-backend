@@ -132,6 +132,7 @@ public class OwnerBookingServiceImpl implements OwnerBookingService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "owner-booking-detail", key = "#bookingId + '-' + #ownerEmail")
     public void checkOut(int bookingId, String ownerEmail) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found!"));

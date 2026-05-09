@@ -11,15 +11,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AuthRequestDTO {
-
-    private String name;
+public class RegisterCacheDTO {
     private String email;
+    private String name;
     private String phone;
-    private String password;
     private Boolean gender;
     private LocalDate dob;
-    private int provinceId;
-    private int wardId;
-
+    private Integer provinceId;
+    private Integer wardId;
+    private String password;
+    private String otpCode;
 }
