@@ -31,7 +31,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(4)
+@Order(6)
 @RequiredArgsConstructor
 public class ResortDataInit implements CommandLineRunner {
 
@@ -45,12 +45,13 @@ public class ResortDataInit implements CommandLineRunner {
     public void init() {
         faker = new Faker();
     }
-    
+
     @Transactional
     @Override
     public void run(String... args) {
 
-        if (resortRepository.count() > 0) return;
+        if (resortRepository.count() > 0)
+            return;
 
         List<User> owners = userRepository.findAll()
                 .stream()
@@ -64,7 +65,8 @@ public class ResortDataInit implements CommandLineRunner {
 
         List<ResortAmenity> amenities = amenityRepository.findAll();
 
-        if (owners.isEmpty() || amenities.isEmpty()) return;
+        if (owners.isEmpty() || amenities.isEmpty())
+            return;
 
         for (int i = 0; i < 10; i++) {
 
@@ -73,10 +75,10 @@ public class ResortDataInit implements CommandLineRunner {
             Random random = new Random();
 
             Set<ResortAmenity> randomAmenities = random.ints(0, amenities.size())
-            .distinct()
-            .limit(2 + random.nextInt(2))
-            .mapToObj(amenities::get)
-            .collect(Collectors.toSet());
+                    .distinct()
+                    .limit(2 + random.nextInt(2))
+                    .mapToObj(amenities::get)
+                    .collect(Collectors.toSet());
 
             Resort resort = Resort.builder()
                     .resortCode("R-" + UUID.randomUUID().toString().substring(0, 6))
@@ -107,17 +109,14 @@ public class ResortDataInit implements CommandLineRunner {
                     ResortImage.builder()
                             .imageUrl("https://source.unsplash.com/400x300/?hotel&sig=" + faker.number().digits(3))
                             .resort(resort)
-                            .build()
-            );
+                            .build());
 
             // 🔥 Menu
-        List<ResortMenu> menus = List.of(
-            createMenu(resort, MenuCategory.MAIN),
-            createMenu(resort, MenuCategory.DRINK),
-            createMenu(resort, MenuCategory.DESSERT),
-            createMenu(resort, MenuCategory.APPETIZER)
-        );
-
+            List<ResortMenu> menus = List.of(
+                    createMenu(resort, MenuCategory.MAIN),
+                    createMenu(resort, MenuCategory.DRINK),
+                    createMenu(resort, MenuCategory.DESSERT),
+                    createMenu(resort, MenuCategory.APPETIZER));
 
             resort.setImages(images);
             resort.setMenuItems(menus);
@@ -127,39 +126,40 @@ public class ResortDataInit implements CommandLineRunner {
 
         System.out.println("✅ Seeded 10 resorts!");
     }
+
     private ResortMenu createMenu(Resort resort, MenuCategory category) {
 
-    String name;
-    BigDecimal price;
+        String name;
+        BigDecimal price;
 
-    switch (category) {
-        case MAIN -> {
-            name = faker.food().dish();
-            price = BigDecimal.valueOf(faker.number().numberBetween(100000, 300000));
+        switch (category) {
+            case MAIN -> {
+                name = faker.food().dish();
+                price = BigDecimal.valueOf(faker.number().numberBetween(100000, 300000));
+            }
+            case DRINK -> {
+                name = faker.beer().name();
+                price = BigDecimal.valueOf(faker.number().numberBetween(20000, 80000));
+            }
+            case DESSERT -> {
+                name = faker.food().ingredient() + " Cake";
+                price = BigDecimal.valueOf(faker.number().numberBetween(30000, 100000));
+            }
+            case APPETIZER -> {
+                name = faker.food().spice() + " Snack";
+                price = BigDecimal.valueOf(faker.number().numberBetween(50000, 150000));
+            }
+            default -> {
+                name = "Menu";
+                price = BigDecimal.valueOf(50000);
+            }
         }
-        case DRINK -> {
-            name = faker.beer().name();
-            price = BigDecimal.valueOf(faker.number().numberBetween(20000, 80000));
-        }
-        case DESSERT -> {
-            name = faker.food().ingredient() + " Cake";
-            price = BigDecimal.valueOf(faker.number().numberBetween(30000, 100000));
-        }
-        case APPETIZER -> {
-            name = faker.food().spice() + " Snack";
-            price = BigDecimal.valueOf(faker.number().numberBetween(50000, 150000));
-        }
-        default -> {
-            name = "Menu";
-            price = BigDecimal.valueOf(50000);
-        }
+
+        return ResortMenu.builder()
+                .name(name)
+                .price(price)
+                .category(category)
+                .resort(resort)
+                .build();
     }
-
-    return ResortMenu.builder()
-            .name(name)
-            .price(price)
-            .category(category) 
-            .resort(resort)
-            .build();
-}
 }

@@ -30,95 +30,98 @@ import com.threektechone.resorthub.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(7)
+@Order(9)
 @RequiredArgsConstructor
 public class BookingDataInit implements CommandLineRunner {
 
-    private final BookingRepository bookingRepository;
-    private final PaymentRepository paymentRepository;
-    private final BookingMealRepository bookingMealRepository;
-    private final UserRepository userRepository;
-    private final ResortRepository resortRepository;
+        private final BookingRepository bookingRepository;
+        private final PaymentRepository paymentRepository;
+        private final BookingMealRepository bookingMealRepository;
+        private final UserRepository userRepository;
+        private final ResortRepository resortRepository;
 
-    private final Faker faker = new Faker();
-    
-    @Transactional
-    @Override
-    public void run(String... args) {
+        private final Faker faker = new Faker();
 
-        // tránh seed lại
-        if (bookingRepository.count() > 0) return;
+        @Transactional
+        @Override
+        public void run(String... args) {
 
-        List<User> customers = userRepository.findAll()
-                .stream()
-                .filter(u -> u.getRole().getRoleName() == RoleName.CUSTOMER)
-                .toList();
+                // tránh seed lại
+                if (bookingRepository.count() > 0)
+                        return;
 
-        List<Resort> resorts = resortRepository.findAll();
+                List<User> customers = userRepository.findAll()
+                                .stream()
+                                .filter(u -> u.getRole().getRoleName() == RoleName.CUSTOMER)
+                                .toList();
 
-        if (customers.isEmpty() || resorts.isEmpty()) return;
+                List<Resort> resorts = resortRepository.findAll();
 
-        for (int i = 1; i <= 10; i++) {
+                if (customers.isEmpty() || resorts.isEmpty())
+                        return;
 
-            User customer = customers.get(faker.random().nextInt(customers.size()));
-            Resort resort = resorts.get(faker.random().nextInt(resorts.size()));
+                for (int i = 1; i <= 10; i++) {
 
-            LocalDateTime checkIn = LocalDateTime.now().plusDays(faker.number().numberBetween(1, 10));
-            LocalDateTime checkOut = checkIn.plusDays(faker.number().numberBetween(1, 5));
+                        User customer = customers.get(faker.random().nextInt(customers.size()));
+                        Resort resort = resorts.get(faker.random().nextInt(resorts.size()));
 
-            // =========================
-            // BOOKING
-            // =========================
-            Booking booking = Booking.builder()
-                    .bookingCode("BKG" + faker.number().digits(6))
-                    .customer(customer)
-                    .resort(resort)
-                    .checkInDate(checkIn)
-                    .checkOutDate(checkOut)
-                    .numberOfPerson(faker.number().numberBetween(1, 5))
-                    .status(BookingStatus.PENDING)
-                    .acceptedTerms(true)
-                    .totalPrice(BigDecimal.valueOf(faker.number().numberBetween(200, 1000)))
-                    .build();
+                        LocalDateTime checkIn = LocalDateTime.now().plusDays(faker.number().numberBetween(1, 10));
+                        LocalDateTime checkOut = checkIn.plusDays(faker.number().numberBetween(1, 5));
 
-            bookingRepository.save(booking);
+                        // =========================
+                        // BOOKING
+                        // =========================
+                        Booking booking = Booking.builder()
+                                        .bookingCode("BKG" + faker.number().digits(6))
+                                        .customer(customer)
+                                        .resort(resort)
+                                        .checkInDate(checkIn)
+                                        .checkOutDate(checkOut)
+                                        .numberOfPerson(faker.number().numberBetween(1, 5))
+                                        .status(BookingStatus.PENDING)
+                                        .acceptedTerms(true)
+                                        .totalPrice(BigDecimal.valueOf(faker.number().numberBetween(200, 1000)))
+                                        .build();
 
-            // =========================
-            // PAYMENT (1-1)
-            // =========================
-            Payment payment = Payment.builder()
-                    .booking(booking)
-                    .amount(booking.getTotalPrice())
-                    .paymentMethod("CREDIT_CARD")
-                    .paymentStatus(PaymentStatus.PENDING)
-                    .build();
+                        bookingRepository.save(booking);
 
-            paymentRepository.save(payment);
+                        // =========================
+                        // PAYMENT (1-1)
+                        // =========================
+                        Payment payment = Payment.builder()
+                                        .booking(booking)
+                                        .amount(booking.getTotalPrice())
+                                        .paymentMethod("CREDIT_CARD")
+                                        .paymentStatus(PaymentStatus.PENDING)
+                                        .build();
 
-            // set lại cho booking (do OneToOne)
-            booking.setPayment(payment);
-            bookingRepository.save(booking);
+                        paymentRepository.save(payment);
 
-            // =========================
-            // MEAL
-            // =========================
-            if (resort.getMenuItems() != null && !resort.getMenuItems().isEmpty()) {
+                        // set lại cho booking (do OneToOne)
+                        booking.setPayment(payment);
+                        bookingRepository.save(booking);
 
-                ResortMenu menu = resort.getMenuItems()
-                        .get(faker.random().nextInt(resort.getMenuItems().size()));
+                        // =========================
+                        // MEAL
+                        // =========================
+                        if (resort.getMenuItems() != null && !resort.getMenuItems().isEmpty()) {
 
-                BookingMeal meal = BookingMeal.builder()
-                        .booking(booking)
-                        .resortMenu(menu)
-                        .date(LocalDate.now().plusDays(faker.number().numberBetween(1, 5)))
-                        .mealTime(MealTime.values()[faker.random().nextInt(MealTime.values().length)])
-                        .quantity(faker.number().numberBetween(1, 3))
-                        .build();
+                                ResortMenu menu = resort.getMenuItems()
+                                                .get(faker.random().nextInt(resort.getMenuItems().size()));
 
-                bookingMealRepository.save(meal);
-            }
+                                BookingMeal meal = BookingMeal.builder()
+                                                .booking(booking)
+                                                .resortMenu(menu)
+                                                .date(LocalDate.now().plusDays(faker.number().numberBetween(1, 5)))
+                                                .mealTime(MealTime.values()[faker.random()
+                                                                .nextInt(MealTime.values().length)])
+                                                .quantity(faker.number().numberBetween(1, 3))
+                                                .build();
+
+                                bookingMealRepository.save(meal);
+                        }
+                }
+
+                System.out.println("✅ Seeded 10 bookings successfully!");
         }
-
-        System.out.println("✅ Seeded 10 bookings successfully!");
-    }
 }

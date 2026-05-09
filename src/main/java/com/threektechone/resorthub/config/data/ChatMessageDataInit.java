@@ -17,7 +17,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(6)
+@Order(8)
 @RequiredArgsConstructor
 public class ChatMessageDataInit implements CommandLineRunner {
 
@@ -30,17 +30,19 @@ public class ChatMessageDataInit implements CommandLineRunner {
     public void init() {
         faker = new Faker();
     }
-    
+
     @Transactional
     @Override
     public void run(String... args) {
 
         // tránh seed lại
-        if (chatRepository.count() > 0) return;
+        if (chatRepository.count() > 0)
+            return;
 
         List<User> users = userRepository.findAll();
 
-        if (users.size() < 2) return;
+        if (users.size() < 2)
+            return;
 
         for (int i = 0; i < 20; i++) {
 

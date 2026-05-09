@@ -19,23 +19,25 @@ import com.threektechone.resorthub.repositories.BookingRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(8)
+@Order(10)
 @RequiredArgsConstructor
 public class BookingMealDataInit implements CommandLineRunner {
 
     private final BookingMealRepository bookingMealRepository;
     private final BookingRepository bookingRepository;
-    
+
     @Transactional
     @Override
     public void run(String... args) {
 
         // tránh seed lại
-        if (bookingMealRepository.count() > 0) return;
+        if (bookingMealRepository.count() > 0)
+            return;
 
         List<Booking> bookings = bookingRepository.findAll();
 
-        if (bookings.isEmpty()) return;
+        if (bookings.isEmpty())
+            return;
 
         for (int i = 0; i < 10; i++) {
 

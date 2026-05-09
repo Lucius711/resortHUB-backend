@@ -22,7 +22,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(9)
+@Order(11)
 @RequiredArgsConstructor
 public class EditResortRequestDataInit implements CommandLineRunner {
 
@@ -36,13 +36,14 @@ public class EditResortRequestDataInit implements CommandLineRunner {
     public void init() {
         faker = new Faker();
     }
-    
+
     @Transactional
     @Override
     public void run(String... args) {
 
         // tránh seed lại
-        if (requestRepository.count() > 0) return;
+        if (requestRepository.count() > 0)
+            return;
 
         List<Resort> resorts = resortRepository.findAll();
 
@@ -56,7 +57,8 @@ public class EditResortRequestDataInit implements CommandLineRunner {
                 .filter(u -> u.getRole().getRoleName() == RoleName.STAFF)
                 .toList();
 
-        if (resorts.isEmpty() || owners.isEmpty() || staffs.isEmpty()) return;
+        if (resorts.isEmpty() || owners.isEmpty() || staffs.isEmpty())
+            return;
 
         for (int i = 0; i < 10; i++) {
 

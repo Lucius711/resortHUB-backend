@@ -25,7 +25,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(3)
+@Order(4)
 @RequiredArgsConstructor
 public class UserDataInit implements CommandLineRunner {
 

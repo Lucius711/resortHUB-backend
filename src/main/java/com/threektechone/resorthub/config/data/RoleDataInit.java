@@ -15,17 +15,18 @@ import com.threektechone.resorthub.repositories.RoleRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(1)
+@Order(3)
 @RequiredArgsConstructor
 public class RoleDataInit implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
-    
+
     @Transactional
     @Override
     public void run(String... args) {
 
-        if (roleRepository.count() > 0) return;
+        if (roleRepository.count() > 0)
+            return;
 
         List<Role> roles = Arrays.stream(RoleName.values())
                 .map(roleName -> Role.builder()

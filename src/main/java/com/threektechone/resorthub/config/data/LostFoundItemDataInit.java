@@ -19,7 +19,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(11)
+@Order(13)
 @RequiredArgsConstructor
 public class LostFoundItemDataInit implements CommandLineRunner {
 
@@ -32,17 +32,19 @@ public class LostFoundItemDataInit implements CommandLineRunner {
     public void init() {
         faker = new Faker();
     }
-    
+
     @Transactional
     @Override
     public void run(String... args) {
 
         // tránh seed lại
-        if (lostFoundRepository.count() > 0) return;
+        if (lostFoundRepository.count() > 0)
+            return;
 
         List<Booking> bookings = bookingRepository.findAll();
 
-        if (bookings.isEmpty()) return;
+        if (bookings.isEmpty())
+            return;
 
         for (int i = 0; i < 10; i++) {
 
@@ -51,8 +53,8 @@ public class LostFoundItemDataInit implements CommandLineRunner {
             // reporter: thường là customer của booking
             User reporter = booking.getCustomer();
 
-            LostFoundItemStatus status =
-                    LostFoundItemStatus.values()[faker.random().nextInt(LostFoundItemStatus.values().length)];
+            LostFoundItemStatus status = LostFoundItemStatus.values()[faker.random()
+                    .nextInt(LostFoundItemStatus.values().length)];
 
             LostFoundItem item = LostFoundItem.builder()
                     .booking(booking)

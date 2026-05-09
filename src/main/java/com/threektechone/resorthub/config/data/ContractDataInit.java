@@ -23,7 +23,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Order(10)
+@Order(12)
 @RequiredArgsConstructor
 public class ContractDataInit implements CommandLineRunner {
 
@@ -37,13 +37,14 @@ public class ContractDataInit implements CommandLineRunner {
     public void init() {
         faker = new Faker();
     }
-    
+
     @Transactional
     @Override
     public void run(String... args) {
 
         // tránh seed lại
-        if (contractRepository.count() > 0) return;
+        if (contractRepository.count() > 0)
+            return;
 
         List<User> owners = userRepository.findAll()
                 .stream()
@@ -57,7 +58,8 @@ public class ContractDataInit implements CommandLineRunner {
 
         List<Resort> resorts = resortRepository.findAll();
 
-        if (owners.isEmpty() || staffs.isEmpty() || resorts.isEmpty()) return;
+        if (owners.isEmpty() || staffs.isEmpty() || resorts.isEmpty())
+            return;
 
         for (int i = 0; i < 10; i++) {
 
