@@ -1,171 +1,90 @@
-# ResortHub
+<p align="center">
+  <img src="https://spring.io/img/projects/spring-boot.svg" width="120" alt="Spring Boot Logo" />
+</p>
 
-## Introduction
-### 1.Purpose
+<h1 align="center">ResortHUB</h1>
 
-The **Resort Booking & Real-time Chat System** is designed to provide a comprehensive online platform that connects customers, resort owners, staff, and administrators within a centralized system.
+<p align="center">
+  Resort Booking & Real-time Chat System built with Spring Boot
+</p>
 
-The system aims to:
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-21-orange" />
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.0.4-brightgreen" />
+  <img src="https://img.shields.io/badge/PostgreSQL-Database-blue" />
+  <img src="https://img.shields.io/badge/Redis-Cache-red" />
+  <img src="https://img.shields.io/badge/Render-Live-black" />
+</p>
 
-- Provide an online resort booking platform for customers.
-- Allow customers to submit booking requests and track booking status in real time.
-- Enable resort staff and owners to review, approve, or reject booking requests.
-- Offer a real-time chat feature between customers and resorts for each booking.
-- Support administrators in monitoring and managing the overall system operations.
+<p align="center">
+  Spring Boot is a project developed by VMware.  
+  Visit 
+  <a href="https://spring.io/projects/spring-boot">
+    Spring Boot Official Documentation
+  </a>
+  for official resources.
+</p>
 
-### 2. Objectives
+---
 
-The main objectives of the system are:
+## Description
 
-- Optimize the resort booking process.
-- Reduce manual operations and paperwork.
-- Increase transparency in booking and approval workflows.
-- Improve overall customer experience through real-time interaction and clear status tracking.
+ResortHub is a resort booking and real-time communication system that supports customers, resort owners, staff, and administrators on a centralized platform.
 
-By integrating booking management, payment processing, contract handling, and communication features into a single platform, the system ensures efficiency, reliability, and scalability for all stakeholders.
+### Features
+- Resort booking workflow
+- Real-time chat
+- Payment integration
+- Dashboard analytics
+- JWT authentication
 
 ## Tech Stack
 - Java 21
 - Spring Boot
-- MySQL
+- PostgreSQL
+- Redis
+- WebSocket
 
 ## Installation
-1. Clone repo
-2. Run mvn install
-3. Run application
 
-## Project Structure
-```text
-RESORTHUB-backend/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/com/threektechone/resorthub/
-│   │   │   ├── config/          # Security, JWT,Data and WebSocket configuration
-│   │   │   ├── controller/      # REST Controllers
-│   │   │   ├── service/         # Business logic
-│   │   │   │   └── impl/
-│   │   │   ├── repositories/      # JPA Repositories
-│   │   │   ├── models/          # JPA Entities
-│   │   │   ├── ExceptionHandler/          # HandleExceptionHandler
-│   │   │   │   └── CustomException/
-│   │   │   ├── dto/             # Request & Response DTOs
-│   │   │   ├── mapper/          # MapStruct / manual mappers
-│   │   │   ├── websocket/       # WebSocket handlers
-│   │   │   ├── enums/       # Enum value of attribute of entity
-│   │   │   └── ResortHubApplication.java
-│   │   │
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       ├── static/
-│   │       └── templates/
-│   │
-│   └── test/                    # Unit & Integration tests
-│
-├── docs/                        # API & system documentation
-├── pom.xml                      # Maven configuration
-└── README.md
+```bash
+git clone <repo-url>
+cd resorthub-backend
+mvn clean install
 ```
-## API Overview
 
-### 1. Authentication Module
+## Compile and Run the Project
+```bash
+mvn spring-boot:run
+```
 
-| No | Method | Endpoint | Purpose |
-|----|--------|----------|---------|
-| 1 | POST | `/api/auth/register` | Register account |
-| 2 | POST | `/api/auth/verify-otp` | Verify OTP |
-| 3 | POST | `/api/auth/login` | Login account |
-| 4 | POST | `/api/auth/refresh-token` | Generate new access token when expired |
-| 5 | POST | `/api/auth/logout` | Logout account |
+## Live Deployment
+Backend API: https://resorthub-backend.onrender.com
 
----
+## Resources
+- Visit the <a href="https://spring.io/projects/spring-boot">Spring Boot Documentation</a> to learn more about the framework.
+- For questions and support, please visit the <a href="https://stackoverflow.com/questions/tagged/spring-boot">Spring Boot Stack Overflow community</a>.
+- To dive deeper and get more hands-on experience, check out the <a href="https://spring.academy">Spring Academy courses</a>.
+- Deploy your application to production using <a href="https://spring.io/guides">Spring deployment guides</a>.
+- Visualize and monitor your application using <a href="https://docs.spring.io/spring-boot/reference/actuator/index.html">Spring Boot Actuator</a>.
+- Need help with your project (part-time to full-time)? Check out <a href="https://spring.io/support">VMware Spring commercial support</a>.
+- To stay in the loop and get updates, follow <a href="https://twitter.com/springcentral">Spring on X</a> and <a href="https://www.linkedin.com/company/vmware-tanzu/">VMware Tanzu on LinkedIn</a>.
+- Looking for a job, or have a job to offer? Check out the <a href="https://jobs.spring.io">Spring Jobs board</a>.
 
-### 2. User Module (Admin)
 
-| No | Method | Endpoint | Purpose |
-|----|--------|----------|---------|
-| 1 | GET | `/api/admin/users` | View user list with pagination, filter and search |
-| 2 | PUT | `/api/admin/users/{id}` | Update user information |
-| 3 | DELETE | `/api/admin/users/{id}` | Inactive or delete user account |
-| 4 | PATCH | `/api/admin/users/{id}/role` | Insert, update and retrieve user role |
-| 5 | PATCH | `/api/admin/users/{id}/status` | Insert, update and retrieve user status |
+## Support
 
----
+Spring Boot is an open-source framework released under the Apache License 2.0.  
+It continues to grow thanks to the contributions and support from the global Spring community.  
+If you'd like to support the Spring ecosystem, please visit the official Spring website.
 
-### 3. Resort Module
+## Stay in Touch
 
-| No | Method | Endpoint | Purpose |
-|----|--------|----------|---------|
-| 1 | POST | `/api/owner/resorts` | Register new resort for staff review |
-| 2 | PATCH | `/api/staff/resorts/{id}/status` | Accept or reject resort after review |
-| 3 | GET | `/api/resorts` | View accepted resort list |
-| 4 | GET | `/api/staff/resorts` | View accepted and rejected resorts |
-| 5 | GET | `/api/resorts/{id}` | View resort details |
+- Author - VMware and the Spring Team
+- Website - <a href="https://spring.io">https://spring.io</a>
+- X - <a href="https://twitter.com/springcentral">@springcentral</a>
 
----
 
-### 4. Booking Module
+## License
 
-| No | Method | Endpoint | Purpose |
-|----|--------|----------|---------|
-| 1 | POST | `/api/customer/bookings` | Customer books a resort |
-| 2 | DELETE | `/api/customer/bookings/{id}` | Cancel booking if not approved by owner |
-| 3 | PATCH | `/api/owner/bookings/{id}/status` | Owner accepts or rejects booking (PENDING) |
-| 4 | GET | `/api/customer/bookings` | Customer views booking list and status |
-
----
-
-### 5. Payment Module
-
-| No | Method | Endpoint | Purpose |
-|----|--------|----------|---------|
-| 1 | POST | `/api/customer/payments` | Generate payment process and redirect to gateway |
-| 2 | POST | `/api/payments/callback` | Receive payment result and update status |
-| 3 | GET | `/api/customer/payments/{id}` | Check payment status of a booking |
-
----
-
-### 6. Chat Module
-
-## WebSocket Endpoint
-- `/ws/chat` → Real-time connection between Customer, Owner, and Staff  
-
-## Topic Channels
-- `/topic/booking/{bookingId}`
-- `/topic/resort/{resortId}`
-
-### REST APIs
-
-| No | Method | Endpoint | Purpose |
-|----|--------|----------|---------|
-| 1 | GET | `/api/chat/booking/{bookingId}` | Get booking chat history |
-| 2 | GET | `/api/chat/resort/{resortId}` | Get resort chat history |
-
----
-
-### 7. Contract Module
-
-| No | Method | Endpoint | Purpose |
-|----|--------|----------|---------|
-| 1 | POST | `/api/staff/contracts` | Staff creates contract after resort approval |
-| 2 | POST | `/api/owner/contracts` | Owner creates contract after booking approval |
-
----
-
-### 8. Lost Item Report Module
-
-| No | Method | Endpoint | Purpose |
-|----|--------|----------|---------|
-| 1 | POST | `/api/customer/lost-items` | Submit lost item report for a booking |
-| 2 | PATCH | `/api/staff/lost-items/{id}` | Staff processes and updates report status |
-
----
-
-### 9. Dashboard Module
-
-| No | Method | Endpoint | Purpose |
-|----|--------|----------|---------|
-| 1 | GET | `/api/owner/dashboard` | Revenue statistics & performance metrics |
-| 2 | GET | `/api/admin/dashboard` | System overview for administrators |
-
----
+Spring Boot is released under the Apache License 2.0.
