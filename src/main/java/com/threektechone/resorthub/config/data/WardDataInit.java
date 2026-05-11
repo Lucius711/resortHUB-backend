@@ -1,5 +1,6 @@
 package com.threektechone.resorthub.config.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
@@ -42,7 +43,6 @@ public class WardDataInit implements CommandLineRunner {
 
             try {
 
-                // ⚠️ QUAN TRỌNG: dùng code, không dùng id
                 String provinceCode = province.getCode();
                 if (provinceCode == null)
                     continue;
@@ -56,17 +56,23 @@ public class WardDataInit implements CommandLineRunner {
 
                 JsonNode root = objectMapper.readTree(response.getBody());
 
-                // CAS API có thể trả nhiều format
-                JsonNode data = root.has("communes") ? root.get("communes")
-                        : root.has("data") ? root.get("data")
+                JsonNode data = root.has("communes")
+                        ? root.get("communes")
+                        : root.has("data")
+                                ? root.get("data")
                                 : root;
 
                 if (!data.isArray())
                     continue;
 
+                List<Ward> wardsToSave = new ArrayList<>();
+
                 for (JsonNode w : data) {
 
-                    String name = w.has("name") ? w.get("name").asText() : null;
+                    String name = w.has("name")
+                            ? w.get("name").asText()
+                            : null;
+
                     String nameEn = w.has("englishName")
                             ? w.get("englishName").asText()
                             : w.has("nameEn")
@@ -76,20 +82,18 @@ public class WardDataInit implements CommandLineRunner {
                     if (name == null)
                         continue;
 
-                    if (!wardRepository.existsByNameAndProvince_Code(name, provinceCode)) {
+                    Ward ward = new Ward();
+                    ward.setName(name);
+                    ward.setNameEn(nameEn);
+                    ward.setProvince(province);
 
-                        Ward ward = new Ward();
-                        ward.setName(name);
-                        ward.setNameEn(nameEn);
-                        ward.setProvince(province);
-
-                        wardRepository.save(ward);
-                    }
+                    wardsToSave.add(ward);
                 }
+
+                wardRepository.saveAll(wardsToSave);
 
             } catch (Exception e) {
                 System.out.println("⚠ Failed province: " + province.getName());
-                e.printStackTrace();
             }
         }
 

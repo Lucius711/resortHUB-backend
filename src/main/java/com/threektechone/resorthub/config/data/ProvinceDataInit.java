@@ -1,5 +1,6 @@
 package com.threektechone.resorthub.config.data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,11 +52,13 @@ public class ProvinceDataInit implements CommandLineRunner {
 
         List<Map<String, Object>> provinces = objectMapper.convertValue(
                 body.get("provinces"),
-                new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {
+                new com.fasterxml.jackson.core.type.TypeReference<>() {
                 });
 
         if (provinces == null)
             return;
+
+        List<Province> provinceList = new ArrayList<>();
 
         for (Map<String, Object> p : provinces) {
 
@@ -63,16 +66,15 @@ public class ProvinceDataInit implements CommandLineRunner {
             String nameEn = (String) p.get("englishName");
             String code = (String) p.get("code");
 
-            if (provinceRepository.existsByName(name))
-                continue;
-
             Province province = new Province();
             province.setCode(code);
             province.setName(name);
             province.setNameEn(nameEn);
 
-            provinceRepository.save(province);
+            provinceList.add(province);
         }
+
+        provinceRepository.saveAll(provinceList);
 
         System.out.println("✅ Provinces seeded from CAS API");
     }
