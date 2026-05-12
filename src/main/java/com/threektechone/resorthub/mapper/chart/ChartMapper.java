@@ -17,7 +17,7 @@ import com.threektechone.resorthub.repositories.projection.UserRoleCountProjecti
 
 @Mapper(componentModel = "spring")
 public interface ChartMapper {
-    
+
     OwnerRevenueChartDTO toOwnerRevenueChartDTO(OwnerRevenueChartProjection projection);
 
     OwnerBookingChartDTO toOwnerBookingChartDTO(OwnerBookingChartProjection projection);

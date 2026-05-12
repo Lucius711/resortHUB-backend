@@ -11,7 +11,7 @@ import com.threektechone.resorthub.models.ResortMenu;
 
 @Mapper(componentModel = "spring")
 public interface ResortMenuMapper {
-    
+
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "name", source = "name")
     @Mapping(target = "price", source = "price")

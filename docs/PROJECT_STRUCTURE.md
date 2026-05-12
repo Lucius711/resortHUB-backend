@@ -29,6 +29,11 @@ RESORTHUB-backend/
 │   └── test/                    # Unit & Integration tests
 │
 ├── docs/                        # API & system documentation
+├── uploads/                      # Maven configuration
+├── Dockerfile                    # Maven configuration
+├── docker-compose.yml                     # Maven configuration
+├── package.json                     # Maven configuration
+├── package-lock.json                      # Maven configuration
 ├── pom.xml                      # Maven configuration
 └── README.md
 ```
