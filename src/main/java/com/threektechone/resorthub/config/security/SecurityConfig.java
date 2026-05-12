@@ -1,4 +1,5 @@
 package com.threektechone.resorthub.config.security;
+
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -17,7 +18,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import lombok.RequiredArgsConstructor;
 
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -29,31 +29,31 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> {})
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/customer/payments/webhook/**").permitAll()
-                .requestMatchers("/api/resorts/**").permitAll()
-                .requestMatchers("/ws/**").permitAll()
-                .requestMatchers("/", "/chat-test.html", "/static/**", "/webjars/**").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/owner/**").hasRole("OWNER")
-                .requestMatchers("/api/staff/**").hasRole("STAFF")
-                .requestMatchers("/api/customer/**").hasRole("CUSTOMER") 
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterAfter(jwtAuthenticationFilter, RateLimitFilter.class);
-        
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {
+                })
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/customer/payments/webhook/**").permitAll()
+                        .requestMatchers("/api/resorts/**").permitAll()
+                        .requestMatchers("/api/provinces/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/", "/chat-test.html", "/static/**", "/webjars/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/owner/**").hasRole("OWNER")
+                        .requestMatchers("/api/staff/**").hasRole("STAFF")
+                        .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
+                        .anyRequest().authenticated())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtAuthenticationFilter, RateLimitFilter.class);
+
         return http.build();
     }
 
-     @Bean
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
@@ -71,5 +71,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
 }
